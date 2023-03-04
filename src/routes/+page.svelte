@@ -4,6 +4,7 @@
 	import type { ChatCompletionRequestMessage } from "openai";
 	import { dialog } from "../lib/stores";
 	import { afterUpdate } from "svelte";
+	import { fly } from "svelte/transition";
 
 	export let form: ActionData;
 
@@ -12,7 +13,7 @@
 
 	$: $dialog[$dialog.length ? $dialog.length - 1 : 0] = {
 		role: "user",
-		content: question
+		content: question,
 	};
 
 	const onSubmit = () => {
@@ -40,21 +41,42 @@
 <div
 	class="fixed top-0 flex w-full items-center justify-between bg-white bg-opacity-50 p-4 backdrop-blur-md"
 >
-	<a
-		class="underline decoration-indigo-600"
-		href="https://platform.openai.com/docs/models/gpt-3-5"
-	>
-		gpt-3.5-turbo
-	</a>
-	<button class="rounded-3xl bg-red-500 px-4 py-2 text-white" on:click={clear}>
-		Clear Conversation
-	</button>
+	<h1>
+		<a
+			class="underline decoration-indigo-600"
+			href="https://platform.openai.com/docs/models/gpt-3-5"
+		>
+			gpt-3.5-turbo
+		</a>
+	</h1>
+	{#if $dialog.length > 1}
+		<button
+			class="rounded-3xl bg-rose-600 p-2 py-2 text-white"
+			on:click={clear}
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+				stroke-width="1.5"
+				stroke="currentColor"
+				class="h-8 w-8"
+			>
+				<title>clear</title>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					d="M6 18L18 6M6 6l12 12"
+				/>
+			</svg>
+		</button>
+	{/if}
 </div>
 
 <div class="mt-24 flex h-full items-center justify-center">
 	{#if $dialog.length < 2}
 		<div>
-			<p class="rounded-3xl bg-gray-100 p-4">
+			<p class="m-4">
 				May produce inaccurate information. Click
 				<a
 					class="underline decoration-indigo-600"
@@ -66,7 +88,7 @@
 </div>
 
 <div>
-	<section class="px-4 pb-4">
+	<section class="overflow-hidden px-4 pb-4">
 		{#each $dialog as { role, content }, i}
 			{#if i !== $dialog.length - 1 || role !== "user" || loading}
 				<div
@@ -74,6 +96,7 @@
 					class:justify-end={role === "user"}
 				>
 					<p
+						in:fly={{ duration: 400, y: 300 }}
 						class="w-fit max-w-[75vw] whitespace-pre-line rounded-3xl {role ===
 						'user'
 							? 'bg-indigo-600 text-white'
@@ -86,21 +109,24 @@
 		{/each}
 		{#if loading}
 			<div
-				class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 py-1 sm:text-lg"
+				in:fly={{ duration: 400, y: 100 }}
+				class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 pt-1 pb-3 sm:text-lg"
 			>
 				. . .
 			</div>
 		{/if}
 	</section>
 
-	<section class="sticky bottom-0 bg-white bg-opacity-50 p-4 backdrop-blur-md">
+	<section
+		class="sticky bottom-0 bg-white bg-opacity-50 px-4 py-8 backdrop-blur-md sm:py-4"
+	>
 		<form method="POST" use:enhance on:submit={onSubmit}>
 			<input type="hidden" name="dialog" value={JSON.stringify($dialog)} />
 			<div class="flex gap-2">
 				<input
 					type="text"
 					placeholder="Message"
-					class="w-full rounded-full border px-4 py-2 focus:outline-indigo-600 sm:text-lg"
+					class="w-full rounded-full border border-gray-300 px-4 py-2 focus:outline-indigo-600 active:outline-indigo-600 sm:text-lg"
 					name="question"
 					autocomplete="off"
 					autofocus

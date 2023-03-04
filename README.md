@@ -1,9 +1,11 @@
 # gpt.robino.dev
 
-[ChatGPT](https://ai.com) wrapper
+A [ChatGPT](https://ai.com) wrapper, uses form actions for submissions and local storage to persist messages.
 
-- [OpenAI](https://github.com/openai)
+- [openai](https://github.com/openai)
 - [sveltejs/kit](https://github.com/sveltejs/kit)
 - [joshnuss/svelte-local-storage-store](https://github.com/joshnuss/svelte-local-storage-store)
 
-MIT LICENSE
+## LICENSE
+
+MIT
