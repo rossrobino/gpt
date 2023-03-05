@@ -114,7 +114,7 @@
 					required
 				/>
 				<button
-					class="rounded-3xl bg-indigo-600 p-2 text-white disabled:animate-spin disabled:bg-gray-300"
+					class="rounded-3xl bg-indigo-600 p-2 text-white disabled:animate-pulse disabled:bg-gray-300"
 					disabled={loading}
 				>
 					<svg
