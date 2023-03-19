@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { enhance, type SubmitFunction } from "$app/forms";
-	import type { ActionData } from "./$types";
 	import { afterUpdate } from "svelte";
 	import { fly } from "svelte/transition";
 
-	export let form: ActionData;
+	export let form;
 
 	let loading = false;
 
