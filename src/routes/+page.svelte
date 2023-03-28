@@ -11,6 +11,8 @@
 	export let form;
 
 	let messageInput: HTMLInputElement;
+	let clearButton: HTMLButtonElement;
+	let submitButton: HTMLButtonElement;
 
 	let content = "";
 	let role: ChatCompletionRequestMessageRoleEnum = "user";
@@ -20,6 +22,7 @@
 
 	const onSubmit: SubmitFunction = () => {
 		// before response
+		messageInput.blur();
 		loading = true;
 		dialog?.push({ role, content });
 		dialog = dialog;
@@ -42,10 +45,16 @@
 	};
 
 	onMount(() => {
-		// focus message on space bar keyup
 		document.addEventListener("keyup", ({ key }) => {
 			if (key === " ") {
+				// focus message on space bar keyup
 				messageInput.focus();
+			} else if (key === "Escape" && clearButton) {
+				// clear on escape
+				clearButton.click();
+			} else if (key === "Enter") {
+				// submit on enter
+				submitButton.click();
 			}
 		});
 	});
@@ -68,16 +77,19 @@
 	{#if dialog?.length}
 		<!-- delete button -->
 		<form method="POST" action="?/clear" use:enhance={onClear}>
-			<button class="rounded-3xl bg-rose-600 p-2 py-2 text-gray-50">
+			<button
+				class="rounded-3xl bg-rose-600 text-gray-50"
+				bind:this={clearButton}
+			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
 					viewBox="0 0 24 24"
 					stroke-width="1.5"
 					stroke="currentColor"
-					class="h-8 w-8"
+					class="h-12 w-12 p-2 py-2"
 				>
-					<title>Clear</title>
+					<title>Clear (esc)</title>
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -144,14 +156,15 @@
 					required
 				/>
 				<button
-					class="rounded-3xl bg-indigo-600 p-2 text-gray-50 disabled:animate-pulse disabled:bg-gray-200 dark:disabled:bg-gray-800"
+					class="rounded-3xl bg-indigo-600 text-gray-50 disabled:animate-pulse disabled:bg-gray-200 dark:disabled:bg-gray-800"
 					disabled={loading}
+					bind:this={submitButton}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
 						fill="currentColor"
-						class="h-8 w-8"
+						class="h-12 w-12 p-2 py-2"
 					>
 						<title>Submit</title>
 						<path
