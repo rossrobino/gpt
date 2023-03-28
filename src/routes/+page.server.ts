@@ -1,9 +1,9 @@
-import {
-	Configuration,
-	OpenAIApi,
-	type ChatCompletionRequestMessage,
+import type {
+	ChatCompletionRequestMessage,
+	ChatCompletionRequestMessageRoleEnum,
 } from "openai";
-import { OPENAI_API_KEY } from "$env/static/private";
+import { openai } from "$lib/openai.server";
+import { info } from "$lib/info";
 
 export const actions = {
 	chat: async ({ request }) => {
@@ -19,33 +19,38 @@ export const actions = {
 			if (formDialog !== "undefined" && formDialog !== "") {
 				dialog = JSON.parse(formDialog as string);
 			} else {
-				// start of dialog will be empty
 				dialog = [];
 			}
 
-			const question = data.get("question") as string;
-			
+			const question = String(data.get("question"));
+			const role = String(
+				data.get("role"),
+			) as ChatCompletionRequestMessageRoleEnum;
+
 			// push the question onto the dialog
-			dialog.push({ role: "user", content: question });
+			dialog.push({ role, content: question });
 
-			const configuration = new Configuration({
-				apiKey: OPENAI_API_KEY,
-			});
+			if (role === "user") {
+				const context: ChatCompletionRequestMessage[] = [
+					{
+						role: "system",
+						content: "You format all responses in markdown",
+					},
+				];
 
-			const openai = new OpenAIApi(configuration);
+				// send entire dialog to openai each time, not just last question
+				const response = await openai.createChatCompletion({
+					model: info.model,
+					messages: [...context, ...dialog],
+					temperature: 0.8,
+				});
 
-			// send entire dialog to openai each time, not just last question
-			const response = await openai.createChatCompletion({
-				model: "gpt-3.5-turbo",
-				messages: dialog,
-				temperature: 0.8,
-			});
+				const message = response.data.choices[0]
+					.message as ChatCompletionRequestMessage;
 
-			const message = response.data.choices[0]
-				.message as ChatCompletionRequestMessage;
-			
-			// push the response to dialog list
-			dialog.push(message);
+				// push the response to dialog list
+				dialog.push(message);
+			}
 
 			// return entire conversation
 			return { dialog };

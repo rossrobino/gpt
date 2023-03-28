@@ -1,20 +1,41 @@
 <script lang="ts">
 	import { enhance, type SubmitFunction } from "$app/forms";
 	import { afterUpdate } from "svelte";
-	import { fly } from "svelte/transition";
+	import { info } from "$lib/info";
+	import { micromark } from "micromark";
+	import type {
+		ChatCompletionRequestMessage,
+		ChatCompletionRequestMessageRoleEnum,
+	} from "openai";
 
 	export let form;
 
+	let content = "";
+	let role: ChatCompletionRequestMessageRoleEnum = "user";
 	let loading = false;
+	let dialog: ChatCompletionRequestMessage[];
+	$: dialog = form?.dialog as ChatCompletionRequestMessage[];
 
 	const onSubmit: SubmitFunction = () => {
 		// before response
 		loading = true;
+		dialog?.push({ role, content });
+		dialog = dialog;
+		content = "";
+		role = "user";
 		// after response
 		return async ({ update }) => {
-			loading = false;
 			// run default update
 			update();
+			loading = false;
+		};
+	};
+
+	const onClear: SubmitFunction = () => {
+		loading = true;
+		return async ({ update }) => {
+			update();
+			loading = false;
 		};
 	};
 
@@ -26,19 +47,17 @@
 
 <!-- heading -->
 <section
-	class="fixed top-0 flex w-full items-center justify-between bg-white bg-opacity-50 p-4 backdrop-blur-md"
+	class="min-h-[5rem] fixed top-0 flex w-full items-center justify-between p-4 backdrop-blur-lg"
 >
-	<h1>
-		<a
-			class="font-semibold underline decoration-indigo-600"
-			href="https://platform.openai.com/docs/models/gpt-3-5"
-		>
-			gpt-3.5-turbo
+	<h1 class="my-0 text-base dark:text-gray-200">
+		<a href="https://platform.openai.com/docs/models/gpt-3-5">
+			{info.model}
 		</a>
 	</h1>
-	{#if form?.dialog.length}
+	{#if dialog?.length}
+		<!-- delete button -->
 		<form method="POST" action="?/clear" use:enhance>
-			<button class="rounded-3xl bg-rose-600 p-2 py-2 text-white">
+			<button class="rounded-3xl bg-rose-600 p-2 py-2 text-gray-50">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
@@ -59,61 +78,63 @@
 	{/if}
 </section>
 
-<!-- middle -->
-<section class="mt-24 flex h-full items-center justify-center">
-	{#if !form?.dialog.length}
-		<div>
-			<p class="m-4">
-				May produce inaccurate information -
-				<a
-					class="font-semibold underline decoration-indigo-600"
-					href="https://openai.com/blog/chatgpt">learn more about GPT</a
-				>.
-			</p>
-		</div>
-	{/if}
-</section>
+<div />
 
-<div>
+<div class="mt-24">
 	<!-- dialog -->
-	{#if form?.dialog}
+	{#if dialog}
 		<section class="overflow-hidden px-4">
-			{#each form?.dialog as { role, content }}
+			{#each dialog as { role, content }}
 				<div
 					class="mb-4 flex w-full last:mb-0"
 					class:justify-end={role === "user"}
 				>
-					<p
-						in:fly={{ duration: 400, y: 300 }}
-						class="w-fit max-w-[75vw] whitespace-pre-line rounded-3xl {role ===
+					<div
+						class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 sm:text-lg {role ===
 						'user'
-							? 'bg-indigo-600 text-white'
-							: 'bg-gray-200'} px-4 py-3 sm:text-lg"
+							? 'bg-indigo-600 text-gray-50'
+							: 'bg-gray-200 dark:bg-gray-800 dark:text-gray-200'}"
 					>
-						{content.trim()}
-					</p>
+						{@html micromark(content)}
+					</div>
 				</div>
 			{/each}
+			{#if loading}
+				<div
+					class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 py-3 text-xl dark:bg-gray-800 dark:text-gray-200"
+				>
+					. . .
+				</div>
+			{/if}
 		</section>
 	{/if}
 
 	<!-- message form -->
-	<section
-		class="sticky bottom-0 bg-white bg-opacity-50 px-4 pt-4 pb-8 backdrop-blur-md sm:pb-4"
-	>
+	<section class="sticky bottom-0 px-4 pt-4 pb-8 backdrop-blur-lg sm:pb-4">
 		<form method="POST" action="?/chat" use:enhance={onSubmit}>
 			<input type="hidden" name="dialog" value={JSON.stringify(form?.dialog)} />
-			<div class="flex gap-2">
+			<div class="flex">
+				<select
+					name="role"
+					bind:value={role}
+					class="rounded-l-full bg-gray-800 py-2 pl-3 pr-0.5 text-gray-50 focus:outline-indigo-600 active:outline-indigo-600 sm:text-lg"
+				>
+					<option value="user">User</option>
+					<option value="system">System</option>
+				</select>
+				<!-- svelte-ignore a11y-autofocus -->
 				<input
 					type="text"
 					placeholder="Message"
-					class="w-full rounded-full border border-gray-300 px-4 py-2 focus:outline-indigo-600 active:outline-indigo-600 sm:text-lg"
+					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border border-gray-300 px-4 py-2 focus:outline-indigo-600 active:outline-indigo-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
 					name="question"
 					autocomplete="off"
+					bind:value={content}
 					required
+					autofocus
 				/>
 				<button
-					class="rounded-3xl bg-indigo-600 p-2 text-white disabled:animate-pulse disabled:bg-gray-300"
+					class="rounded-3xl bg-indigo-600 p-2 text-gray-50 disabled:animate-pulse disabled:bg-gray-200 dark:disabled:bg-gray-800"
 					disabled={loading}
 				>
 					<svg
