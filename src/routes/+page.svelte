@@ -122,7 +122,6 @@
 					<option value="user">User</option>
 					<option value="system">System</option>
 				</select>
-				<!-- svelte-ignore a11y-autofocus -->
 				<input
 					type="text"
 					placeholder="Message"
@@ -131,7 +130,6 @@
 					autocomplete="off"
 					bind:value={content}
 					required
-					autofocus
 				/>
 				<button
 					class="rounded-3xl bg-indigo-600 p-2 text-gray-50 disabled:animate-pulse disabled:bg-gray-200 dark:disabled:bg-gray-800"
