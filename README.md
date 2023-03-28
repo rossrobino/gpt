@@ -3,7 +3,7 @@
 A progressively enhanced [ChatGPT](https://ai.com) wrapper.
 
 - Works without JavaScript
-- Returns readable answers in markdoc
+- Returns readable answers in markdown
 
 ## Tooling
 
