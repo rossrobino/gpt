@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+	* {
+		@apply appearance-none focus:outline-none focus:outline focus:outline-indigo-400;
+	}
 	h1,
 	h2,
 	h3,

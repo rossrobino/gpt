@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance, type SubmitFunction } from "$app/forms";
-	import { afterUpdate } from "svelte";
+	import { afterUpdate, onMount } from "svelte";
 	import { info } from "$lib/info";
 	import { micromark } from "micromark";
 	import type {
@@ -10,11 +10,13 @@
 
 	export let form;
 
+	let messageInput: HTMLInputElement;
+
 	let content = "";
 	let role: ChatCompletionRequestMessageRoleEnum = "user";
 	let loading = false;
-	let dialog: ChatCompletionRequestMessage[];
-	$: dialog = form?.dialog as ChatCompletionRequestMessage[];
+	let dialog: ChatCompletionRequestMessage[] = [];
+	$: if (form?.dialog) dialog = form?.dialog as ChatCompletionRequestMessage[];
 
 	const onSubmit: SubmitFunction = () => {
 		// before response
@@ -39,6 +41,15 @@
 		};
 	};
 
+	onMount(() => {
+		// focus message on space bar keyup
+		document.addEventListener("keyup", ({ key }) => {
+			if (key === " ") {
+				messageInput.focus();
+			}
+		});
+	});
+
 	afterUpdate(() => {
 		// scroll to bottom after question is updated
 		window.scrollTo(0, document.body.scrollHeight);
@@ -47,7 +58,7 @@
 
 <!-- heading -->
 <section
-	class="min-h-[5rem] fixed top-0 flex w-full items-center justify-between p-4 backdrop-blur-lg"
+	class="fixed top-0 flex min-h-[5rem] w-full items-center justify-between p-4 backdrop-blur-lg"
 >
 	<h1 class="my-0 text-base dark:text-gray-200">
 		<a href="https://platform.openai.com/docs/models/gpt-3-5">
@@ -56,7 +67,7 @@
 	</h1>
 	{#if dialog?.length}
 		<!-- delete button -->
-		<form method="POST" action="?/clear" use:enhance>
+		<form method="POST" action="?/clear" use:enhance={onClear}>
 			<button class="rounded-3xl bg-rose-600 p-2 py-2 text-gray-50">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -110,14 +121,14 @@
 	{/if}
 
 	<!-- message form -->
-	<section class="sticky bottom-0 px-4 pt-4 pb-8 backdrop-blur-lg sm:pb-4">
+	<section class="sticky bottom-0 px-4 pb-8 pt-4 backdrop-blur-lg sm:pb-4">
 		<form method="POST" action="?/chat" use:enhance={onSubmit}>
 			<input type="hidden" name="dialog" value={JSON.stringify(form?.dialog)} />
 			<div class="flex">
 				<select
 					name="role"
 					bind:value={role}
-					class="rounded-l-full bg-gray-800 py-2 pl-3 pr-0.5 text-gray-50 focus:outline-indigo-600 active:outline-indigo-600 sm:text-lg"
+					class="rounded-l-full bg-gray-800 px-4 py-2 text-gray-50 sm:text-lg"
 				>
 					<option value="user">User</option>
 					<option value="system">System</option>
@@ -125,10 +136,11 @@
 				<input
 					type="text"
 					placeholder="Message"
-					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border border-gray-300 px-4 py-2 focus:outline-indigo-600 active:outline-indigo-600 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
+					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
 					name="question"
 					autocomplete="off"
 					bind:value={content}
+					bind:this={messageInput}
 					required
 				/>
 				<button
