@@ -10,6 +10,7 @@
 
 	export let form;
 
+	let innerHeight: number;
 	let messageInput: HTMLInputElement;
 	let clearButton: HTMLButtonElement;
 	let submitButton: HTMLButtonElement;
@@ -17,8 +18,9 @@
 	let content = "";
 	let role: ChatCompletionRequestMessageRoleEnum = "user";
 	let loading = false;
+	let clearing = false;
 	let dialog: ChatCompletionRequestMessage[] = [];
-	$: if (form?.dialog) dialog = form?.dialog as ChatCompletionRequestMessage[];
+	$: if (form?.dialog) dialog = form?.dialog;
 
 	const onSubmit: SubmitFunction = () => {
 		// before response
@@ -37,11 +39,32 @@
 	};
 
 	const onClear: SubmitFunction = () => {
+		clearing = true;
 		loading = true;
 		return async ({ update }) => {
 			update();
 			loading = false;
+			clearing = false;
 		};
+	};
+
+	/**
+	 * sets the background color of a message
+	 * opacity gets lower as the message scrolls up
+	 */
+	const setMessageBackgroundColor = () => {
+		const messages: NodeListOf<HTMLElement> =
+			document.querySelectorAll(".message");
+		if (messages) {
+			messages.forEach((message) => {
+				const messagePositions = message.getBoundingClientRect();
+				const compStyles = window.getComputedStyle(message);
+				const bgColor = compStyles.getPropertyValue("background-color");
+				const rgb = bgColor.split("(")[1].split(")")[0].split(",").slice(0, 3);
+				const a = (messagePositions.bottom / innerHeight) * 0.25 + 0.75;
+				message.style.backgroundColor = `rgba(${rgb},${a})`;
+			});
+		}
 	};
 
 	onMount(() => {
@@ -57,13 +80,19 @@
 				submitButton.click();
 			}
 		});
+		document.addEventListener("scroll", () => {
+			setMessageBackgroundColor();
+		});
 	});
 
 	afterUpdate(() => {
 		// scroll to bottom after question is updated
 		window.scrollTo(0, document.body.scrollHeight);
+		setMessageBackgroundColor();
 	});
 </script>
+
+<svelte:window bind:innerHeight />
 
 <!-- heading -->
 <section
@@ -80,6 +109,7 @@
 			<button
 				class="rounded-3xl bg-rose-600 text-gray-50"
 				bind:this={clearButton}
+				disabled={loading}
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +152,7 @@
 					</div>
 				</div>
 			{/each}
-			{#if loading}
+			{#if loading && !clearing}
 				<div
 					class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 py-3 text-xl dark:bg-gray-800 dark:text-gray-200"
 				>
