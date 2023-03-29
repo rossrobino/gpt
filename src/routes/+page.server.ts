@@ -4,6 +4,12 @@ import type {
 } from "openai";
 import { openai } from "$lib/openai.server";
 import { info } from "$lib/info";
+import { z } from "zod";
+import { JSDOM } from "jsdom";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import rehypeRemark from "rehype-remark";
+import remarkStringify from "remark-stringify";
 
 export const actions = {
 	chat: async ({ request }) => {
@@ -22,13 +28,68 @@ export const actions = {
 				dialog = [];
 			}
 
-			const question = String(data.get("question"));
+			let content = String(data.get("question"));
 			const role = String(
 				data.get("role"),
 			) as ChatCompletionRequestMessageRoleEnum;
 
-			// push the question onto the dialog
-			dialog.push({ role, content: question });
+			if (role === "system") {
+				// check if url
+				const UrlSchema = z.string().url();
+				const safeParse = UrlSchema.safeParse(content);
+
+				// if url
+				if (safeParse.success) {
+					// fetch content
+					const urlRes = await fetch(content);
+					const html = await urlRes.text();
+
+					const { document } = new JSDOM(html).window;
+
+					// select body element
+					const body = document.querySelector("body");
+
+					if (body?.textContent) {
+						if (content.endsWith(".md")) {
+							// set to the content
+							content = body.textContent;
+						} else {
+							// select script elements
+							const scriptElements = body.querySelectorAll("script");
+
+							// remove script tags
+							scriptElements.forEach((script) => {
+								script.parentNode?.removeChild(script);
+							});
+
+							// html to .md
+							const md = await unified()
+								.use(rehypeParse)
+								.use(rehypeRemark)
+								.use(remarkStringify)
+								.process(body.outerHTML);
+
+							// set content equal to md file
+							content = String(md);
+						}
+					}
+				}
+			}
+
+			// push the message onto the dialog
+			dialog.push({ role, content });
+
+			// count characters
+			let characterLength = 0;
+			dialog.forEach(({ content }) => {
+				characterLength += content.length;
+			});
+
+			// if approaching token limit
+			while (characterLength > 16000) {
+				characterLength -= dialog[0].content.length;
+				dialog.shift();
+			}
 
 			if (role === "user") {
 				const context: ChatCompletionRequestMessage[] = [

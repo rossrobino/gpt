@@ -170,14 +170,14 @@
 				<select
 					name="role"
 					bind:value={role}
-					class="rounded-l-full bg-gray-800 px-4 py-2 text-gray-50 sm:text-lg"
+					class="rounded-l-full bg-gray-800 px-4 py-2 text-center text-gray-50 sm:text-lg"
 				>
 					<option value="user">User</option>
 					<option value="system">System</option>
 				</select>
 				<input
 					type="text"
-					placeholder="Message"
+					placeholder={role === "system" ? "Message, URL" : "Message"}
 					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
 					name="question"
 					autocomplete="off"

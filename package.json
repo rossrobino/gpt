@@ -15,6 +15,7 @@
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-vercel": "^2.4.1",
 		"@sveltejs/kit": "^1.14.0",
+		"@types/jsdom": "^21.1.1",
 		"@typescript-eslint/eslint-plugin": "^5.57.0",
 		"@typescript-eslint/parser": "^5.57.0",
 		"autoprefixer": "^10.4.14",
@@ -30,11 +31,17 @@
 		"tailwindcss": "^3.3.0",
 		"tslib": "^2.5.0",
 		"typescript": "^5.0.2",
-		"vite": "^4.2.1"
+		"vite": "^4.2.1",
+		"zod": "^3.21.4"
 	},
 	"type": "module",
 	"dependencies": {
+		"jsdom": "^21.1.1",
 		"micromark": "^3.1.0",
-		"openai": "^3.2.1"
+		"openai": "^3.2.1",
+		"rehype-parse": "^8.0.4",
+		"rehype-remark": "^9.1.2",
+		"remark-stringify": "^10.0.2",
+		"unified": "^10.1.2"
 	}
 }
