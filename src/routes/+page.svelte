@@ -154,7 +154,7 @@
 			{/each}
 			{#if loading && !clearing}
 				<div
-					class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 py-3 text-xl dark:bg-gray-800 dark:text-gray-200"
+					class="w-fit animate-pulse rounded-3xl bg-gray-200 px-4 py-3 dark:bg-gray-800 dark:text-gray-200 sm:text-lg"
 				>
 					. . .
 				</div>
