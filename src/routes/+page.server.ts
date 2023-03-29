@@ -86,9 +86,14 @@ export const actions = {
 			});
 
 			// if approaching token limit
-			while (characterLength > 16000) {
-				characterLength -= dialog[0].content.length;
-				dialog.shift();
+			while (characterLength > 15000) {
+				if (dialog[0].content.length > 100) {
+					characterLength -= 100;
+					dialog[0].content = dialog[0].content.slice(0, -100);
+				} else {
+					characterLength -= dialog[0].content.length;
+					dialog.shift();
+				}
 			}
 
 			if (role === "user") {
