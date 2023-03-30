@@ -2,14 +2,13 @@ import type {
 	ChatCompletionRequestMessage,
 	ChatCompletionRequestMessageRoleEnum,
 } from "openai";
-import { openai } from "$lib/openai.server";
-import { info } from "$lib/info";
+import { createChatCompletion } from "$lib/openai.server";
 import { z } from "zod";
 import { JSDOM } from "jsdom";
-import { unified } from "unified";
-import rehypeParse from "rehype-parse";
-import rehypeRemark from "rehype-remark";
-import remarkStringify from "remark-stringify";
+import { htmlToMd } from "$lib/markdownUtils";
+
+const maxContentLength = 15_000;
+const summarizeLength = 1_000;
 
 export const actions = {
 	chat: async ({ request }) => {
@@ -28,7 +27,7 @@ export const actions = {
 				dialog = [];
 			}
 
-			let content = String(data.get("question"));
+			let content = String(data.get("content"));
 			const role = String(
 				data.get("role"),
 			) as ChatCompletionRequestMessageRoleEnum;
@@ -54,23 +53,15 @@ export const actions = {
 							// set to the content
 							content = body.textContent;
 						} else {
-							// select script elements
-							const scriptElements = body.querySelectorAll("script");
+							// select elements to remove
+							const removeElements = body.querySelectorAll("script, img");
 
-							// remove script tags
-							scriptElements.forEach((script) => {
-								script.parentNode?.removeChild(script);
+							// remove elements
+							removeElements.forEach((el) => {
+								el.parentNode?.removeChild(el);
 							});
 
-							// html to .md
-							const md = await unified()
-								.use(rehypeParse)
-								.use(rehypeRemark)
-								.use(remarkStringify)
-								.process(body.outerHTML);
-
-							// set content equal to md file
-							content = String(md);
+							content = await htmlToMd(body.outerHTML);
 						}
 					}
 				}
@@ -80,39 +71,46 @@ export const actions = {
 			dialog.push({ role, content });
 
 			// count characters
-			let characterLength = 0;
+			let contentLength = 0;
 			dialog.forEach(({ content }) => {
-				characterLength += content.length;
+				contentLength += content.length;
 			});
 
-			// if approaching token limit
-			while (characterLength > 15000) {
-				if (dialog[0].content.length > 100) {
-					characterLength -= 100;
-					dialog[0].content = dialog[0].content.slice(0, -100);
-				} else {
-					characterLength -= dialog[0].content.length;
+			for (const [i, m] of dialog.entries()) {
+				const contentIsToLong = contentLength > maxContentLength;
+				const messageIsToLong = m.content.length > summarizeLength;
+				const lastItemInList = i === dialog.length - 1;
+
+				if (contentIsToLong && messageIsToLong) {
+					try {
+						// try to summarize first
+						const message = await createChatCompletion([
+							{
+								role: "user",
+								content: `summarize this text to under ${summarizeLength} characters: ${m.content}`,
+							},
+						]);
+
+						// adjust content length to summarized content
+						contentLength -= m.content.length;
+						contentLength += message.content.length;
+
+						// set content to the summarized content
+						m.content = message.content;
+					} catch {
+						// if error remove item instead
+						dialog.splice(i, 1);
+					}
+				} else if (contentIsToLong && lastItemInList) {
+					// remove the first message from the dialog
+					contentLength -= dialog[0].content.length;
 					dialog.shift();
 				}
 			}
 
 			if (role === "user") {
-				const context: ChatCompletionRequestMessage[] = [
-					{
-						role: "system",
-						content: "You format all responses in markdown",
-					},
-				];
-
-				// send entire dialog to openai each time, not just last question
-				const response = await openai.createChatCompletion({
-					model: info.model,
-					messages: [...context, ...dialog],
-					temperature: 0.8,
-				});
-
-				const message = response.data.choices[0]
-					.message as ChatCompletionRequestMessage;
+				// send entire dialog to openai each time, not just last message
+				const message = await createChatCompletion(dialog);
 
 				// push the response to dialog list
 				dialog.push(message);

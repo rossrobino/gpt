@@ -2,11 +2,11 @@
 	import { enhance, type SubmitFunction } from "$app/forms";
 	import { afterUpdate, onMount } from "svelte";
 	import { info } from "$lib/info";
-	import { micromark } from "micromark";
 	import type {
 		ChatCompletionRequestMessage,
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
+	import { mdToHtml } from "$lib/markdownUtils";
 
 	export let form;
 
@@ -26,7 +26,9 @@
 		// before response
 		messageInput.blur();
 		loading = true;
-		dialog?.push({ role, content });
+		if (role === "user") {
+			dialog?.push({ role, content });
+		}
 		dialog = dialog;
 		content = "";
 		role = "user";
@@ -39,6 +41,7 @@
 	};
 
 	const onClear: SubmitFunction = () => {
+		// don't show ... when clearing
 		clearing = true;
 		loading = true;
 		return async ({ update }) => {
@@ -49,7 +52,7 @@
 	};
 
 	/**
-	 * sets the background color of a message
+	 * sets the background color of a message,
 	 * opacity gets lower as the message scrolls up
 	 */
 	const setMessageBackgroundColor = () => {
@@ -86,7 +89,7 @@
 	});
 
 	afterUpdate(() => {
-		// scroll to bottom after question is updated
+		// scroll to bottom after dialog is updated
 		window.scrollTo(0, document.body.scrollHeight);
 		setMessageBackgroundColor();
 	});
@@ -148,7 +151,7 @@
 							? 'bg-indigo-600 text-gray-50'
 							: 'bg-gray-200 dark:bg-gray-800 dark:text-gray-200'}"
 					>
-						{@html micromark(content)}
+						{@html mdToHtml(content)}
 					</div>
 				</div>
 			{/each}
@@ -179,17 +182,13 @@
 					type="text"
 					placeholder={role === "system" ? "Message, URL" : "Message"}
 					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
-					name="question"
+					name="content"
 					autocomplete="off"
 					bind:value={content}
 					bind:this={messageInput}
 					required
 				/>
-				<button
-					class="rounded-3xl bg-indigo-600 text-gray-50 disabled:animate-pulse disabled:bg-gray-200 dark:disabled:bg-gray-800"
-					disabled={loading}
-					bind:this={submitButton}
-				>
+				<button disabled={loading} bind:this={submitButton}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
