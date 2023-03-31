@@ -4,13 +4,14 @@
 
 @layer base {
 	* {
-		@apply transition appearance-none;
+		@apply appearance-none transition;
 	}
 	input,
 	select {
 		@apply focus:outline-none;
 	}
-	button, a {
+	button,
+	a {
 		@apply focus:outline-none focus:outline-indigo-600;
 	}
 	html {

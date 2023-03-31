@@ -54,7 +54,9 @@ export const actions = {
 							content = body.textContent;
 						} else {
 							// select elements to remove
-							const removeElements = body.querySelectorAll("script, img");
+							const removeElements = body.querySelectorAll(
+								"script, img, hr, br",
+							);
 
 							// remove elements
 							removeElements.forEach((el) => {

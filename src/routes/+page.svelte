@@ -159,7 +159,9 @@
 							? 'bg-indigo-600'
 							: 'bg-gray-700'}"
 					>
-						{@html mdToHtml(content)}
+						{@html mdToHtml(content)
+							.replace(/(li>\n)/gm, "li>")
+							.replace(/(ul>\n)/gm, "ul>")}
 					</div>
 				</div>
 			{/each}
