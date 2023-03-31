@@ -66,7 +66,7 @@
 				const compStyles = window.getComputedStyle(message);
 				const bgColor = compStyles.getPropertyValue("background-color");
 				const rgb = bgColor.split("(")[1].split(")")[0].split(",").slice(0, 3);
-				const a = (messagePositions.bottom / innerHeight) * 0.35 + 0.65;
+				const a = (messagePositions.bottom / innerHeight) * 0.3 + 0.7;
 				message.style.backgroundColor = `rgba(${rgb},${a})`;
 			});
 		}
