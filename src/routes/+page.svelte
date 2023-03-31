@@ -161,7 +161,7 @@
 					>
 						{@html mdToHtml(content)
 							.replace(/(li>\n)/gm, "li>")
-							.replace(/(ul>\n)/gm, "ul>")}
+							.replace(/(<ul>\n)/gm, "<ul>")}
 					</div>
 				</div>
 			{/each}
@@ -184,7 +184,7 @@
 					name="role"
 					bind:value={role}
 					bind:this={roleSelect}
-					class="rounded-l-full bg-gray-700 px-4 py-2 text-center text-gray-50 sm:text-lg"
+					class="rounded-l-full bg-gray-700 px-4 py-2 text-center text-gray-50 dark:bg-gray-800 sm:text-lg"
 				>
 					<option value="user">User</option>
 					<option value="system">System</option>
