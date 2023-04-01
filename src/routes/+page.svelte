@@ -28,21 +28,25 @@
 		content: "",
 		role: "user",
 		dialog: [],
-	}
+	};
 
 	$: if (form?.dialog) clientForm.dialog = form?.dialog;
 
 	export const snapshot = {
 		capture: () => clientForm,
 		restore: (value) => (clientForm = value),
-	}
+	};
 
+	// submit button
 	const onSubmit: SubmitFunction = () => {
 		// before response
 		messageInput.blur();
 		loading = true;
 		if (clientForm.role === "user") {
-			clientForm.dialog?.push({ role: clientForm.role, content: clientForm.content });
+			clientForm.dialog?.push({
+				role: clientForm.role,
+				content: clientForm.content,
+			});
 		}
 		clientForm.dialog = clientForm.dialog;
 		clientForm.content = "";
@@ -56,6 +60,7 @@
 		};
 	};
 
+	// clear "X" button
 	const onClear: SubmitFunction = () => {
 		// don't show ... when clearing
 		clearing = true;
@@ -67,31 +72,50 @@
 		};
 	};
 
-	onMount(() => {
-		document.addEventListener("keyup", ({ key }) => {
-			if (key === " ") {
-				// focus message on space bar keyup
-				messageInput.focus();
-			} else if (key === "Escape" && clearButton) {
-				// clear on escape
-				clearButton.click();
-			} else if (key === "ArrowLeft" || key === "ArrowRight") {
-				roleSelect.focus();
-				if (clientForm.role === "user") {
-					clientForm.role = "system";
-				} else {
-					clientForm.role = "user";
-				}
+	const onKeyUp = ({ key }: KeyboardEvent) => {
+		if (key === " ") {
+			// focus message on space bar keyup
+			messageInput.focus();
+		} else if (key === "Escape" && clearButton) {
+			// clear on escape
+			clearButton.click();
+		} else if (key === "ArrowLeft" || key === "ArrowRight") {
+			roleSelect.focus();
+			if (clientForm.role === "user") {
+				clientForm.role = "system";
+			} else {
+				clientForm.role = "user";
 			}
-		});
-	});
-
+		}
+	};
 
 	afterUpdate(() => {
 		// scroll to bottom after dialog is updated
 		window.scrollTo(0, document.body.scrollHeight);
+		setMessageBackgroundColor();
 	});
+
+	/**
+	 * sets the background color of a message,
+	 * opacity gets lower as the message scrolls up
+	 */
+	const setMessageBackgroundColor = () => {
+		const messages: NodeListOf<HTMLElement> =
+			document.querySelectorAll(".message");
+		if (messages) {
+			messages.forEach((message) => {
+				const messagePositions = message.getBoundingClientRect();
+				const compStyles = window.getComputedStyle(message);
+				const bgColor = compStyles.getPropertyValue("background-color");
+				const rgb = bgColor.split("(")[1].split(")")[0].split(",").slice(0, 3);
+				const a = (messagePositions.bottom / innerHeight) * 0.2 + 0.8;
+				message.style.backgroundColor = `rgba(${rgb},${a})`;
+			});
+		}
+	};
 </script>
+
+<svelte:window on:keyup={onKeyUp} on:scroll={setMessageBackgroundColor} />
 
 <!-- heading -->
 <section
@@ -99,7 +123,7 @@
 >
 	<h1 class="my-0 text-base dark:text-gray-200">
 		{#if !clientForm.dialog.length}
-			<a href="https://platform.openai.com/docs/models/gpt-3-5">
+			<a href="https://platform.openai.com/docs/models/gpt-3-5" class="tracking-wide">
 				{info.model}
 			</a>
 		{/if}
@@ -112,6 +136,7 @@
 				bind:this={clearButton}
 				disabled={loading}
 			>
+				<!-- x icon -->
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					fill="none"
@@ -144,7 +169,7 @@
 					class:justify-end={role === "user"}
 				>
 					<div
-						class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 text-gray-50 sm:text-lg {role ===
+						class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 text-gray-50 shadow sm:text-lg {role ===
 						'user'
 							? 'bg-indigo-600'
 							: 'bg-gray-700'}"
@@ -168,21 +193,23 @@
 	<!-- message form -->
 	<section class="sticky bottom-0 px-4 pt-4 backdrop-blur-lg">
 		<form method="POST" action="?/chat" use:enhance={onSubmit}>
-			<input type="hidden" name="dialog" value={JSON.stringify(form?.dialog)} />
+			<input type="hidden" name="dialog" value={JSON.stringify(clientForm.dialog)} />
 			<div class="flex pb-4">
 				<select
 					name="role"
 					bind:value={clientForm.role}
 					bind:this={roleSelect}
-					class="rounded-l-full bg-gray-700 px-4 py-2 text-center text-gray-50 dark:bg-gray-800 sm:text-lg"
+					class="rounded-l-full bg-gray-700 px-4 py-2 text-center text-gray-50 shadow dark:bg-gray-800 sm:text-lg"
 				>
 					<option value="user">User</option>
 					<option value="system">System</option>
 				</select>
 				<input
 					type="text"
-					placeholder={clientForm.role === "system" ? "Message, URL" : "Message"}
-					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border-b border-r border-t border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
+					placeholder={clientForm.role === "system"
+						? "Message, URL"
+						: "Message"}
+					class="mr-2 w-full whitespace-pre-wrap rounded-r-full px-4 py-2 shadow dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
 					name="content"
 					autocomplete="off"
 					bind:value={clientForm.content}
@@ -191,8 +218,9 @@
 				/>
 				<button
 					disabled={loading}
-					class:bg-gray-800={clientForm.role === "system"}
+					class:bg-gray-700={clientForm.role === "system"}
 				>
+					<!-- up arrow icon -->
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
