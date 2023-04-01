@@ -10,29 +10,43 @@
 
 	export let form;
 
-	let innerHeight: number;
 	let messageInput: HTMLInputElement;
 	let clearButton: HTMLButtonElement;
-	let submitButton: HTMLButtonElement;
 	let roleSelect: HTMLSelectElement;
 
-	let content = "";
-	let role: ChatCompletionRequestMessageRoleEnum = "user";
 	let loading = false;
 	let clearing = false;
-	let dialog: ChatCompletionRequestMessage[] = [];
-	$: if (form?.dialog) dialog = form?.dialog;
+
+	interface ClientForm {
+		content: string;
+		role: ChatCompletionRequestMessageRoleEnum;
+		dialog: ChatCompletionRequestMessage[];
+	}
+
+	// for interactivity and snapshot
+	let clientForm: ClientForm = {
+		content: "",
+		role: "user",
+		dialog: [],
+	}
+
+	$: if (form?.dialog) clientForm.dialog = form?.dialog;
+
+	export const snapshot = {
+		capture: () => clientForm,
+		restore: (value) => (clientForm = value),
+	}
 
 	const onSubmit: SubmitFunction = () => {
 		// before response
 		messageInput.blur();
 		loading = true;
-		if (role === "user") {
-			dialog?.push({ role, content });
+		if (clientForm.role === "user") {
+			clientForm.dialog?.push({ role: clientForm.role, content: clientForm.content });
 		}
-		dialog = dialog;
-		content = "";
-		role = "user";
+		clientForm.dialog = clientForm.dialog;
+		clientForm.content = "";
+		clientForm.role = "user";
 		// after response
 		return async ({ update }) => {
 			// run default update
@@ -53,25 +67,6 @@
 		};
 	};
 
-	/**
-	 * sets the background color of a message,
-	 * opacity gets lower as the message scrolls up
-	 */
-	const setMessageBackgroundColor = () => {
-		const messages: NodeListOf<HTMLElement> =
-			document.querySelectorAll(".message");
-		if (messages) {
-			messages.forEach((message) => {
-				const messagePositions = message.getBoundingClientRect();
-				const compStyles = window.getComputedStyle(message);
-				const bgColor = compStyles.getPropertyValue("background-color");
-				const rgb = bgColor.split("(")[1].split(")")[0].split(",").slice(0, 3);
-				const a = (messagePositions.bottom / innerHeight) * 0.3 + 0.7;
-				message.style.backgroundColor = `rgba(${rgb},${a})`;
-			});
-		}
-	};
-
 	onMount(() => {
 		document.addEventListener("keyup", ({ key }) => {
 			if (key === " ") {
@@ -82,39 +77,34 @@
 				clearButton.click();
 			} else if (key === "ArrowLeft" || key === "ArrowRight") {
 				roleSelect.focus();
-				if (role === "user") {
-					role = "system";
+				if (clientForm.role === "user") {
+					clientForm.role = "system";
 				} else {
-					role = "user";
+					clientForm.role = "user";
 				}
 			}
 		});
-		document.addEventListener("scroll", () => {
-			setMessageBackgroundColor();
-		});
 	});
+
 
 	afterUpdate(() => {
 		// scroll to bottom after dialog is updated
 		window.scrollTo(0, document.body.scrollHeight);
-		setMessageBackgroundColor();
 	});
 </script>
-
-<svelte:window bind:innerHeight />
 
 <!-- heading -->
 <section
 	class="fixed top-0 flex min-h-[5rem] w-full items-center justify-between p-4 backdrop-blur-lg"
 >
 	<h1 class="my-0 text-base dark:text-gray-200">
-		{#if !dialog.length}
+		{#if !clientForm.dialog.length}
 			<a href="https://platform.openai.com/docs/models/gpt-3-5">
 				{info.model}
 			</a>
 		{/if}
 	</h1>
-	{#if dialog.length}
+	{#if clientForm.dialog.length}
 		<!-- delete button -->
 		<form method="POST" action="?/clear" use:enhance={onClear}>
 			<button
@@ -146,9 +136,9 @@
 
 <div class="mt-24">
 	<!-- dialog -->
-	{#if dialog}
+	{#if clientForm.dialog}
 		<section class="overflow-hidden px-4">
-			{#each dialog as { role, content }}
+			{#each clientForm.dialog as { role, content }}
 				<div
 					class="mb-4 flex w-full last:mb-0"
 					class:justify-end={role === "user"}
@@ -182,7 +172,7 @@
 			<div class="flex pb-4">
 				<select
 					name="role"
-					bind:value={role}
+					bind:value={clientForm.role}
 					bind:this={roleSelect}
 					class="rounded-l-full bg-gray-700 px-4 py-2 text-center text-gray-50 dark:bg-gray-800 sm:text-lg"
 				>
@@ -191,18 +181,17 @@
 				</select>
 				<input
 					type="text"
-					placeholder={role === "system" ? "Message, URL" : "Message"}
+					placeholder={clientForm.role === "system" ? "Message, URL" : "Message"}
 					class="mr-2 w-full whitespace-pre-wrap rounded-r-full border-b border-r border-t border-gray-300 px-4 py-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 sm:text-lg"
 					name="content"
 					autocomplete="off"
-					bind:value={content}
+					bind:value={clientForm.content}
 					bind:this={messageInput}
 					required
 				/>
 				<button
 					disabled={loading}
-					bind:this={submitButton}
-					class:bg-gray-800={role === "system"}
+					class:bg-gray-800={clientForm.role === "system"}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
