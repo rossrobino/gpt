@@ -1,6 +1,6 @@
 # gpt.robino.dev
 
-A progressively enhanced [ChatGPT](https://ai.com) wrapper.
+A progressively enhanced openai [ChatGPT](https://ai.com) wrapper.
 
 [gpt.robino.dev](https://gpt.robino.dev)
 
@@ -16,11 +16,6 @@ A progressively enhanced [ChatGPT](https://ai.com) wrapper.
 - Space: focuses message input
 - ArrowRight / ArrowLeft: changes role
 - Escape: clears conversation
-
-## Tooling
-
-- [openai](https://github.com/openai)
-- [sveltejs/kit](https://github.com/sveltejs/kit)
 
 ## LICENSE
 
