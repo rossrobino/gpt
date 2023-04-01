@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { enhance, type SubmitFunction } from "$app/forms";
-	import { afterUpdate, onMount } from "svelte";
 	import { info } from "$lib/info";
 	import type {
 		ChatCompletionRequestMessage,
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
 	import { mdToHtml } from "$lib/markdownUtils";
+	import ScrollDown from "$lib/ScrollDown.svelte";
 
 	export let form;
 
@@ -89,12 +89,6 @@
 		}
 	};
 
-	afterUpdate(() => {
-		// scroll to bottom after dialog is updated
-		window.scrollTo(0, document.body.scrollHeight);
-		setMessageBackgroundColor();
-	});
-
 	/**
 	 * sets the background color of a message,
 	 * opacity gets lower as the message scrolls up
@@ -123,7 +117,10 @@
 >
 	<h1 class="my-0 text-base dark:text-gray-200">
 		{#if !clientForm.dialog.length}
-			<a href="https://platform.openai.com/docs/models/gpt-3-5" class="tracking-wide">
+			<a
+				href="https://platform.openai.com/docs/models/gpt-3-5"
+				class="tracking-wide"
+			>
 				{info.model}
 			</a>
 		{/if}
@@ -178,6 +175,7 @@
 							.replace(/(li>\n)/gm, "li>")
 							.replace(/(<ul>\n)/gm, "<ul>")}
 					</div>
+					<ScrollDown />
 				</div>
 			{/each}
 			{#if loading && !clearing}
@@ -193,7 +191,11 @@
 	<!-- message form -->
 	<section class="sticky bottom-0 px-4 pt-4 backdrop-blur-lg">
 		<form method="POST" action="?/chat" use:enhance={onSubmit}>
-			<input type="hidden" name="dialog" value={JSON.stringify(clientForm.dialog)} />
+			<input
+				type="hidden"
+				name="dialog"
+				value={JSON.stringify(clientForm.dialog)}
+			/>
 			<div class="flex pb-4">
 				<select
 					name="role"
