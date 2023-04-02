@@ -5,7 +5,7 @@
 		ChatCompletionRequestMessage,
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
-	import Message from "$lib/Message.svelte";
+	import Message from "$lib/components/Message.svelte";
 
 	export let form;
 
@@ -38,7 +38,6 @@
 
 	// submit button
 	const onSubmit: SubmitFunction = () => {
-		// before response
 		messageInput.blur();
 		loading = true;
 		if (clientForm.role === "user") {
@@ -50,16 +49,14 @@
 		clientForm.dialog = clientForm.dialog;
 		clientForm.content = "";
 		clientForm.role = "user";
-		// after response
 		return async ({ update }) => {
-			// run default update
 			update();
 			loading = false;
 			messageInput.focus();
 		};
 	};
 
-	// clear "X" button
+	// clear x button
 	const onClear: SubmitFunction = () => {
 		clientForm.dialog = [];
 	};

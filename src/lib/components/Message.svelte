@@ -2,9 +2,11 @@
 	import type { ChatCompletionRequestMessageRoleEnum } from "openai";
 	import { mdToHtml } from "$lib/markdownUtils";
 	import { onMount } from "svelte";
+	import { fly } from "svelte/transition";
 
 	export let role: ChatCompletionRequestMessageRoleEnum = "user";
 	export let content = "";
+	let innerWidth: number;
 
 	onMount(() => {
 		// scroll to bottom when new message appears
@@ -12,7 +14,16 @@
 	});
 </script>
 
-<div class="mb-4 flex w-full last:mb-0" class:justify-end={role === "user"}>
+<svelte:window bind:innerWidth />
+
+<div
+	class="mb-4 flex w-full last:mb-0"
+	class:justify-end={role === "user"}
+	out:fly={{
+		duration: 1500,
+		x: role === "user" ? innerWidth : -innerWidth,
+	}}
+>
 	<div
 		class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 text-gray-50 shadow sm:text-lg {role ===
 		'user'
