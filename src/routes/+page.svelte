@@ -5,8 +5,7 @@
 		ChatCompletionRequestMessage,
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
-	import { mdToHtml } from "$lib/markdownUtils";
-	import ScrollDown from "$lib/ScrollDown.svelte";
+	import Message from "$lib/Message.svelte";
 
 	export let form;
 
@@ -62,14 +61,7 @@
 
 	// clear "X" button
 	const onClear: SubmitFunction = () => {
-		// don't show ... when clearing
-		clearing = true;
-		loading = true;
-		return async ({ update }) => {
-			update();
-			loading = false;
-			clearing = false;
-		};
+		clientForm.dialog = [];
 	};
 
 	const onKeyUp = ({ key }: KeyboardEvent) => {
@@ -161,22 +153,7 @@
 	{#if clientForm.dialog}
 		<section class="overflow-hidden px-4">
 			{#each clientForm.dialog as { role, content }}
-				<div
-					class="mb-4 flex w-full last:mb-0"
-					class:justify-end={role === "user"}
-				>
-					<div
-						class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 text-gray-50 shadow sm:text-lg {role ===
-						'user'
-							? 'bg-indigo-600'
-							: 'bg-gray-700'}"
-					>
-						{@html mdToHtml(content)
-							.replace(/(li>\n)/gm, "li>")
-							.replace(/(<ul>\n)/gm, "<ul>")}
-					</div>
-					<ScrollDown />
-				</div>
+				<Message {role} {content} />
 			{/each}
 			{#if loading && !clearing}
 				<div
