@@ -21,6 +21,13 @@ Requests time out at 10 seconds due to vercel hobby plan limits.
 - ArrowRight / ArrowLeft: changes role
 - Escape: clears conversation
 
+## Run locally
+
+- Clone repo to local machine
+- Create a `.env` file and add your `OPENAI_API_KEY`
+- `npm install`
+- `npm run dev -- --open`
+
 ## LICENSE
 
 MIT
