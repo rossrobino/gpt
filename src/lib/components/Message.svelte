@@ -3,6 +3,7 @@
 	import { mdToHtml } from "$lib/markdownUtils";
 	import { onMount } from "svelte";
 	import { fly } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
 
 	export let role: ChatCompletionRequestMessageRoleEnum = "user";
 	export let content = "";
@@ -20,7 +21,8 @@
 	class="mb-4 flex w-full last:mb-0"
 	class:justify-end={role === "user"}
 	out:fly={{
-		duration: 1500,
+		duration: 1000,
+		easing: quintOut,
 		x: role === "user" ? innerWidth : -innerWidth,
 	}}
 >
