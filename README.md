@@ -8,6 +8,7 @@ Requests time out at 10 seconds due to vercel hobby plan limits.
 
 ## Features
 
+- Free - no API key required
 - Works without JavaScript
 - When dialog approaches the [max token size](https://platform.openai.com/docs/models), older messages are summarized by GPT to shorter lengths
 - Returns readable answers in markdown
