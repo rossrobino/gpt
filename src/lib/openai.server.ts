@@ -26,6 +26,7 @@ export const createChatCompletion = async (
 		model: info.model,
 		messages: [...context, ...messages],
 		temperature: 0.8,
+		max_tokens: 300,
 	});
 	const message = response.data.choices[0]
 		.message as ChatCompletionRequestMessage;
