@@ -106,7 +106,7 @@
 	class="fixed top-0 flex min-h-[5rem] w-full items-center justify-between p-4 backdrop-blur-lg"
 >
 	<h1 class="my-0 text-base dark:text-gray-200">
-		{#if !clientForm.dialog.length}
+		{#if !clientForm.dialog?.length}
 			<a
 				href="https://platform.openai.com/docs/models/gpt-3-5"
 				class="tracking-wide"
