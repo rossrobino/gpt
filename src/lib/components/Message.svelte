@@ -27,10 +27,10 @@
 	}}
 >
 	<div
-		class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-3 text-gray-50 shadow sm:text-lg {role ===
+		class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-[0.6rem] text-gray-50 shadow sm:text-lg {role ===
 		'user'
-			? 'bg-indigo-600'
-			: 'bg-gray-700'}"
+			? 'bg-blue-600'
+			: 'bg-gray-100 text-gray-950'}"
 	>
 		{@html mdToHtml(content)
 			.replace(/(li>\n)/gm, "li>")

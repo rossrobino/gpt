@@ -75,38 +75,40 @@ export const actions = {
 			// count characters
 			let contentLength = 0;
 			dialog.forEach(({ content }) => {
-				contentLength += content.length;
+				if (content) contentLength += content.length;
 			});
 
 			for (const [i, m] of dialog.entries()) {
-				const contentIsToLong = contentLength > maxContentLength;
-				const messageIsToLong = m.content.length > summarizeLength;
-				const lastItemInList = i === dialog.length - 1;
+				if (m.content) {
+					const contentIsToLong = contentLength > maxContentLength;
+					const messageIsToLong = m.content.length > summarizeLength;
+					const lastItemInList = i === dialog.length - 1;
 
-				if (contentIsToLong && messageIsToLong) {
-					try {
-						// try to summarize first
-						const message = await createChatCompletion([
-							{
-								role: "user",
-								content: `summarize this text to under ${summarizeLength} characters: ${m.content}`,
-							},
-						]);
+					if (contentIsToLong && messageIsToLong) {
+						try {
+							// try to summarize first
+							const message = await createChatCompletion([
+								{
+									role: "user",
+									content: `summarize this text to under ${summarizeLength} characters: ${m.content}`,
+								},
+							]);
 
-						// adjust content length to summarized content
-						contentLength -= m.content.length;
-						contentLength += message.content.length;
+							// adjust content length to summarized content
+							contentLength -= m.content.length;
+							if (message.content) contentLength += message.content.length;
 
-						// set content to the summarized content
-						m.content = message.content;
-					} catch {
-						// if error remove item instead
-						dialog.splice(i, 1);
+							// set content to the summarized content
+							m.content = message.content;
+						} catch {
+							// if error remove item instead
+							dialog.splice(i, 1);
+						}
+					} else if (contentIsToLong && lastItemInList) {
+						// remove the first message from the dialog
+						if (dialog[0].content) contentLength -= dialog[0].content.length;
+						dialog.shift();
 					}
-				} else if (contentIsToLong && lastItemInList) {
-					// remove the first message from the dialog
-					contentLength -= dialog[0].content.length;
-					dialog.shift();
 				}
 			}
 
