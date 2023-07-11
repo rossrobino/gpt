@@ -55,6 +55,7 @@
 		clientForm.dialog = clientForm.dialog;
 		clientForm.content = "";
 		clientForm.role = "user";
+		messageInput.style.height = "";
 		return async ({ update }) => {
 			update();
 			loading = false;
@@ -190,10 +191,9 @@
 						name="content"
 						bind:value={clientForm.content}
 						bind:this={messageInput}
-						on:input={(e) => {
-							e.currentTarget.style.height = "";
-							e.currentTarget.style.height =
-								e.currentTarget.scrollHeight + "px";
+						on:input={() => {
+							messageInput.style.height = "";
+							messageInput.style.height = messageInput.scrollHeight + "px";
 						}}
 						required
 					/>
