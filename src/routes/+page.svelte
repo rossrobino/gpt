@@ -190,20 +190,6 @@
 							}
 						}}
 					/>
-					<!-- <textarea
-						placeholder={clientForm.role === "system"
-							? "Message, URL"
-							: "Message"}
-						class="mr-4 h-[3rem] max-h-48 min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl px-4 py-[0.6rem] shadow sm:text-lg"
-						name="content"
-						bind:value={clientForm.content}
-						bind:this={messageInput}
-						on:input={() => {
-							messageInput.style.height = "";
-							messageInput.style.height = messageInput.scrollHeight + "px";
-						}}
-						required
-					/> -->
 					<button
 						disabled={loading}
 						class:bg-gray-700={clientForm.role === "system"}
