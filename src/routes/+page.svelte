@@ -10,12 +10,12 @@
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
 	import Message from "$lib/components/Message.svelte";
+	import { Editor } from "@rossrobino/components";
 
 	inject({ mode: dev ? "development" : "production" });
 
 	export let form;
 
-	let messageInput: HTMLTextAreaElement;
 	let clearButton: HTMLButtonElement;
 
 	let loading = false;
@@ -43,7 +43,6 @@
 
 	// submit button
 	const onSubmit: SubmitFunction = () => {
-		messageInput.blur();
 		loading = true;
 		if (clientForm.role === "user") {
 			clientForm.dialog?.push({
@@ -54,11 +53,9 @@
 		clientForm.dialog = clientForm.dialog;
 		clientForm.content = "";
 		clientForm.role = "user";
-		messageInput.style.height = "";
 		return async ({ update }) => {
 			update();
 			loading = false;
-			messageInput.focus();
 		};
 	};
 
@@ -68,10 +65,7 @@
 	};
 
 	const onKeyUp = ({ key }: KeyboardEvent) => {
-		if (key === " ") {
-			// focus message on space bar keyup
-			messageInput.focus();
-		} else if (key === "Escape" && clearButton) {
+		if (key === "Escape" && clearButton) {
 			// clear on escape
 			clearButton.click();
 		}
@@ -181,7 +175,22 @@
 						<option value="user">User</option>
 						<option value="system">System</option>
 					</select>
-					<textarea
+					<Editor
+						contentElements={[]}
+						textAreaPlaceholder={clientForm.role === "system"
+							? "Message, URL"
+							: "Message"}
+						textAreaClass="messageInput mr-4 h-[3rem] max-h-48 min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl px-4 py-[0.6rem] shadow sm:text-lg"
+						textAreaName="content"
+						bind:textAreaValue={clientForm.content}
+						on:input={(e) => {
+							if (e.target instanceof HTMLElement) {
+								e.target.style.height = "";
+								e.target.style.height = e.target.scrollHeight + "px";
+							}
+						}}
+					/>
+					<!-- <textarea
 						placeholder={clientForm.role === "system"
 							? "Message, URL"
 							: "Message"}
@@ -194,7 +203,7 @@
 							messageInput.style.height = messageInput.scrollHeight + "px";
 						}}
 						required
-					/>
+					/> -->
 					<button
 						disabled={loading}
 						class:bg-gray-700={clientForm.role === "system"}
