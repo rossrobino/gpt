@@ -17,7 +17,6 @@
 
 	let messageInput: HTMLTextAreaElement;
 	let clearButton: HTMLButtonElement;
-	let roleSelect: HTMLSelectElement;
 
 	let loading = false;
 	let clearing = false;
@@ -177,8 +176,7 @@
 					<select
 						name="role"
 						bind:value={clientForm.role}
-						bind:this={roleSelect}
-						class="rounded-l-3xl bg-gray-700 px-4 py-2 text-center text-gray-50 shadow dark:bg-gray-800 sm:text-lg"
+						class="rounded-l-3xl rounded-r-none bg-gray-700 px-4 py-2 text-center text-gray-50 shadow sm:text-lg"
 					>
 						<option value="user">User</option>
 						<option value="system">System</option>
