@@ -94,7 +94,7 @@
 <svelte:window on:keyup={onKeyUp} on:scroll={setMessageBackgroundColor} />
 
 <main
-	class="flex min-h-[100dvh] flex-col justify-between bg-gray-50 text-gray-950"
+	class="flex min-h-[100dvh] w-full min-w-[300px] flex-col justify-between text-gray-950"
 >
 	<!-- heading -->
 	<section
@@ -152,27 +152,27 @@
 					<div
 						class="flex w-fit gap-1.5 rounded-3xl bg-gray-100 px-4 py-5 text-lg font-extrabold text-gray-950 sm:text-xl"
 					>
-						<div class="rounded-full bg-gray-400 p-0.5" />
-						<div class="rounded-full bg-gray-400 p-0.5" />
-						<div class="rounded-full bg-gray-400 p-0.5" />
+						<div class="animate-pulse rounded-full bg-gray-400 p-0.5" />
+						<div class="animate-pulse rounded-full bg-gray-400 p-0.5" />
+						<div class="animate-pulse rounded-full bg-gray-400 p-0.5" />
 					</div>
 				{/if}
 			</section>
 		{/if}
 
 		<!-- message form -->
-		<section class="sticky bottom-0 px-4 pt-4 backdrop-blur-lg">
+		<section class="sticky bottom-0 bg-gray-100 px-4 pb-8 pt-4 sm:pb-4">
 			<form method="POST" action="?/chat" use:enhance={onSubmit}>
 				<input
 					type="hidden"
 					name="dialog"
 					value={JSON.stringify(clientForm.dialog)}
 				/>
-				<div class="flex pb-4">
+				<div class="flex">
 					<select
 						name="role"
 						bind:value={clientForm.role}
-						class="rounded-l-3xl rounded-r-none bg-gray-700 px-4 py-2 text-center text-gray-50 shadow sm:text-lg"
+						class="rounded-l-3xl rounded-r-none bg-gray-700 px-4 py-2 text-center text-gray-50 shadow-xl sm:text-lg"
 					>
 						<option value="user">User</option>
 						<option value="system">System</option>
@@ -182,7 +182,7 @@
 						textAreaPlaceholder={clientForm.role === "system"
 							? "Message, URL"
 							: "Message"}
-						textAreaClass="messageInput mr-4  max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] shadow sm:text-lg"
+						textAreaClass="messageInput mr-4 max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] shadow sm:text-lg"
 						textAreaName="content"
 						bind:textAreaValue={clientForm.content}
 						on:input={(e) => {
@@ -194,6 +194,7 @@
 					/>
 					<button
 						disabled={loading}
+						class="self-center"
 						class:bg-gray-700={clientForm.role === "system"}
 					>
 						<!-- up arrow icon -->
@@ -213,7 +214,6 @@
 					</button>
 				</div>
 			</form>
-			<div class="-mx-4 bg-gray-100 p-4 sm:hidden" />
 		</section>
 	</div>
 </main>

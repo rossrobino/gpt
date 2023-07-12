@@ -20,6 +20,7 @@
 <div
 	class="mb-4 flex w-full last:mb-0"
 	class:justify-end={role === "user"}
+	class:justify-center={role === "system"}
 	out:fly={{
 		duration: 1000,
 		easing: quintOut,
@@ -27,10 +28,11 @@
 	}}
 >
 	<div
-		class="message w-fit max-w-[75vw] whitespace-pre-line break-words rounded-3xl px-4 py-[0.6rem] text-gray-50 shadow sm:text-lg {role ===
-		'user'
-			? 'bg-blue-600'
-			: 'bg-gray-100 text-gray-950'}"
+		class="message w-fit max-w-[90%] whitespace-pre-line break-words rounded-3xl px-4 py-[0.6rem] text-gray-50 shadow sm:text-lg"
+		class:bg-blue-600={role === "user"}
+		class:bg-gray-50={role === "assistant"}
+		class:text-gray-950={role === "assistant"}
+		class:bg-gray-700={role === "system"}
 	>
 		{@html mdToHtml(content)
 			.replace(/(li>\n)/gm, "li>")
