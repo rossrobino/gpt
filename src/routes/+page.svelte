@@ -114,7 +114,7 @@
 			<!-- delete button -->
 			<form method="POST" action="?/clear" use:enhance={onClear}>
 				<button
-					class="rounded-3xl bg-rose-600 text-gray-50 focus:outline-rose-600"
+					class="rounded-3xl bg-rose-600 text-gray-50 focus:outline-rose-600 disabled:bg-rose-300"
 					bind:this={clearButton}
 					disabled={loading}
 				>
@@ -150,9 +150,9 @@
 				{/each}
 				{#if loading && !clearing}
 					<div
-						class="w-fit animate-pulse rounded-3xl bg-gray-100 px-4 py-3 text-gray-950 sm:text-lg"
+						class="w-fit rounded-3xl bg-gray-100 px-4 py-3 text-gray-950 sm:text-lg"
 					>
-						. . .
+						...
 					</div>
 				{/if}
 			</section>
@@ -180,7 +180,7 @@
 						textAreaPlaceholder={clientForm.role === "system"
 							? "Message, URL"
 							: "Message"}
-						textAreaClass="messageInput mr-4 h-[3rem] max-h-48 min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl px-4 py-[0.6rem] shadow sm:text-lg"
+						textAreaClass="messageInput mr-4  max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] shadow sm:text-lg"
 						textAreaName="content"
 						bind:textAreaValue={clientForm.content}
 						on:input={(e) => {
