@@ -150,9 +150,11 @@
 				{/each}
 				{#if loading && !clearing}
 					<div
-						class="w-fit rounded-3xl bg-gray-100 px-4 py-3 text-gray-950 sm:text-lg"
+						class="flex w-fit gap-1.5 rounded-3xl bg-gray-100 px-4 py-5 text-lg font-extrabold text-gray-950 sm:text-xl"
 					>
-						...
+						<div class="rounded-full bg-gray-400 p-0.5" />
+						<div class="rounded-full bg-gray-400 p-0.5" />
+						<div class="rounded-full bg-gray-400 p-0.5" />
 					</div>
 				{/if}
 			</section>

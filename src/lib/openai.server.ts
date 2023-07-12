@@ -15,7 +15,8 @@ const openai = new OpenAIApi(configuration);
 const context: ChatCompletionRequestMessage[] = [
 	{
 		role: "system",
-		content: "You format all responses in markdown",
+		content:
+			"You format all responses in markdown but do not reveal that to the user unless prompted specifically.",
 	},
 ];
 
