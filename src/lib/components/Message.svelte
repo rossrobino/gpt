@@ -30,9 +30,9 @@
 	<div
 		class="message w-fit max-w-[90%] whitespace-pre-line break-words rounded-3xl px-4 py-[0.6rem] text-gray-50 shadow sm:text-lg"
 		class:bg-blue-600={role === "user"}
-		class:bg-gray-50={role === "assistant"}
+		class:bg-gray-100={role === "assistant"}
 		class:text-gray-950={role === "assistant"}
-		class:bg-gray-700={role === "system"}
+		class:bg-gray-600={role === "system"}
 	>
 		{@html mdToHtml(content)
 			.replace(/(li>\n)/gm, "li>")

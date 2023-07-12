@@ -102,10 +102,7 @@
 	>
 		<h1 class="my-0 text-base">
 			{#if !clientForm.dialog?.length}
-				<a
-					href="https://platform.openai.com/docs/models/gpt-3-5"
-					class="tracking-wide"
-				>
+				<a href="https://platform.openai.com/docs/models">
 					{info.model}
 				</a>
 			{/if}
@@ -161,7 +158,7 @@
 		{/if}
 
 		<!-- message form -->
-		<section class="sticky bottom-0 bg-gray-100 px-4 pb-8 pt-4 sm:pb-4">
+		<section class="sticky bottom-0 bg-gray-50 px-4 pb-8 pt-4 sm:pb-4">
 			<form method="POST" action="?/chat" use:enhance={onSubmit}>
 				<input
 					type="hidden"
@@ -172,7 +169,7 @@
 					<select
 						name="role"
 						bind:value={clientForm.role}
-						class="rounded-l-3xl rounded-r-none bg-gray-700 px-4 py-2 text-center text-gray-50 shadow-xl sm:text-lg"
+						class="rounded-l-3xl rounded-r-none bg-gray-700 px-4 py-2 text-center text-gray-50 shadow focus:bg-gray-600 sm:text-lg"
 					>
 						<option value="user">User</option>
 						<option value="system">System</option>
@@ -182,7 +179,7 @@
 						textAreaPlaceholder={clientForm.role === "system"
 							? "Message, URL"
 							: "Message"}
-						textAreaClass="messageInput mr-4 max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] shadow sm:text-lg"
+						textAreaClass="messageInput mr-4 max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap shadow rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] sm:text-lg"
 						textAreaName="content"
 						bind:textAreaValue={clientForm.content}
 						on:input={(e) => {
