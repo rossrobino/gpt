@@ -2,8 +2,6 @@
 
 A progressively enhanced openai [ChatGPT](https://ai.com) wrapper.
 
-Requests time out at 10 seconds due to vercel hobby plan limits.
-
 [gpt.robino.dev](https://gpt.robino.dev)
 
 ## Features
@@ -15,12 +13,6 @@ Requests time out at 10 seconds due to vercel hobby plan limits.
 - Use the "system" role to set context
 - Use the "system" role scrape a website's text content - scripts, images, and line breaks are removed
 - Stores history in session storage using a SvelteKit snapshot
-
-## Keyboard Shortcuts
-
-- Space: focuses message input
-- ArrowRight / ArrowLeft: changes role
-- Escape: clears conversation
 
 ## Run locally
 
