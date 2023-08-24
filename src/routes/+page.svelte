@@ -10,7 +10,7 @@
 		ChatCompletionRequestMessageRoleEnum,
 	} from "openai";
 	import Message from "$lib/components/Message.svelte";
-	import { Editor } from "@rossrobino/components";
+	import { Editor } from "drab";
 
 	inject({ mode: dev ? "development" : "production" });
 
@@ -176,12 +176,12 @@
 					</select>
 					<Editor
 						contentElements={[]}
-						textAreaPlaceholder={clientForm.role === "system"
+						placeholderTextarea={clientForm.role === "system"
 							? "Message, URL"
 							: "Message"}
-						textAreaClass="messageInput mr-4 max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap shadow rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] sm:text-lg"
-						textAreaName="content"
-						bind:textAreaValue={clientForm.content}
+						classTextarea="messageInput mr-4 max-h-48 h-[3rem] min-h-[3rem] w-full whitespace-pre-wrap shadow rounded-r-3xl rounded-l-none px-4 py-[.76rem] sm:py-[.6rem] sm:text-lg"
+						nameTextarea="content"
+						bind:valueTextarea={clientForm.content}
 						on:input={(e) => {
 							if (e.target instanceof HTMLElement) {
 								e.target.style.height = "";
