@@ -1,15 +1,19 @@
 <script lang="ts">
 	import type { Messages } from "$lib/types";
 	import Message from "$lib/components/Message.svelte";
+	import gettingStarted from "./gettingStarted.md?raw";
 
 	let loading = false;
 	let cancel = false;
 
 	let messages: Messages = [
 		{
-			value: { role: "user", content: "" },
+			value: {
+				role: "user",
+				content: gettingStarted,
+			},
 			open: true,
-			edit: true,
+			edit: false,
 		},
 	];
 

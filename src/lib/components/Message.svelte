@@ -85,7 +85,7 @@
 		<svelte:fragment slot="content">
 			{#if !message.edit}
 				<div
-					class="px-5"
+					class="px-4"
 					role="article"
 					on:dblclick={() => (message.edit = true)}
 					in:fade={{ duration }}
