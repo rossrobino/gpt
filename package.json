@@ -36,6 +36,9 @@
 	"type": "module",
 	"dependencies": {
 		"@vercel/analytics": "^1.0.2",
+		"highlight.js": "^11.8.0",
+		"marked": "^7.0.4",
+		"marked-highlight": "^2.0.4",
 		"openai": "^4.2.0"
 	}
 }

@@ -1,10 +1,10 @@
 import { OpenAI } from "openai";
-import type { ChatCompletionMessage } from "openai/resources/chat";
 import { OPENAI_API_KEY } from "$env/static/private";
 import { error } from "@sveltejs/kit";
 
 export const POST = async ({ request }) => {
-	const messages = (await request.json()) as ChatCompletionMessage[];
+	const messages =
+		(await request.json()) as OpenAI.Chat.ChatCompletionMessage[];
 
 	console.log(messages);
 
@@ -22,7 +22,6 @@ export const POST = async ({ request }) => {
 		const readable = new ReadableStream({
 			start: async (controller) => {
 				for await (const part of stream) {
-					// instead of writing out here
 					const text = new TextEncoder().encode(
 						part.choices[0]?.delta?.content || "",
 					);
