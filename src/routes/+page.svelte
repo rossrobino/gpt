@@ -12,7 +12,7 @@
 				content: "",
 			},
 			open: true,
-			edit: false,
+			edit: true,
 		},
 	];
 
