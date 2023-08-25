@@ -37,7 +37,7 @@
 	};
 </script>
 
-<div transition:slide={{ duration: 200 }}>
+<div in:slide={{ duration: 200 }}>
 	<Details bind:open={message.open}>
 		<svelte:fragment slot="summary" let:open>
 			<div
@@ -87,7 +87,7 @@
 						{/if}
 					</button>
 					<button
-						on:click|stopPropagation={remove}
+						on:click|preventDefault|stopPropagation={remove}
 						title="Remove"
 						class="btn btn-s"
 					>

@@ -90,7 +90,6 @@
 
 	const clear = () => {
 		messages = [];
-		addMessage();
 	};
 </script>
 
