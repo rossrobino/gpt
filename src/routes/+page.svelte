@@ -2,6 +2,7 @@
 	import type { ChatCompletionMessage } from "openai/resources/chat";
 	import { Editor, Sheet } from "drab";
 	import { mdToHtml } from "$lib/util/mdToHtml";
+	import SystemRole from "$lib/components/SystemRole.svelte";
 
 	let inputForm: HTMLFormElement;
 
@@ -13,6 +14,7 @@
 
 	const chat = async () => {
 		messages = [...messages, { role: "user", content }];
+		content = "";
 		const response = await fetch("/api/chat", {
 			method: "POST",
 			body: JSON.stringify(messages),
@@ -30,6 +32,7 @@
 					"utf-8",
 				).decode(chunk.value);
 				chunk = await reader.read();
+				window.scrollTo(0, document.body.scrollHeight);
 			}
 		}
 	};
@@ -43,20 +46,19 @@
 
 <svelte:document on:keydown={onKeyDown} />
 
-<header>
+<nav>
 	<button on:click={() => (displaySettings = true)}>Settings</button>
-</header>
+</nav>
 
 <Sheet
 	bind:display={displaySettings}
-	class="backdrop-blur"
+	class="z-10 backdrop-blur"
 	classSheet="p-4 shadow bg-white"
 >
-	<h3>System Prompt</h3>
-	<Editor />
+	<SystemRole />
 </Sheet>
 
-<section class="prose m-4">
+<section class="prose mx-4 my-12">
 	{#each messages as message}
 		<h2>{message.role}</h2>
 		<div>
@@ -66,7 +68,7 @@
 	{/each}
 </section>
 
-<section class="fixed bottom-0 w-full p-4">
+<section class="sticky bottom-0 w-full p-4">
 	<form bind:this={inputForm} on:submit|preventDefault={chat} class="flex">
 		<Editor classTextarea="border grow" bind:valueTextarea={content} />
 		<button class="bg-gray-950 p-4 text-white">Submit</button>
