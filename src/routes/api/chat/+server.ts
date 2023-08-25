@@ -23,7 +23,10 @@ export const POST = async ({ request }) => {
 			start: async (controller) => {
 				for await (const part of stream) {
 					// instead of writing out here
-					controller.enqueue(part.choices[0]?.delta?.content || "");
+					const text = new TextEncoder().encode(
+						part.choices[0]?.delta?.content || "",
+					);
+					controller.enqueue(text);
 				}
 			},
 		});
