@@ -6,8 +6,6 @@ export const POST = async ({ request }) => {
 	const messages =
 		(await request.json()) as OpenAI.Chat.ChatCompletionMessage[];
 
-	console.log(messages);
-
 	const openai = new OpenAI({
 		apiKey: OPENAI_API_KEY,
 	});
@@ -15,7 +13,8 @@ export const POST = async ({ request }) => {
 	try {
 		const stream = await openai.chat.completions.create({
 			messages,
-			model: "gpt-3.5-turbo",
+			// model: "gpt-3.5-turbo",
+			model: "gpt-4",
 			stream: true,
 		});
 
@@ -27,6 +26,7 @@ export const POST = async ({ request }) => {
 					);
 					controller.enqueue(text);
 				}
+				controller.close();
 			},
 		});
 
@@ -38,6 +38,6 @@ export const POST = async ({ request }) => {
 			console.error(e);
 			throw error(e.status, e.name);
 		}
-		throw error(500, "something went wrong.");
+		throw error(500, "Server error.");
 	}
 };

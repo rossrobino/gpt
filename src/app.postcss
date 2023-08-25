@@ -20,10 +20,13 @@
 		@apply rounded bg-gray-800 px-3 py-2 text-sm capitalize leading-4 tracking-wide text-gray-50 shadow transition hover:bg-gray-900 active:scale-95 active:shadow-none disabled:cursor-not-allowed disabled:bg-gray-400 disabled:text-gray-50 disabled:shadow disabled:hover:bg-gray-400;
 	}
 	.btn-s {
-		@apply bg-transparent text-gray-900 shadow-none hover:bg-gray-100;
+		@apply bg-gray-50 bg-opacity-0 text-inherit shadow-none hover:bg-opacity-10;
+	}
+	.btn-d {
+		@apply bg-rose-800 hover:bg-rose-900;
 	}
 	.input {
-		@apply rounded border p-4 text-sm leading-4 disabled:cursor-not-allowed disabled:opacity-50;
+		@apply rounded bg-transparent p-2 text-sm leading-4 disabled:cursor-not-allowed disabled:opacity-50;
 	}
 	.label {
 		@apply text-sm font-semibold;

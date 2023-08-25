@@ -2,10 +2,13 @@
 	import "../app.postcss";
 	import { dev } from "$app/environment";
 	import { inject } from "@vercel/analytics";
+	import Breakpoint from "$lib/components/Breakpoint.svelte";
 
 	inject({ mode: dev ? "development" : "production" });
 </script>
 
-<main class="flex min-h-screen flex-col justify-between">
+<Breakpoint />
+
+<main>
 	<slot />
 </main>

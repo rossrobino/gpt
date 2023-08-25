@@ -1,81 +1,112 @@
 <script lang="ts">
-	import type { ChatCompletionMessage } from "openai/resources/chat";
-	import { Sheet } from "drab";
-	import SystemRole from "$lib/components/SystemRole.svelte";
+	import type { Messages } from "$lib/types";
 	import Message from "$lib/components/Message.svelte";
 
-	let messages: ChatCompletionMessage[] = [{ role: "user", content: "" }];
+	let loading = false;
+	let cancel = false;
 
-	let displaySettings = false;
+	let messages: Messages = [];
+
+	export const snapshot = {
+		capture: () => messages,
+		restore: (value) => (messages = value),
+	};
+
+	if (!messages.length) {
+		messages = [
+			{
+				value: { role: "user", content: "" },
+				open: true,
+				edit: true,
+			},
+		];
+	}
 
 	const chat = async () => {
+		messages[messages.length - 1].edit = false;
 		window.scrollTo(0, document.body.scrollHeight);
 		const response = await fetch("/api/chat", {
 			method: "POST",
-			body: JSON.stringify(messages),
+			body: JSON.stringify(messages.map((message) => message.value)),
 			headers: {
 				"content-type": "application/json",
 			},
 		});
 		if (response.body) {
-			messages = [...messages, { role: "assistant", content: "" }];
+			messages = [
+				...messages,
+				{ value: { role: "assistant", content: "" }, open: true, edit: false },
+			];
 			const reader = response.body.getReader();
 			let chunk = await reader.read();
-			while (!chunk.done) {
-				console.log(chunk);
-				messages[messages.length - 1].content += new TextDecoder(
+			while (!chunk.done && !cancel) {
+				messages[messages.length - 1].value.content += new TextDecoder(
 					"utf-8",
 				).decode(chunk.value);
 				chunk = await reader.read();
 				window.scrollTo(0, document.body.scrollHeight);
 			}
+			cancel = false;
+		}
+	};
+
+	const submit = async () => {
+		if (loading) {
+			cancel = true;
+		} else {
+			loading = true;
+			try {
+				await chat();
+				addMessage();
+			} catch (error) {
+				console.error(error);
+			}
+			loading = false;
 		}
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		if (!e.shiftKey && e.key === "Enter") {
+		if (e.ctrlKey && e.key === "Enter" && !loading) {
 			e.preventDefault();
-			chat();
+			submit();
 		}
 	};
 
 	const addMessage = () => {
-		messages = [...messages, { role: "user", content: "" }];
+		messages = [
+			...messages,
+			{
+				value: { role: "user", content: "" },
+				open: true,
+				edit: true,
+			},
+		];
 	};
 
 	const removeMessage = (i: number) => {
-		console.log("remove");
 		messages.splice(i, 1);
 		messages = messages;
+	};
+
+	const clear = () => {
+		messages = [];
+		addMessage();
 	};
 </script>
 
 <svelte:document on:keydown={onKeyDown} />
 
-<nav>
-	<button class="btn btn-s" on:click={() => (displaySettings = true)}>
-		Settings
-	</button>
-	<Sheet
-		bind:display={displaySettings}
-		class="z-10 backdrop-blur"
-		classSheet="p-4 shadow bg-white"
-	>
-		<SystemRole />
-	</Sheet>
-</nav>
-
-<section class="prose my-12 max-w-none">
-	{#each messages as message, i}
+<section class="prose prose-sm max-w-none">
+	{#each messages as message, i (message.value)}
 		<Message on:remove={() => removeMessage(i)} {message} />
 	{/each}
-	<div class="flex justify-end p-4">
-		<button on:click={addMessage} class="btn">New</button>
+	<div class="flex justify-between gap-4 border-t p-4">
+		<button on:click={clear} class="btn btn-d" disabled={loading}>Clear</button>
+		<div class="flex gap-4">
+			<button on:click={addMessage} class="btn" disabled={loading}>New</button>
+			<button on:click={submit} class="btn">
+				{loading ? "Stop" : "Submit"}
+			</button>
+		</div>
 	</div>
-</section>
-
-<section class="sticky bottom-0 flex justify-end p-4">
-	<form on:submit|preventDefault={chat}>
-		<button class="btn">Submit</button>
-	</form>
 </section>
