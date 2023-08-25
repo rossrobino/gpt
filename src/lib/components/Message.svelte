@@ -31,16 +31,15 @@
 		if (node instanceof HTMLElement) {
 			const textarea = node.querySelector("textarea");
 			if (textarea) {
-				console.log(textarea);
 				textarea.focus();
+				textarea.scrollIntoView();
 			}
 		}
-		window.scrollTo(0, document.body.scrollHeight);
 	};
 </script>
 
 <div transition:slide={{ duration: 200 }}>
-	<Details open={message.open}>
+	<Details bind:open={message.open}>
 		<svelte:fragment slot="summary" let:open>
 			<div
 				class="flex cursor-pointer items-center justify-between gap-8 p-2 shadow transition"
