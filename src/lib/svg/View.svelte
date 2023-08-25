@@ -2,7 +2,7 @@
 	xmlns="http://www.w3.org/2000/svg"
 	viewBox="0 0 20 20"
 	fill="currentColor"
-	class="h-5 w-5"
+	class="h-4 w-4"
 >
 	<path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
 	<path

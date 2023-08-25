@@ -32,7 +32,6 @@
 			const textarea = node.querySelector("textarea");
 			if (textarea) {
 				textarea.focus();
-				textarea.scrollIntoView();
 			}
 		}
 	};
@@ -45,8 +44,8 @@
 				class="flex cursor-pointer items-center justify-between gap-8 p-2 shadow transition"
 				class:text-gray-50={message.value.role === "user" ||
 					message.value.role === "system"}
-				class:bg-teal-900={message.value.role === "user"}
-				class:bg-gray-950={message.value.role === "system"}
+				class:bg-sky-900={message.value.role === "user"}
+				class:bg-gray-800={message.value.role === "system"}
 				class:text-gray-900={message.value.role === "assistant"}
 				class:bg-gray-300={message.value.role === "assistant"}
 			>
@@ -56,7 +55,13 @@
 					on:click|stopPropagation
 				>
 					{#each roles as role}
-						<option value={role}>{role}</option>
+						<option
+							class:bg-gray-800={message.value.role === "user" ||
+								message.value.role === "system"}
+							value={role}
+						>
+							{role}
+						</option>
 					{/each}
 				</select>
 				<div class="flex items-center">
@@ -70,8 +75,10 @@
 					<button
 						class="btn btn-s"
 						title={message.edit ? "View" : "Edit"}
-						on:click|preventDefault|stopPropagation={() =>
-							(message.edit = !message.edit)}
+						on:click|preventDefault|stopPropagation={() => {
+							message.edit = !message.edit;
+							message.open = true;
+						}}
 					>
 						{#if message.edit}
 							<View />

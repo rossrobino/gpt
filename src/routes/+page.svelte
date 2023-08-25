@@ -98,7 +98,7 @@
 
 <section class="prose prose-sm max-w-none">
 	{#each messages as message, i (message.value)}
-		<Message on:remove={() => removeMessage(i)} {message} />
+		<Message on:remove={() => removeMessage(i)} bind:message />
 	{/each}
 	<div class="flex justify-between gap-4 border-t p-4">
 		<button on:click={clear} class="btn btn-d" disabled={loading}>Clear</button>
