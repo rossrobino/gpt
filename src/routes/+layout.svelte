@@ -6,6 +6,6 @@
 	inject({ mode: dev ? "development" : "production" });
 </script>
 
-<main>
+<main class="flex min-h-screen flex-col justify-between">
 	<slot />
 </main>

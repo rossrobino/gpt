@@ -3,6 +3,7 @@
 	import { Editor, Sheet } from "drab";
 	import { mdToHtml } from "$lib/util/mdToHtml";
 	import SystemRole from "$lib/components/SystemRole.svelte";
+	import Message from "$lib/components/Message.svelte";
 
 	let inputForm: HTMLFormElement;
 
@@ -14,6 +15,7 @@
 
 	const chat = async () => {
 		messages = [...messages, { role: "user", content }];
+		window.scrollTo(0, document.body.scrollHeight);
 		content = "";
 		const response = await fetch("/api/chat", {
 			method: "POST",
@@ -48,23 +50,18 @@
 
 <nav>
 	<button on:click={() => (displaySettings = true)}>Settings</button>
+	<Sheet
+		bind:display={displaySettings}
+		class="z-10 backdrop-blur"
+		classSheet="p-4 shadow bg-white"
+	>
+		<SystemRole />
+	</Sheet>
 </nav>
-
-<Sheet
-	bind:display={displaySettings}
-	class="z-10 backdrop-blur"
-	classSheet="p-4 shadow bg-white"
->
-	<SystemRole />
-</Sheet>
 
 <section class="prose mx-4 my-12">
 	{#each messages as message}
-		<h2>{message.role}</h2>
-		<div>
-			{@html mdToHtml(message.content ? message.content : "")}
-		</div>
-		<hr />
+		<Message {message} />
 	{/each}
 </section>
 
