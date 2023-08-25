@@ -38,30 +38,16 @@
 </script>
 
 <div in:slide={{ duration: 200 }}>
-	<Details bind:open={message.open}>
+	<Details bind:open={message.open} class="border-b bg-white">
 		<svelte:fragment slot="summary" let:open>
-			<div
-				class="flex cursor-pointer items-center justify-between gap-8 p-2 shadow transition"
-				class:text-gray-50={message.value.role === "user" ||
-					message.value.role === "system"}
-				class:bg-sky-900={message.value.role === "user"}
-				class:bg-gray-800={message.value.role === "system"}
-				class:text-gray-900={message.value.role === "assistant"}
-				class:bg-gray-300={message.value.role === "assistant"}
-			>
+			<div class="flex cursor-pointer items-center justify-between gap-8 p-2">
 				<select
-					class="input capitalize"
+					class="input w-24 appearance-none p-2 capitalize underline hover:decoration-dashed"
 					bind:value={message.value.role}
 					on:click|stopPropagation
 				>
 					{#each roles as role}
-						<option
-							class:bg-gray-800={message.value.role === "user" ||
-								message.value.role === "system"}
-							value={role}
-						>
-							{role}
-						</option>
+						<option value={role}>{role}</option>
 					{/each}
 				</select>
 				<div class="flex items-center">
@@ -113,7 +99,7 @@
 			{:else if message.value.content !== null}
 				<div use:lifecycle in:fade={{ duration }}>
 					<Editor
-						classTextarea="w-full h-64 p-5 appearance-none focus:outline-none block"
+						classTextarea="w-full h-64 px-4 appearance-none focus:outline-none block"
 						classControls="hidden"
 						placeholderTextarea="Message"
 						bind:valueTextarea={message.value.content}

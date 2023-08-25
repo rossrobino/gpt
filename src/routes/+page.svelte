@@ -90,7 +90,7 @@
 	{#each messages as message, i (message.value)}
 		<Message on:remove={() => removeMessage(i)} bind:message />
 	{/each}
-	<div class="flex justify-between gap-4 border-t p-4">
+	<div class="flex justify-between gap-4 p-4">
 		<div>
 			<button
 				on:click={clear}
