@@ -10,7 +10,6 @@ A flexible openai [ChatGPT](https://ai.com) wrapper.
 - Streams responses from vercel edge functions using a readable stream
 - Use the `system` role to set context
 - Delete and edit previous messages
-- Stores history in session storage
 
 ## Use the components
 

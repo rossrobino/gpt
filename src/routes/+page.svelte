@@ -5,22 +5,13 @@
 	let loading = false;
 	let cancel = false;
 
-	let messages: Messages = [];
-
-	export const snapshot = {
-		capture: () => messages,
-		restore: (value) => (messages = value),
-	};
-
-	if (!messages.length) {
-		messages = [
-			{
-				value: { role: "user", content: "" },
-				open: true,
-				edit: true,
-			},
-		];
-	}
+	let messages: Messages = [
+		{
+			value: { role: "user", content: "" },
+			open: true,
+			edit: true,
+		},
+	];
 
 	const chat = async () => {
 		messages[messages.length - 1].edit = false;
