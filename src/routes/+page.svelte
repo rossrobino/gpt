@@ -1,22 +1,15 @@
 <script lang="ts">
 	import type { ChatCompletionMessage } from "openai/resources/chat";
-	import { Editor, Sheet } from "drab";
-	import { mdToHtml } from "$lib/util/mdToHtml";
+	import { Sheet } from "drab";
 	import SystemRole from "$lib/components/SystemRole.svelte";
 	import Message from "$lib/components/Message.svelte";
 
-	let inputForm: HTMLFormElement;
-
-	let messages: ChatCompletionMessage[] = [];
-
-	let content = "";
+	let messages: ChatCompletionMessage[] = [{ role: "user", content: "" }];
 
 	let displaySettings = false;
 
 	const chat = async () => {
-		messages = [...messages, { role: "user", content }];
 		window.scrollTo(0, document.body.scrollHeight);
-		content = "";
 		const response = await fetch("/api/chat", {
 			method: "POST",
 			body: JSON.stringify(messages),
@@ -41,15 +34,28 @@
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (!e.shiftKey && e.key === "Enter") {
+			e.preventDefault();
 			chat();
 		}
+	};
+
+	const addMessage = () => {
+		messages = [...messages, { role: "user", content: "" }];
+	};
+
+	const removeMessage = (i: number) => {
+		console.log("remove");
+		messages.splice(i, 1);
+		messages = messages;
 	};
 </script>
 
 <svelte:document on:keydown={onKeyDown} />
 
 <nav>
-	<button on:click={() => (displaySettings = true)}>Settings</button>
+	<button class="btn btn-s" on:click={() => (displaySettings = true)}>
+		Settings
+	</button>
 	<Sheet
 		bind:display={displaySettings}
 		class="z-10 backdrop-blur"
@@ -59,15 +65,17 @@
 	</Sheet>
 </nav>
 
-<section class="prose mx-4 my-12">
-	{#each messages as message}
-		<Message {message} />
+<section class="prose my-12 max-w-none">
+	{#each messages as message, i}
+		<Message on:remove={() => removeMessage(i)} {message} />
 	{/each}
+	<div class="flex justify-end p-4">
+		<button on:click={addMessage} class="btn">New</button>
+	</div>
 </section>
 
-<section class="sticky bottom-0 w-full p-4">
-	<form bind:this={inputForm} on:submit|preventDefault={chat} class="flex">
-		<Editor classTextarea="border grow" bind:valueTextarea={content} />
-		<button class="bg-gray-950 p-4 text-white">Submit</button>
+<section class="sticky bottom-0 flex justify-end p-4">
+	<form on:submit|preventDefault={chat}>
+		<button class="btn">Submit</button>
 	</form>
 </section>
