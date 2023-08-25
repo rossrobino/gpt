@@ -100,7 +100,16 @@
 		<Message on:remove={() => removeMessage(i)} bind:message />
 	{/each}
 	<div class="flex justify-between gap-4 border-t p-4">
-		<button on:click={clear} class="btn btn-d" class:hidden={messages.length < 1} disabled={loading}>Clear</button>
+		<div>
+			<button
+				on:click={clear}
+				class="btn btn-d"
+				class:hidden={messages.length < 1}
+				disabled={loading}
+			>
+				Clear
+			</button>
+		</div>
 		<div class="flex gap-4">
 			<button on:click={addMessage} class="btn" disabled={loading}>New</button>
 			<button on:click={submit} class="btn" class:hidden={messages.length < 1}>
