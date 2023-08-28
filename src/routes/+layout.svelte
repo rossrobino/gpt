@@ -7,8 +7,7 @@
 	inject({ mode: dev ? "development" : "production" });
 </script>
 
-<Breakpoint />
-
-<main>
+<main class="prose prose-sm prose-neutral max-w-none dark:prose-invert">
+	<Breakpoint />
 	<slot />
 </main>

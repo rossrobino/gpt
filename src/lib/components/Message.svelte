@@ -34,7 +34,10 @@
 	};
 </script>
 
-<Details bind:open={message.open} class="border-b bg-white">
+<Details
+	bind:open={message.open}
+	class="border-b bg-white dark:border-neutral-700 dark:bg-neutral-900"
+>
 	<svelte:fragment slot="summary" let:open>
 		<div class="flex cursor-pointer items-center justify-between gap-8 p-2">
 			<select
@@ -94,7 +97,7 @@
 		{:else if message.value.content !== null}
 			<div use:lifecycle>
 				<Editor
-					classTextarea="w-full h-64 px-4 appearance-none focus:outline-none block"
+					classTextarea="w-full h-64 px-4 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
 					classControls="hidden"
 					placeholderTextarea="Message"
 					bind:valueTextarea={message.value.content}

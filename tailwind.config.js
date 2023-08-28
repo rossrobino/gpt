@@ -4,6 +4,12 @@ import typography from "@tailwindcss/typography";
 export default {
 	content: ["./src/**/*.{html,js,svelte,ts}"],
 	theme: {
+		borderColor: {
+			DEFAULT: "#d4d4d4",
+			neutral: {
+				700: "#404040",
+			},
+		},
 		extend: {
 			fontFamily: {
 				antique: [

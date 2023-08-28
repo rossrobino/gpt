@@ -89,7 +89,7 @@
 
 <svelte:document on:keydown={onKeyDown} />
 
-<section class="prose prose-sm max-w-none">
+<section>
 	{#each messages as message, i (message.value)}
 		<Message on:remove={() => removeMessage(i)} bind:message />
 	{/each}
