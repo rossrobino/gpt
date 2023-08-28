@@ -35,9 +35,9 @@ export const POST = async ({ request }) => {
 		});
 	} catch (e) {
 		if (e instanceof OpenAI.APIError && e.status) {
-			console.error(e);
 			throw error(e.status, e.name);
 		}
-		throw error(500, "Server error.");
+		console.error(e);
+		throw error(500);
 	}
 };
