@@ -1,9 +1,22 @@
 <script lang="ts">
 	import type { Messages } from "$lib/types";
 	import Message from "$lib/components/Message.svelte";
+	import Bars from "$lib/svg/Bars.svelte";
+	import { Editor, Sheet } from "drab";
+	import X from "$lib/svg/X.svelte";
+	import Plus from "$lib/svg/Plus.svelte";
+	import Arrow from "$lib/svg/Arrow.svelte";
 
 	let loading = false;
 	let cancel = false;
+	let display = false;
+
+	let customInstructions = "";
+
+	export const snapshot = {
+		capture: () => customInstructions,
+		restore: (value) => (customInstructions = value),
+	};
 
 	let messages: Messages = [
 		{
@@ -21,7 +34,10 @@
 		window.scrollTo(0, document.body.scrollHeight);
 		const response = await fetch("/api/chat", {
 			method: "POST",
-			body: JSON.stringify(messages.map((message) => message.value)),
+			body: JSON.stringify([
+				{ role: "system", content: customInstructions },
+				...messages.map((message) => message.value),
+			]),
 			headers: {
 				"content-type": "application/json",
 			},
@@ -89,26 +105,73 @@
 
 <svelte:document on:keydown={onKeyDown} />
 
-<section>
-	{#each messages as message, i (message.value)}
-		<Message on:remove={() => removeMessage(i)} bind:message />
-	{/each}
-	<div class="flex justify-between gap-4 p-4">
-		<div>
-			<button
-				on:click={clear}
-				class="btn btn-d"
-				class:hidden={messages.length < 1}
-				disabled={loading}
-			>
-				Clear
-			</button>
-		</div>
-		<div class="flex gap-4">
-			<button on:click={addMessage} class="btn" disabled={loading}>New</button>
-			<button on:click={submit} class="btn" class:hidden={messages.length < 1}>
-				{loading ? "Stop" : "Submit"}
-			</button>
-		</div>
+<Sheet
+	bind:display
+	class="z-50 backdrop-blur"
+	classSheet="p-4 shadow bg-white dark:bg-neutral-900"
+>
+	<div class="mb-4 flex items-center justify-between gap-12">
+		<h2 class="my-0">Custom Instructions</h2>
+		<button
+			type="button"
+			title="Close"
+			class="btn btn-s"
+			on:click={() => (display = false)}
+		>
+			<X />
+		</button>
 	</div>
-</section>
+	<Editor
+		classTextarea="w-full h-64 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
+		classControls="hidden"
+		placeholderTextarea="ex: You respond in Japanese."
+		bind:valueTextarea={customInstructions}
+	/>
+</Sheet>
+
+<div>
+	<header
+		class="sticky top-0 z-10 flex justify-between gap-3 p-3 backdrop-blur"
+	>
+		<button
+			class="btn btn-s"
+			title="Settings"
+			on:click={() => (display = true)}
+		>
+			<Bars />
+		</button>
+		<button
+			on:click={clear}
+			class="btn btn-d flex items-center gap-1"
+			class:hidden={messages.length < 1}
+			disabled={loading}
+		>
+			Clear <X />
+		</button>
+	</header>
+	<main class="border-t dark:border-neutral-700">
+		{#each messages as message, i (message.value)}
+			<Message on:remove={() => removeMessage(i)} bind:message />
+		{/each}
+	</main>
+</div>
+<footer class="sticky bottom-0 z-10 flex justify-end gap-3 p-3 backdrop-blur">
+	<button
+		on:click={addMessage}
+		class="btn flex items-center gap-1"
+		disabled={loading}
+	>
+		New <Plus />
+	</button>
+	<button
+		on:click={submit}
+		class="btn flex items-center gap-1"
+		class:hidden={messages.length < 1}
+	>
+		{#if loading}
+			Stop <X />
+		{:else}
+			Send <Arrow />
+		{/if}
+	</button>
+</footer>

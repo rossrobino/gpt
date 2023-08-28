@@ -39,7 +39,7 @@
 	class="border-b bg-white dark:border-neutral-700 dark:bg-neutral-900"
 >
 	<svelte:fragment slot="summary" let:open>
-		<div class="flex cursor-pointer items-center justify-between gap-8 p-2">
+		<div class="flex cursor-pointer items-center justify-between gap-8 p-3">
 			<select
 				class="input w-24 appearance-none p-2 capitalize underline hover:decoration-dashed"
 				bind:value={message.value.role}
@@ -49,7 +49,7 @@
 					<option value={role}>{role}</option>
 				{/each}
 			</select>
-			<div class="flex items-center">
+			<div class="flex items-center gap-1">
 				<div
 					class="btn btn-s transition"
 					class:rotate-180={open}
