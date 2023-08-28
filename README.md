@@ -1,6 +1,6 @@
 # gpt.robino.dev
 
-A flexible openai [ChatGPT](https://ai.com) wrapper.
+A custom openai [ChatGPT](https://ai.com) wrapper.
 
 [gpt.robino.dev](https://gpt.robino.dev)
 
