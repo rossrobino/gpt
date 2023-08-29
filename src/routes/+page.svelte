@@ -2,10 +2,10 @@
 	import type { Messages } from "$lib/types";
 	import Message from "$lib/components/Message.svelte";
 	import Bars from "$lib/svg/Bars.svelte";
-	import { Editor, Sheet } from "drab";
-	import X from "$lib/svg/X.svelte";
-	import Plus from "$lib/svg/Plus.svelte";
+	import Settings from "$lib/components/Settings.svelte";
 	import Arrow from "$lib/svg/Arrow.svelte";
+	import Plus from "$lib/svg/Plus.svelte";
+	import X from "$lib/svg/X.svelte";
 
 	let loading = false;
 	let cancel = false;
@@ -105,29 +105,7 @@
 
 <svelte:document on:keydown={onKeyDown} />
 
-<Sheet
-	bind:display
-	class="z-50 backdrop-blur"
-	classSheet="p-4 shadow bg-white dark:bg-neutral-900"
->
-	<div class="mb-4 flex items-center justify-between gap-12">
-		<h2 class="my-0">Custom Instructions</h2>
-		<button
-			type="button"
-			title="Close"
-			class="btn btn-s"
-			on:click={() => (display = false)}
-		>
-			<X />
-		</button>
-	</div>
-	<Editor
-		classTextarea="w-full h-64 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
-		classControls="hidden"
-		placeholderTextarea="ex: You respond in Japanese."
-		bind:valueTextarea={customInstructions}
-	/>
-</Sheet>
+<Settings bind:display bind:customInstructions />
 
 <div>
 	<header
@@ -169,7 +147,7 @@
 		class:hidden={messages.length < 1}
 	>
 		{#if loading}
-			Stop <X />
+			Stop <X class="animate-spin" />
 		{:else}
 			Send <Arrow />
 		{/if}

@@ -97,7 +97,7 @@
 		{:else if message.value.content !== null}
 			<div use:lifecycle>
 				<Editor
-					classTextarea="w-full h-64 px-4 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
+					classTextarea="w-full h-48 min-h-[2rem] px-4 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
 					classControls="hidden"
 					placeholderTextarea="Message"
 					bind:valueTextarea={message.value.content}
