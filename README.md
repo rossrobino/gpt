@@ -11,6 +11,13 @@ A custom openai [ChatGPT](https://ai.com) wrapper.
 - Use the `system` role to set context
 - Delete and edit previous messages
 
+## Keyboard Shortcuts
+
+| Function | Key Combination           |
+| -------- | ------------------------- |
+| Send     | `ctrl or meta` + `Enter`  |
+| Clear    | `ctrl or meta` + `Escape` |
+
 ## Use the components
 
 - [drab](https://github.com/rossrobino/drab)

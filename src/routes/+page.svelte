@@ -76,9 +76,14 @@
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		if (e.ctrlKey && e.key === "Enter" && !loading) {
-			e.preventDefault();
-			submit();
+		if (e.ctrlKey || e.metaKey) {
+			if (e.key === "Enter") {
+				e.preventDefault();
+				submit();
+			} else if (e.key === "Escape") {
+				e.preventDefault();
+				clear();
+			}
 		}
 	};
 
@@ -99,7 +104,7 @@
 	};
 
 	const clear = () => {
-		messages = [];
+		if (!loading) messages = [];
 	};
 </script>
 
