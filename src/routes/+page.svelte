@@ -137,7 +137,7 @@
 	</main>
 </div>
 <footer class="sticky bottom-0 z-10 flex justify-end gap-3 p-3 backdrop-blur">
-	<button on:click={addMessage} class="btn btn-p" disabled={loading}>
+	<button on:click={addMessage} class="btn btn-s" disabled={loading}>
 		New <Plus />
 	</button>
 	<button on:click={submit} class="btn btn-p" disabled={messages.length < 1}>
