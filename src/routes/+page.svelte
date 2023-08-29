@@ -10,7 +10,6 @@
 	let loading = false;
 	let cancel = false;
 	let display = false;
-
 	let customInstructions = "";
 
 	export const snapshot = {
@@ -125,9 +124,8 @@
 		</button>
 		<button
 			on:click={clear}
-			class="btn btn-d flex items-center gap-1"
-			class:hidden={messages.length < 1}
-			disabled={loading}
+			class="btn btn-d"
+			disabled={loading || messages.length < 1}
 		>
 			Clear <X />
 		</button>
@@ -139,18 +137,10 @@
 	</main>
 </div>
 <footer class="sticky bottom-0 z-10 flex justify-end gap-3 p-3 backdrop-blur">
-	<button
-		on:click={addMessage}
-		class="btn flex items-center gap-1"
-		disabled={loading}
-	>
+	<button on:click={addMessage} class="btn btn-p" disabled={loading}>
 		New <Plus />
 	</button>
-	<button
-		on:click={submit}
-		class="btn flex items-center gap-1"
-		class:hidden={messages.length < 1}
-	>
+	<button on:click={submit} class="btn btn-p" disabled={messages.length < 1}>
 		{#if loading}
 			Stop <X class="animate-spin" />
 		{:else}

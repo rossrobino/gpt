@@ -13,10 +13,10 @@ A custom openai [ChatGPT](https://ai.com) wrapper.
 
 ## Keyboard Shortcuts
 
-| Function | Key Combination           |
-| -------- | ------------------------- |
-| Send     | `ctrl or meta` + `Enter`  |
-| Clear    | `ctrl or meta` + `Escape` |
+| Function    | Key Combination           |
+| ----------- | ------------------------- |
+| Send / Stop | `ctrl or meta` + `Enter`  |
+| Clear       | `ctrl or meta` + `Escape` |
 
 ## Use the components
 
