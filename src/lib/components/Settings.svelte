@@ -17,7 +17,7 @@
 		<button
 			type="button"
 			title="Close"
-			class="btn btn-s"
+			class="btn btn-g"
 			on:click={() => (display = false)}
 		>
 			<X />

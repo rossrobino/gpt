@@ -116,7 +116,7 @@
 		class="sticky top-0 z-10 flex justify-between gap-3 p-3 backdrop-blur"
 	>
 		<button
-			class="btn btn-s"
+			class="btn btn-g"
 			title="Settings"
 			on:click={() => (display = true)}
 		>

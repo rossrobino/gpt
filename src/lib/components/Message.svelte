@@ -51,14 +51,14 @@
 			</select>
 			<div class="flex items-center gap-1">
 				<div
-					class="btn btn-s transition"
+					class="btn btn-g transition"
 					class:rotate-180={open}
 					title={open ? "Close" : "Open"}
 				>
 					<Chevron />
 				</div>
 				<button
-					class="btn btn-s"
+					class="btn btn-g"
 					title={message.edit ? "View" : "Edit"}
 					on:click|preventDefault|stopPropagation={() => {
 						message.edit = !message.edit;
@@ -74,7 +74,7 @@
 				<button
 					on:click|preventDefault|stopPropagation={remove}
 					title="Remove"
-					class="btn btn-s"
+					class="btn btn-g"
 				>
 					<X />
 				</button>
