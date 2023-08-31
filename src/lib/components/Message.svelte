@@ -34,14 +34,11 @@
 	};
 </script>
 
-<Details
-	bind:open={message.open}
-	class="border-b bg-white dark:border-neutral-700 dark:bg-neutral-900"
->
+<Details bind:open={message.open} class="border-b bg-card">
 	<svelte:fragment slot="summary" let:open>
-		<div class="flex cursor-pointer items-center justify-between gap-8 p-3">
+		<div class="flex cursor-pointer items-center justify-between gap-8 p-4">
 			<select
-				class="input w-24 appearance-none p-2 capitalize underline hover:decoration-dashed"
+				class="input w-fit capitalize"
 				bind:value={message.value.role}
 				on:click|stopPropagation
 			>
@@ -51,14 +48,14 @@
 			</select>
 			<div class="flex items-center gap-1">
 				<div
-					class="btn btn-g transition"
+					class="button button-ghost"
 					class:rotate-180={open}
 					title={open ? "Close" : "Open"}
 				>
 					<Chevron />
 				</div>
 				<button
-					class="btn btn-g"
+					class="button button-ghost"
 					title={message.edit ? "View" : "Edit"}
 					on:click|preventDefault|stopPropagation={() => {
 						message.edit = !message.edit;
@@ -74,7 +71,7 @@
 				<button
 					on:click|preventDefault|stopPropagation={remove}
 					title="Remove"
-					class="btn btn-g"
+					class="button button-ghost"
 				>
 					<X />
 				</button>
@@ -82,27 +79,25 @@
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="content">
-		{#if !message.edit}
-			<div
-				class="px-4"
-				role="article"
-				on:dblclick={() => (message.edit = true)}
-			>
-				{@html mdToHtml(
-					message.value.content
-						? message.value.content
-						: "No message available.",
-				)}
-			</div>
-		{:else if message.value.content !== null}
-			<div use:lifecycle>
-				<Editor
-					classTextarea="w-full h-48 min-h-[2rem] px-4 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
-					classControls="hidden"
-					placeholderTextarea="Message"
-					bind:valueTextarea={message.value.content}
-				/>
-			</div>
-		{/if}
+		<div class="p-4">
+			{#if !message.edit}
+				<div role="article" on:dblclick={() => (message.edit = true)}>
+					{@html mdToHtml(
+						message.value.content
+							? message.value.content
+							: "No message available.",
+					)}
+				</div>
+			{:else if message.value.content !== null}
+				<div use:lifecycle>
+					<Editor
+						classTextarea="w-full h-48 min-h-[2.5rem] input"
+						classControls="hidden"
+						placeholderTextarea="Message"
+						bind:valueTextarea={message.value.content}
+					/>
+				</div>
+			{/if}
+		</div>
 	</svelte:fragment>
 </Details>

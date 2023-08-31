@@ -113,10 +113,10 @@
 
 <div>
 	<header
-		class="sticky top-0 z-10 flex justify-between gap-3 p-3 backdrop-blur"
+		class="sticky top-0 z-10 flex justify-between gap-4 p-4 backdrop-blur"
 	>
 		<button
-			class="btn btn-g"
+			class="button button-ghost"
 			title="Settings"
 			on:click={() => (display = true)}
 		>
@@ -124,23 +124,31 @@
 		</button>
 		<button
 			on:click={clear}
-			class="btn btn-d"
+			class="button button-destructive gap-1"
 			disabled={loading || messages.length < 1}
 		>
 			Clear <X />
 		</button>
 	</header>
-	<main class="border-t dark:border-neutral-700">
+	<main class="border-t">
 		{#each messages as message, i (message.value)}
 			<Message on:remove={() => removeMessage(i)} bind:message />
 		{/each}
 	</main>
 </div>
-<footer class="sticky bottom-0 z-10 flex justify-end gap-3 p-3 backdrop-blur">
-	<button on:click={addMessage} class="btn btn-s" disabled={loading}>
+<footer class="sticky bottom-0 z-10 flex justify-end gap-4 p-4 backdrop-blur">
+	<button
+		on:click={addMessage}
+		class="button button-secondary gap-1"
+		disabled={loading}
+	>
 		New <Plus />
 	</button>
-	<button on:click={submit} class="btn btn-p" disabled={messages.length < 1}>
+	<button
+		on:click={submit}
+		class="button button-primary gap-1"
+		disabled={messages.length < 1}
+	>
 		{#if loading}
 			Stop <X class="animate-spin" />
 		{:else}

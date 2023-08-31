@@ -5,6 +5,6 @@
 
 {#if dev}
 	<Breakpoint
-		class="fixed bottom-3 left-3 z-50 rounded border px-2 py-1 font-mono tabular-nums shadow"
+		class="font-sm fixed bottom-3 left-3 z-50 rounded border px-3 py-2 font-mono tabular-nums shadow"
 	/>
 {/if}

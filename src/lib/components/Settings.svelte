@@ -7,24 +7,20 @@
 	export let customInstructions: string;
 </script>
 
-<Sheet
-	bind:display
-	class="z-50 backdrop-blur"
-	classSheet="p-4 shadow bg-white dark:bg-neutral-900"
->
+<Sheet bind:display class="z-50 backdrop-blur" classSheet="p-4 shadow bg-card">
 	<div class="mb-4 flex items-center justify-between gap-12">
 		<h2 class="my-0">Custom Instructions</h2>
 		<button
 			type="button"
 			title="Close"
-			class="btn btn-g"
+			class="button button-ghost"
 			on:click={() => (display = false)}
 		>
 			<X />
 		</button>
 	</div>
 	<Editor
-		classTextarea="w-full h-64 appearance-none focus:outline-none bg-transparent block placeholder:text-neutral-400"
+		classTextarea="w-full h-64 input"
 		classControls="hidden"
 		placeholderTextarea="ex: You respond in Japanese."
 		bind:valueTextarea={customInstructions}

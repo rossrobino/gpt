@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class="prose prose-sm prose-neutral flex min-h-[100dvh] max-w-none flex-col justify-between dark:prose-invert"
+	class="prose prose-sm prose-zinc flex min-h-[100dvh] max-w-none flex-col justify-between dark:prose-invert"
 >
 	<Breakpoint />
 	<slot />

@@ -1,41 +1,39 @@
 @import url("$lib/styles/highlight.postcss");
+@import url("layercomp") layer(components);
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/** uses the TailwindCSS Typography plugin for base styles */
 @layer base {
-	a,
-	button,
-	input,
-	textarea,
-	summary {
-		@apply outline-offset-4;
+	:root {
+		--background: 0 0% 98%; /* zinc 50 */
+		--foreground: 240 5.3% 26.1%; /* 700 */
+		--card: 0 0% 100%; /* white */
+		--primary: 240 5.9% 10%; /* 900 */
+		--primary-foreground: 240 4.8% 95.9%; /* 100 */
+		--secondary: 240 5.9% 90%; /* 200 */
+		--secondary-foreground: 240 5.9% 10%; /* 900 */
+		--muted: 240 4.8% 95.9%; /* 100 */
+		--muted-foreground: 240 5.2% 33.9%; /* 600 */
+		--destructive: 345.3 82.7% 40.8%; /* rose 700 */
+		--destructive-foreground: 240 4.8% 95.9%; /* 100 */
+		--border: 240 4.9% 83.9%; /* 300 */
+		--radius: 0.3rem;
 	}
-}
-
-@layer components {
-	.btn {
-		@apply flex items-center gap-1 rounded px-3 py-2 text-sm capitalize leading-4 tracking-wide shadow transition active:scale-95 active:shadow-none disabled:cursor-not-allowed disabled:bg-neutral-500 disabled:text-neutral-50 disabled:shadow disabled:hover:bg-neutral-500;
-	}
-	.btn-p {
-		@apply bg-neutral-800 text-neutral-50 hover:bg-neutral-900;
-	}
-	.btn-s {
-		@apply bg-sky-800 text-neutral-50 hover:bg-sky-900;
-	}
-	.btn-g {
-		@apply bg-neutral-500 bg-opacity-0 shadow-none hover:bg-opacity-10;
-	}
-	.btn-d {
-		@apply bg-rose-800 text-neutral-50 hover:bg-rose-900;
-	}
-	.input {
-		@apply cursor-pointer rounded bg-transparent p-2 text-sm leading-4 disabled:cursor-not-allowed disabled:opacity-50;
-	}
-	.label {
-		@apply text-sm font-semibold;
+	.dark {
+		--background: 240 10% 3.9%; /* zinc 950 */
+		--foreground: 240 4.9% 83.9%; /* 300 */
+		--card: 0 0% 0%; /* black */
+		--primary: 240 4.8% 95.9%; /* 100 */
+		--primary-foreground: 240 5.9% 10%; /* 900 */
+		--secondary: 240 3.7% 15.9%; /* 800 */
+		--secondary-foreground: 240 4.8% 95.9%; /* 100 */
+		--muted: 240 5.9% 10%; /* 900 */
+		--muted-foreground: 240 5% 64.9%; /* 400 */
+		--destructive: 343.4 79.7% 34.7%; /* rose 800 */
+		--destructive-foreground: 240 4.8% 95.9%; /* 100 */
+		--border: 240 5.3% 26.1%; /* 700 */
 	}
 }
 
