@@ -20,7 +20,7 @@
 		</button>
 	</div>
 	<Editor
-		classTextarea="w-full h-64 input"
+		classTextarea="input"
 		classControls="hidden"
 		placeholderTextarea="ex: You respond in Japanese."
 		bind:valueTextarea={customInstructions}
