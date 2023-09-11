@@ -7,7 +7,11 @@
 	export let customInstructions: string;
 </script>
 
-<Sheet bind:display class="z-50 backdrop-blur" classSheet="p-4 shadow bg-card">
+<Sheet
+	bind:display
+	class="z-50 backdrop-blur"
+	classSheet="p-4 shadow bg-card w-full"
+>
 	<div class="mb-4 flex items-center justify-between gap-12">
 		<h2 class="my-0">Custom Instructions</h2>
 		<button

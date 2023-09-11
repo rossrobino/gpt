@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
+		"host": "vite dev --host",
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -14,14 +15,14 @@
 	"devDependencies": {
 		"@sveltejs/adapter-vercel": "^3.0.3",
 		"@sveltejs/kit": "^1.24.1",
-		"@tailwindcss/typography": "^0.5.9",
+		"@tailwindcss/typography": "^0.5.10",
 		"@typescript-eslint/eslint-plugin": "^6.6.0",
 		"@typescript-eslint/parser": "^6.6.0",
 		"autoprefixer": "^10.4.15",
-		"drab": "^3.0.5",
-		"eslint": "^8.48.0",
+		"drab": "^4.0.0",
+		"eslint": "^8.49.0",
 		"eslint-config-prettier": "^9.0.0",
-		"eslint-plugin-svelte": "^2.33.0",
+		"eslint-plugin-svelte": "^2.33.1",
 		"postcss": "^8.4.29",
 		"prettier": "^3.0.3",
 		"prettier-plugin-svelte": "^3.0.3",
@@ -31,15 +32,15 @@
 		"tailwindcss": "^3.3.3",
 		"tslib": "^2.6.2",
 		"typescript": "^5.2.2",
-		"uico": "^0.1.0",
+		"uico": "^0.1.3",
 		"vite": "^4.4.9"
 	},
 	"type": "module",
 	"dependencies": {
 		"@vercel/analytics": "^1.0.2",
 		"highlight.js": "^11.8.0",
-		"marked": "^8.0.0",
-		"marked-highlight": "^2.0.5",
-		"openai": "^4.4.0"
+		"marked": "^9.0.0",
+		"marked-highlight": "^2.0.6",
+		"openai": "^4.6.0"
 	}
 }
