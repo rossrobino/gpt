@@ -27,7 +27,7 @@
 		"prettier": "^3.0.3",
 		"prettier-plugin-svelte": "^3.0.3",
 		"prettier-plugin-tailwindcss": "^0.5.4",
-		"robino": "^0.0.1",
+		"robino": "^0.0.19",
 		"svelte": "^4.2.0",
 		"svelte-check": "^3.5.1",
 		"tailwindcss": "^3.3.3",
@@ -40,8 +40,8 @@
 	"dependencies": {
 		"@vercel/analytics": "^1.0.2",
 		"highlight.js": "^11.8.0",
-		"marked": "^9.0.0",
+		"marked": "^9.0.1",
 		"marked-highlight": "^2.0.6",
-		"openai": "^4.7.0"
+		"openai": "^4.7.1"
 	}
 }

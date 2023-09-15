@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Message } from "$lib/types";
 	import { Details, Editor } from "drab";
-	import { mdToHtml } from "$lib/util/mdToHtml";
+	import { process } from "robino/util/md";
 	import Chevron from "$lib/svg/Chevron.svelte";
 	import X from "$lib/svg/X.svelte";
 	import { createEventDispatcher } from "svelte";
@@ -82,11 +82,11 @@
 		<div class="p-4">
 			{#if !message.edit}
 				<div role="article" on:dblclick={() => (message.edit = true)}>
-					{@html mdToHtml(
+					{@html process(
 						message.value.content
 							? message.value.content
 							: "No message available.",
-					)}
+					).html}
 				</div>
 			{:else if message.value.content !== null}
 				<div use:lifecycle>
