@@ -1,8 +1,8 @@
-/** @type {import("prettier").Options} */
+import config from "robino/config/prettier";
+
+/** @type {import("prettier").Config} */
 export default {
-	useTabs: true,
-	printWidth: 80,
-	htmlWhitespaceSensitivity: "ignore",
+	...config,
 	plugins: ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
 	overrides: [
 		{
