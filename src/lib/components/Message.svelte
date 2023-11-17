@@ -7,7 +7,7 @@
 	import { createEventDispatcher } from "svelte";
 	import Edit from "$lib/svg/Edit.svelte";
 	import View from "$lib/svg/View.svelte";
-	import type { ChatCompletionMessage } from "openai/resources/chat";
+	import type { ChatCompletionRole } from "openai/resources/chat";
 	import { fade } from "svelte/transition";
 
 	export let message: Message;
@@ -16,7 +16,7 @@
 
 	const remove = () => dispatch("remove");
 
-	const roles: ChatCompletionMessage["role"][] = [
+	const roles: ChatCompletionRole[] = [
 		"user",
 		"system",
 		"assistant",
