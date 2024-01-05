@@ -26,8 +26,8 @@ A custom openai [ChatGPT](https://ai.com) wrapper.
 
 - Clone repo to local machine
 - Create a `.env` file and add your `OPENAI_API_KEY`
-- `pnpm i`
-- `pnpm dev`
+- `bun i`
+- `bun dev`
 
 ## LICENSE
 

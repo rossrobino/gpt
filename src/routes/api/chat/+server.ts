@@ -34,9 +34,10 @@ export const POST = async ({ request }) => {
 		});
 	} catch (e) {
 		if (e instanceof OpenAI.APIError && e.status) {
-			throw error(e.status, e.name);
+			// conflict between openai types and sveltekit's
+			error(e.status as 400, e.name);
 		}
 		console.error(e);
-		throw error(500);
+		error(500);
 	}
 };
