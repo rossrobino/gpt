@@ -2,7 +2,6 @@
 	import type { ChatCompletionRole } from "openai/resources/chat/completions.js";
 	import type { Messages } from "$lib/types";
 	import Message from "$lib/components/Message.svelte";
-	import Bars from "$lib/svg/Bars.svelte";
 	import Settings from "$lib/components/Settings.svelte";
 	import Arrow from "$lib/svg/Arrow.svelte";
 	import Plus from "$lib/svg/Plus.svelte";
@@ -131,9 +130,6 @@
 	/** set to `false` upon response, if `true`, stops the stream loop on the client */
 	let cancel = false;
 
-	/** displays the settings sheet panel */
-	let display = false;
-
 	let messages: Messages = [];
 
 	addMessage();
@@ -141,23 +137,15 @@
 
 <svelte:document on:keydown={onKeyDown} />
 
-<Settings
-	bind:display
-	bind:sessionInstructions
-	bind:localInstructions={$localInstructions}
-/>
-
 <div>
 	<header
 		class="sticky top-0 z-10 flex justify-between gap-4 p-4 backdrop-blur"
 	>
-		<button
-			class="button button-ghost"
-			title="Settings"
-			on:click={() => (display = true)}
-		>
-			<Bars />
-		</button>
+		<Settings
+			bind:sessionInstructions
+			bind:localInstructions={$localInstructions}
+		/>
+
 		<button on:click={clear} class="button button-destructive gap-1">
 			Clear <X />
 		</button>

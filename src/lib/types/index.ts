@@ -1,4 +1,4 @@
-import type { ChatCompletionRole } from "openai/resources/chat";
+import type { ChatCompletionRole } from "openai/resources/index.mjs";
 
 export type Messages = Message[];
 
