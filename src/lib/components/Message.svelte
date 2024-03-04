@@ -16,6 +16,16 @@
 	const remove = () => dispatch("remove");
 
 	const roles: ChatCompletionRole[] = ["user", "system", "assistant"];
+
+	let html = "";
+
+	$: {
+		process(
+			message.value.content ? message.value.content : "No message available.",
+		).then((result) => {
+			html = result.html;
+		});
+	}
 </script>
 
 <drab-details
@@ -79,11 +89,7 @@
 			<div class="overflow-hidden">
 				{#if !message.edit}
 					<div role="article" on:dblclick={() => (message.edit = true)}>
-						{@html process(
-							message.value.content
-								? message.value.content
-								: "No message available.",
-						).html}
+						{@html html}
 					</div>
 				{:else if message.value.content !== null}
 					<drab-editor content="textarea">
