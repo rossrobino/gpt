@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Message } from "$lib/types";
-	import { process } from "robino/util/md";
+	import { processMarkdown } from "robino/util/md";
 	import Chevron from "$lib/svg/Chevron.svelte";
 	import X from "$lib/svg/X.svelte";
 	import { createEventDispatcher } from "svelte";
@@ -20,7 +20,7 @@
 	let html = "";
 
 	$: {
-		process(
+		processMarkdown(
 			message.value.content ? message.value.content : "No message available.",
 		).then((result) => {
 			html = result.html;

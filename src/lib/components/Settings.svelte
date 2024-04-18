@@ -9,6 +9,8 @@
 <drab-dialog
 	animation-keyframe-from-transform="translateX(-100%)"
 	animation-keyframe-to-transform="translateX(0)"
+	click-outside-close
+	remove-body-scroll
 >
 	<button data-trigger class="button button-ghost" title="Settings">
 		<Bars />

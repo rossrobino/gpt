@@ -6,24 +6,20 @@
 	import { onMount } from "svelte";
 
 	onMount(async () => {
-		const { Editor } = await import("drab/editor");
 		if (!customElements.get("drab-editor")) {
-			customElements.define("drab-editor", Editor);
+			await import("drab/editor/define");
 		}
 
-		const { Dialog } = await import("drab/dialog");
 		if (!customElements.get("drab-dialog")) {
-			customElements.define("drab-dialog", Dialog);
+			await import("drab/dialog/define");
 		}
 
-		const { Details } = await import("drab/details");
 		if (!customElements.get("drab-details")) {
-			customElements.define("drab-details", Details);
+			await import("drab/details/define");
 		}
 
-		const { Breakpoint } = await import("drab/breakpoint");
-		if (!customElements.get("drab-breakpoint")) {
-			customElements.define("drab-breakpoint", Breakpoint);
+		if (dev && !customElements.get("drab-breakpoint")) {
+			await import("drab/breakpoint/define");
 		}
 	});
 
