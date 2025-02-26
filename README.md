@@ -1,6 +1,6 @@
-# gpt.robino.dev
+# gpt
 
-A custom openai [ChatGPT](https://ai.com) wrapper.
+A custom openai chat wrapper.
 
 ## Features
 
