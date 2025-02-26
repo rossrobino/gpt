@@ -21,7 +21,7 @@
 			method: "POST",
 			body: JSON.stringify([
 				// custom instructions is always the first system message
-				{ role: "system", content: instructions },
+				{ role: "user", content: instructions },
 				...messages.map((message) => message.value),
 			]),
 			headers: {
@@ -34,17 +34,11 @@
 			addMessage({ role: "assistant", edit: false });
 			const reader = response.body.getReader();
 			let chunk = await reader.read();
-			let yPos = window.scrollY;
 			while (!chunk.done && !cancel) {
 				messages[messages.length - 1].value.content += new TextDecoder(
 					"utf-8",
 				).decode(chunk.value);
 				chunk = await reader.read();
-				// if the user scrolls up, stop scrolling down
-				if (window.scrollY >= yPos) {
-					scrollToBottom();
-					yPos = window.scrollY;
-				}
 			}
 		}
 	};

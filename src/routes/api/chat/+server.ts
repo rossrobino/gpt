@@ -1,6 +1,6 @@
-import { OpenAI } from "openai";
 import { OPENAI_API_KEY } from "$env/static/private";
 import { error } from "@sveltejs/kit";
+import { OpenAI } from "openai";
 
 export const POST = async ({ request }) => {
 	const messages =
@@ -13,7 +13,7 @@ export const POST = async ({ request }) => {
 	try {
 		const stream = await openai.chat.completions.create({
 			messages,
-			model: "gpt-4o",
+			model: "o1-mini",
 			stream: true,
 		});
 
@@ -34,6 +34,7 @@ export const POST = async ({ request }) => {
 		});
 	} catch (e) {
 		if (e instanceof OpenAI.APIError && e.status) {
+			console.error(e);
 			// conflict between openai types and sveltekit's
 			error(e.status as 400, e.name);
 		}

@@ -15,7 +15,7 @@
 
 	const remove = () => dispatch("remove");
 
-	const roles: ChatCompletionRole[] = ["user", "system", "assistant"];
+	const roles: ChatCompletionRole[] = ["user", "assistant"];
 
 	let html = "";
 
