@@ -2,8 +2,6 @@
 
 A custom openai [ChatGPT](https://ai.com) wrapper.
 
-[gpt.robino.dev](https://gpt.robino.dev)
-
 ## Features
 
 - Streams responses from vercel edge functions using a readable stream
