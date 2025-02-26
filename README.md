@@ -6,9 +6,7 @@ A custom openai [ChatGPT](https://ai.com) wrapper.
 
 ## Features
 
-- Free - no API key required
 - Streams responses from vercel edge functions using a readable stream
-- Use the `system` role to set context
 - Delete and edit previous messages
 
 ## Keyboard Shortcuts
