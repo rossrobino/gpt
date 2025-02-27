@@ -13,7 +13,7 @@ export const POST = async ({ request }) => {
 	try {
 		const stream = await openai.chat.completions.create({
 			messages,
-			model: "o1-mini",
+			model: "4o",
 			stream: true,
 		});
 

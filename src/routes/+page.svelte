@@ -21,7 +21,7 @@
 			method: "POST",
 			body: JSON.stringify([
 				// custom instructions is always the first system message
-				{ role: "user", content: instructions },
+				{ role: "system", content: instructions },
 				...messages.map((message) => message.value),
 			]),
 			headers: {
