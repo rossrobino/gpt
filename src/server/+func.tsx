@@ -54,7 +54,7 @@ app.post("/", async (c) => {
 					{ role: "system", content: systemPrompt },
 					...messages.map((v) => v.message),
 				],
-				model: "gpt-4o",
+				model: "gpt-4o-mini",
 				stream: true,
 			});
 
