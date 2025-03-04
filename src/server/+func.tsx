@@ -9,6 +9,11 @@ const app = new Router({
 	start() {
 		return { page: new Page(html) };
 	},
+	error({ error }) {
+		return new Response(`Internal server error:\n\n${error.message}`, {
+			status: 500,
+		});
+	},
 });
 
 app.get("/", async (c) => {
@@ -24,7 +29,9 @@ const openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
 
 app.post("/", async (c) => {
 	const data = await c.req.formData();
-	const entries = [...data.entries()];
+	const entries = Array.from(data.entries());
+
+	let newMessage = "";
 
 	const messages: MessageEntry[] = entries.map(([name, value], i) => {
 		const [key] = name.split("-");
@@ -34,7 +41,10 @@ app.post("/", async (c) => {
 		let content = String(value).replaceAll("\\n", "\n");
 
 		// render the new message
-		if (i === entries.length - 1) content = processor.render(content);
+		if (i === entries.length - 1) {
+			newMessage = content;
+			content = processor.render(content);
+		}
 
 		return {
 			index: i,
@@ -49,7 +59,10 @@ app.post("/", async (c) => {
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
 			const stream = await openai.chat.completions.create({
-				messages: messages.map((v) => v.message),
+				messages: [
+					...messages.map((v) => v.message).slice(0, -1),
+					{ role: "user", content: newMessage },
+				],
 				model: "gpt-4o-mini",
 				stream: true,
 			});
