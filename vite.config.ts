@@ -9,11 +9,7 @@ export default defineConfig({
 	},
 	plugins: [
 		domco({
-			adapter: adapter({
-				config: {
-					runtime: "edge",
-				},
-			}),
+			adapter: adapter(),
 		}),
 		tailwindcss(),
 	],
