@@ -1,5 +1,4 @@
 import { processor } from "@/lib/md";
-import systemPrompt from "@/lib/system-prompt.md?raw";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { Page, escape } from "@robino/html";
 import { Router } from "@robino/router";
@@ -50,10 +49,7 @@ app.post("/", async (c) => {
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
 			const stream = await openai.chat.completions.create({
-				messages: [
-					{ role: "system", content: systemPrompt },
-					...messages.map((v) => v.message),
-				],
+				messages: messages.map((v) => v.message),
 				model: "gpt-4o-mini",
 				stream: true,
 			});
