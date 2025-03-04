@@ -1,29 +1,17 @@
 # gpt
 
-A custom openai chat wrapper.
+A zero client-side JS openai chat wrapper.
 
-## Features
-
-- Streams responses from vercel edge functions using a readable stream
-- Delete and edit previous messages
-
-## Keyboard Shortcuts
-
-| Function    | Key Combination           |
-| ----------- | ------------------------- |
-| Send / Stop | `ctrl or meta` + `Enter`  |
-| Clear       | `ctrl or meta` + `Escape` |
-
-## Use the components
-
-- [drab](https://github.com/rossrobino/drab)
+- Form submissions to submit messages
+- Streams HTML in order with the chat response
+- CSS cross document view transitions for animations
 
 ## Run locally
 
 - Clone repo to local machine
 - Create a `.env` file and add your `OPENAI_API_KEY`
-- `bun i`
-- `bun dev`
+- `npm i`
+- `npm run dev`
 
 ## LICENSE
 

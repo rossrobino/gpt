@@ -1,39 +1,34 @@
 {
 	"name": "gpt",
-	"version": "2.0.0",
 	"private": true,
+	"version": "0.0.0",
+	"type": "module",
 	"scripts": {
-		"dev": "vite dev",
-		"host": "vite dev --host",
+		"dev": "vite",
+		"check": "tsc",
 		"build": "vite build",
 		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --plugin-search-dir . --check . && eslint .",
-		"format": "prettier --write . --plugin=prettier-plugin-svelte --plugin=prettier-plugin-tailwindcss"
+		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-vercel": "^5.3.0",
-		"@sveltejs/kit": "^2.5.8",
-		"@sveltejs/vite-plugin-svelte": "^3.1.0",
-		"@tailwindcss/typography": "^0.5.13",
-		"@vercel/analytics": "^1.2.2",
-		"autoprefixer": "^10.4.19",
-		"drab": "^5.4.0",
-		"openai": "^4.85.4",
-		"postcss": "^8.4.38",
-		"prettier": "^3.2.5",
-		"prettier-plugin-svelte": "^3.2.3",
-		"prettier-plugin-tailwindcss": "^0.5.14",
-		"robino": "^0.2.0",
-		"svelte": "^4.2.17",
-		"svelte-check": "^3.7.1",
-		"svelte-local-storage-store": "^0.6.4",
-		"tailwindcss": "^3.4.3",
-		"tslib": "^2.6.2",
-		"typescript": "^5.4.5",
-		"uico": "^0.2.4",
-		"vite": "^5.2.11"
+		"@domcojs/vercel": "^1.1.1",
+		"@tailwindcss/vite": "^4.0.9",
+		"domco": "^3.0.2",
+		"prettier": "^3.5.3",
+		"prettier-plugin-tailwindcss": "^0.6.11",
+		"tailwindcss": "^4.0.9",
+		"typescript": "^5.8.2",
+		"vite": "^6.2.0"
 	},
-	"type": "module"
+	"dependencies": {
+		"@robino/html": "^0.8.0",
+		"@robino/jsx": "^0.2.5",
+		"@robino/md": "^3.1.1",
+		"@robino/prettier": "^1.0.2",
+		"@robino/router": "^0.2.1",
+		"@robino/tsconfig": "^1.0.1",
+		"@shikijs/langs": "^3.1.0",
+		"openai": "^4.86.1",
+		"uico": "^0.4.6"
+	}
 }

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/chat.svg" />
+		<link rel="stylesheet" href="/client/tailwind.css" />
+		<title>gpt.robino.dev</title>
+	</head>
+	<body class="prose mx-auto max-w-[85ch]">
+		<header class="flex justify-end p-6">
+			<a
+				href="/"
+				class="button icon destructive gap-1"
+				aria-label="clear chat"
+				style="view-transition-name: clear"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+					class="size-5"
+				>
+					<path
+						d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
+					/>
+				</svg>
+			</a>
+		</header>
+		<main class="p-6">
+			<form method="post" action="/#response">
+				<chat-messages></chat-messages>
+				<chat-response id="response"></chat-response>
+				<div class="my-4 flex justify-end gap-4">
+					<button
+						class="icon gap-1"
+						style="view-transition-name: submit"
+						aria-label="submit"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							class="size-5"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</button>
+					<a
+						href="/"
+						target="_blank"
+						class="button secondary icon gap-1"
+						style="view-transition-name: new-tab"
+						aria-label="new tab"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+							class="size-5"
+						>
+							<path
+								d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z"
+							/>
+						</svg>
+					</a>
+				</div>
+			</form>
+		</main>
+	</body>
+</html>

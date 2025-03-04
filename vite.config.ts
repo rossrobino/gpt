@@ -1,6 +1,20 @@
-import { sveltekit } from "@sveltejs/kit/vite";
+import { adapter } from "@domcojs/vercel";
+import tailwindcss from "@tailwindcss/vite";
+import { domco } from "domco";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	build: {
+		minify: true,
+	},
+	plugins: [
+		domco({
+			adapter: adapter({
+				config: {
+					runtime: "edge",
+				},
+			}),
+		}),
+		tailwindcss(),
+	],
 });
