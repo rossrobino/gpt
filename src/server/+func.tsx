@@ -12,6 +12,7 @@ const app = new Router({
 	error({ error }) {
 		return new Response(`Internal server error:\n\n${error.message}`, {
 			status: 500,
+			headers: { "content-type": "text/html" },
 		});
 	},
 });
