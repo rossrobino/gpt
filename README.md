@@ -9,7 +9,7 @@ A zero client-side JS openai chat wrapper.
 ## Run locally
 
 - Clone repo to local machine
-- Create a `.env` file and add your `OPENAI_API_KEY`
+- Create a `.env` file and add your `VITE_OPENAI_API_KEY`
 - `npm i`
 - `npm run dev`
 
