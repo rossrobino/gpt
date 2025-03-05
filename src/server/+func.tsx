@@ -9,7 +9,9 @@ const app = new Router({
 	start() {
 		return { page: new Page(html) };
 	},
-	error() {
+	error({ error }) {
+		console.error(error);
+
 		return new Response("Internal server error", {
 			status: 500,
 			headers: { "content-type": "text/html" },
