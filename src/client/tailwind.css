@@ -71,7 +71,8 @@
 
 @layer base {
 	:root {
-		/* syntax highlighting */
+		--accent: light-dark(var(--base-800), var(--base-500));
+
 		--shiki-foreground: var(--color-base-200);
 		--shiki-background: var(--color-base-900);
 		--shiki-token-constant: var(--color-base-50);
@@ -83,6 +84,10 @@
 		--shiki-token-string-expression: oklch(0.901 0.058 230.902);
 		--shiki-token-punctuation: var(--color-base-300);
 		--shiki-token-link: var(--color-base-300);
+	}
+
+	* {
+		scroll-padding-block-start: calc(var(--spacing) * 16);
 	}
 
 	@view-transition {
@@ -107,6 +112,13 @@
 	.button,
 	button {
 		@apply shadow transition-transform active:scale-97 active:shadow-none;
+	}
+
+	.loading {
+		opacity: 0;
+	}
+	body:not(:has(chat-response .chat-bubble)) .loading {
+		@apply animate-pulse;
 	}
 
 	/* remove the margin from the top/bottom of the prose */

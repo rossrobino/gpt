@@ -1,34 +1,42 @@
-import { processor } from "@/lib/md";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { Page, escape } from "@robino/html";
+import type { Processor } from "@robino/md";
 import { Router } from "@robino/router";
 import { html } from "client:page";
-import { OpenAI } from "openai";
+import type { OpenAI } from "openai";
 
 const app = new Router({
 	start() {
 		return { page: new Page(html) };
 	},
-	error({ error }) {
-		return new Response(`Internal server error:\n\n${error.message}`, {
+	error() {
+		return new Response("Internal server error", {
 			status: 500,
 			headers: { "content-type": "text/html" },
 		});
 	},
 });
 
-app.get("/", async (c) => {
-	return c.state.page
+app.get("/", (c) =>
+	c.state.page
 		.inject(
 			"chat-messages",
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />,
 		)
-		.toResponse();
-});
+		.inject("chat-response", <div class="chat-bubble"></div>)
+		.toResponse(),
+);
 
-const openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
+let processor: Processor;
+let openai: OpenAI;
 
 app.post("/", async (c) => {
+	if (!processor) processor = (await import("@/lib/md")).processor;
+	if (!openai) {
+		const { OpenAI } = await import("openai");
+		openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
+	}
+
 	const data = await c.req.formData();
 	const entries = Array.from(data.entries());
 
@@ -59,6 +67,8 @@ app.post("/", async (c) => {
 	return c.state.page
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
+			yield '<div class="py-6 chat-bubble">';
+
 			const stream = await openai.chat.completions.create({
 				messages: [
 					...messages.map((v) => v.message).slice(0, -1),
@@ -80,8 +90,6 @@ app.post("/", async (c) => {
 					},
 				}),
 			);
-
-			yield '<div class="py-8 chat-bubble">';
 
 			let finalContent = "";
 			const reader = htmlStream.getReader();

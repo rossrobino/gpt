@@ -41,8 +41,7 @@ export const Message = (props: { md?: boolean; entry: MessageEntry }) => {
 					name={`content-${props.entry.index}`}
 					placeholder="Ask anything"
 					style="view-transition-name: textarea"
-					class="mt-12 h-32 shadow-sm outline-none"
-					required
+					class="bg-muted mt-12 h-32 border-none shadow-sm transition-shadow outline-none focus:shadow-md"
 				></textarea>
 			)}
 		</div>
