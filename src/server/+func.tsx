@@ -1,9 +1,8 @@
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { Page, escape } from "@robino/html";
-import type { Processor } from "@robino/md";
 import { Router } from "@robino/router";
 import { html } from "client:page";
-import type { OpenAI } from "openai";
+import { OpenAI } from "openai";
 
 const app = new Router({
 	start() {
@@ -29,11 +28,10 @@ app.get("/", (c) =>
 		.toResponse(),
 );
 
-let processor: Processor;
-let openai: OpenAI;
+const openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
 
 app.post("/", async (c) => {
-	if (!processor) processor = (await import("@/lib/md")).processor;
+	const { processor } = await import("@/lib/md");
 
 	const data = await c.req.formData();
 	const entries = Array.from(data.entries());
@@ -66,11 +64,6 @@ app.post("/", async (c) => {
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
 			yield '<div class="py-6 chat-bubble">';
-
-			if (!openai) {
-				const { OpenAI } = await import("openai");
-				openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
-			}
 
 			const stream = await openai.chat.completions.create({
 				messages: [
