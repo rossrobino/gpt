@@ -30,7 +30,7 @@ export const Message = (props: { md?: boolean; entry: MessageEntry }) => {
 					></input>
 
 					<div
-						class={`chat-bubble ${props.entry.message.role === "user" ? "bg-muted rounded-xl p-3 px-4" : "py-8"}`}
+						class={`chat-bubble ${props.entry.message.role === "user" ? "bg-muted rounded-md p-3 px-4 shadow" : "py-8"}`}
 						style={`view-transition-name: content-${props.entry.index}`}
 					>
 						{props.entry.message.content}
@@ -41,7 +41,7 @@ export const Message = (props: { md?: boolean; entry: MessageEntry }) => {
 					name={`content-${props.entry.index}`}
 					placeholder="Ask anything"
 					style="view-transition-name: textarea"
-					class="mt-12 h-32"
+					class="mt-12 h-32 shadow-sm outline-none"
 					required
 				></textarea>
 			)}

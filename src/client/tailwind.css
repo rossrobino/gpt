@@ -35,6 +35,8 @@
 
 	--font-sans: var(--font-family-sans);
 	--font-mono: var(--font-family-mono);
+	--font-old-style:
+		"Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
 
 	--text-xs: var(--font-size-1);
 	--text-xs--line-height: var(--line-height-1);
@@ -69,8 +71,6 @@
 
 @layer base {
 	:root {
-		--border-radius: 4px;
-
 		/* syntax highlighting */
 		--shiki-foreground: var(--color-base-200);
 		--shiki-background: var(--color-base-900);
@@ -104,6 +104,11 @@
 }
 
 @layer components {
+	.button,
+	button {
+		@apply shadow transition-transform active:scale-97 active:shadow-none;
+	}
+
 	/* remove the margin from the top/bottom of the prose */
 	.chat-bubble {
 		> *:first-child {
