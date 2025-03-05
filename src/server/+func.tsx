@@ -32,10 +32,6 @@ let openai: OpenAI;
 
 app.post("/", async (c) => {
 	if (!processor) processor = (await import("@/lib/md")).processor;
-	if (!openai) {
-		const { OpenAI } = await import("openai");
-		openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
-	}
 
 	const data = await c.req.formData();
 	const entries = Array.from(data.entries());
@@ -68,6 +64,11 @@ app.post("/", async (c) => {
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
 			yield '<div class="py-6 chat-bubble">';
+
+			if (!openai) {
+				const { OpenAI } = await import("openai");
+				openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
+			}
 
 			const stream = await openai.chat.completions.create({
 				messages: [
