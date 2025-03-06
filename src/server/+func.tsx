@@ -1,8 +1,8 @@
+import { openai } from "@/lib/openai";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { Page, escape } from "@robino/html";
 import { Router } from "@robino/router";
 import { html } from "client:page";
-import { OpenAI } from "openai";
 
 const app = new Router({
 	start() {
@@ -18,17 +18,15 @@ const app = new Router({
 	},
 });
 
-app.get("/", (c) =>
-	c.state.page
+app.get("/", (c) => {
+	c.res = c.state.page
 		.inject(
 			"chat-messages",
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />,
 		)
 		.inject("chat-response", <div class="chat-bubble"></div>)
-		.toResponse(),
-);
-
-const openai = new OpenAI({ apiKey: import.meta.env.VITE_OPENAI_API_KEY });
+		.toResponse();
+});
 
 app.post("/", async (c) => {
 	const { processor } = await import("@/lib/md");
@@ -60,7 +58,7 @@ app.post("/", async (c) => {
 		};
 	});
 
-	return c.state.page
+	c.res = c.state.page
 		.inject("chat-messages", <Messages messages={messages} />)
 		.inject("chat-response", async function* () {
 			yield '<div class="py-6 chat-bubble">';

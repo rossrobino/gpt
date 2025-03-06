@@ -12,11 +12,11 @@
 	},
 	"devDependencies": {
 		"@domcojs/vercel": "^1.1.1",
-		"@tailwindcss/vite": "^4.0.9",
+		"@tailwindcss/vite": "^4.0.11",
 		"domco": "^3.0.2",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"tailwindcss": "^4.0.9",
+		"tailwindcss": "^4.0.11",
 		"typescript": "^5.8.2",
 		"vite": "^6.2.0"
 	},
@@ -25,10 +25,10 @@
 		"@robino/jsx": "^0.2.5",
 		"@robino/md": "^3.1.1",
 		"@robino/prettier": "^1.0.2",
-		"@robino/router": "^0.2.1",
+		"@robino/router": "^0.4.0",
 		"@robino/tsconfig": "^1.0.1",
 		"@shikijs/langs": "^3.1.0",
-		"openai": "^4.86.1",
+		"openai": "^4.86.2",
 		"uico": "^0.6.2"
 	}
 }
