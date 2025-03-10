@@ -65,10 +65,11 @@ app.post("/", async (c) => {
 
 			const stream = await openai.chat.completions.create({
 				messages: [
+					{ role: "user", content: "always respond in markdown formatting" },
 					...messages.map((v) => v.message).slice(0, -1),
 					{ role: "user", content: newMessage },
 				],
-				model: "gpt-4o-mini",
+				model: "o3-mini",
 				stream: true,
 			});
 
