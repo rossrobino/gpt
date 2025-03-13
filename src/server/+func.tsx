@@ -1,50 +1,47 @@
 import { openai } from "@/lib/openai";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
-import { Page, escape } from "@robino/html";
+import { escape } from "@robino/html";
 import { Router } from "@robino/router";
 import { html } from "client:page";
 
 const app = new Router({
-	start() {
-		return { page: new Page(html) };
-	},
-	error({ error }) {
-		console.error(error);
+	html,
+	error(c) {
+		console.error(c.error);
 
-		return new Response("Internal server error", {
+		c.res.set("Internal server error", {
 			status: 500,
-			headers: { "content-type": "text/html" },
+			headers: { contentType: "text/html" },
 		});
 	},
 });
 
 app.get("/", (c) => {
-	c.res = c.state.page
-		.inject(
+	c.res.html((p) => {
+		p.inject(
 			"chat-messages",
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />,
-		)
-		.inject("chat-response", <div class="chat-bubble"></div>)
-		.toResponse();
+		).inject("chat-response", <div class="chat-bubble"></div>);
+	});
 });
 
 app.post("/", async (c) => {
 	const { processor } = await import("@/lib/md");
 
 	const data = await c.req.formData();
-	const entries = Array.from(data.entries());
+	const contentEntries = Array.from(data.entries()).filter(([name]) => {
+		return name.startsWith("content");
+	});
+	const web = data.get("web");
+	console.log(web);
 
 	let newMessage = "";
 
-	const messages: MessageEntry[] = entries.map(([name, value], i) => {
-		const [key] = name.split("-");
-
-		if (key !== "content") throw new Error(`Unknown key: ${key}`);
-
-		let content = String(value).replaceAll("\\n", "\n");
+	const messages: MessageEntry[] = contentEntries.map(([, value], i) => {
+		let content = String(value).replaceAll("\\n", "\n").replaceAll("\\t", "\t");
 
 		// render the new message
-		if (i === entries.length - 1) {
+		if (i === contentEntries.length - 1) {
 			newMessage = content;
 			content = processor.render(content);
 		}
@@ -58,68 +55,76 @@ app.post("/", async (c) => {
 		};
 	});
 
-	c.res = c.state.page
-		.inject("chat-messages", <Messages messages={messages} />)
-		.inject("chat-response", async function* () {
-			yield '<div class="py-6 chat-bubble">';
+	c.res.html((p) => {
+		p.inject("chat-messages", <Messages messages={messages} />).inject(
+			"chat-response",
+			async function* () {
+				yield '<div class="py-6 chat-bubble">';
 
-			const stream = await openai.chat.completions.create({
-				messages: [
-					{ role: "user", content: "always respond in markdown formatting" },
-					...messages.map((v) => v.message).slice(0, -1),
-					{ role: "user", content: newMessage },
-				],
-				model: "o3-mini",
-				stream: true,
-			});
+				const response = await openai.responses.create({
+					model: "gpt-4o",
+					input: [
+						{
+							role: "user",
+							content:
+								"Use markdown syntax for your responses. For example, surround codeblocks in three backticks with the language if you are writing code. I don't want you to put the entire message in a markdown codeblock just use the syntax to respond.",
+						},
+						...messages.map((v) => v.message).slice(0, -1),
+						{ role: "user", content: newMessage },
+					],
+					stream: true,
+					tools: web === "on" ? [{ type: "web_search_preview" }] : [],
+				});
 
-			const htmlStream = processor.renderStream(
-				new ReadableStream<string>({
-					async start(c) {
-						for await (const chunk of stream) {
-							const content = chunk.choices[0]?.delta.content;
-							if (content) c.enqueue(content);
-						}
+				const htmlStream = processor.renderStream(
+					new ReadableStream<string>({
+						async start(c) {
+							for await (const event of response) {
+								if (event.type === "response.output_text.delta") {
+									if (event.delta) c.enqueue(event.delta);
+								}
+							}
 
-						c.close();
-					},
-				}),
-			);
+							c.close();
+						},
+					}),
+				);
 
-			let finalContent = "";
-			const reader = htmlStream.getReader();
+				let finalContent = "";
+				const reader = htmlStream.getReader();
 
-			while (true) {
-				const { value, done } = await reader.read();
-				if (value) {
-					// stream
-					yield value;
-					finalContent += value;
+				while (true) {
+					const { value, done } = await reader.read();
+					if (value) {
+						// stream
+						yield value;
+						finalContent += value;
+					}
+					if (done) break;
 				}
-				if (done) break;
-			}
 
-			yield (
-				<>
-					{"</div>"}
+				yield (
+					<>
+						{"</div>"}
 
-					{/* append the final value to send back */}
-					<input
-						hidden
-						name={`content-${messages.length}`}
-						value={escape(finalContent, true)}
-					></input>
+						{/* append the final value to send back */}
+						<input
+							hidden
+							name={`content-${messages.length}`}
+							value={escape(finalContent, true)}
+						></input>
 
-					<Message
-						entry={{
-							index: messages.length + 1,
-							message: { role: "user", content: "" },
-						}}
-					/>
-				</>
-			);
-		})
-		.toResponse();
+						<Message
+							entry={{
+								index: messages.length + 1,
+								message: { role: "user", content: "" },
+							}}
+						/>
+					</>
+				);
+			},
+		);
+	});
 });
 
 export const handler = app.fetch;
