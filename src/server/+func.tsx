@@ -29,11 +29,10 @@ app.post("/", async (c) => {
 	const { processor } = await import("@/lib/md");
 
 	const data = await c.req.formData();
-	const contentEntries = Array.from(data.entries()).filter(([name]) => {
-		return name.startsWith("content");
-	});
+	const contentEntries = Array.from(data.entries()).filter(([name]) =>
+		name.startsWith("content"),
+	);
 	const web = data.get("web");
-	console.log(web);
 
 	let newMessage = "";
 
@@ -64,11 +63,12 @@ app.post("/", async (c) => {
 				const response = await openai.responses.create({
 					model: "gpt-4o",
 					input: [
-						{
-							role: "user",
-							content:
-								"Use markdown syntax for your responses. For example, surround codeblocks in three backticks with the language if you are writing code. I don't want you to put the entire message in a markdown codeblock just use the syntax to respond.",
-						},
+						// needed for o3-mini for some reason
+						// {
+						// 	role: "user",
+						// 	content:
+						// 		"Use markdown syntax for your responses. For example, surround codeblocks in three backticks with the language if you are writing code. I don't want you to put the entire message in a markdown codeblock just use the syntax to respond.",
+						// },
 						...messages.map((v) => v.message).slice(0, -1),
 						{ role: "user", content: newMessage },
 					],
