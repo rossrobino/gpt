@@ -11,24 +11,22 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@domcojs/vercel": "^1.1.1",
-		"@tailwindcss/vite": "^4.0.14",
-		"domco": "^3.0.2",
+		"@domcojs/vercel": "^2.0.0",
+		"@tailwindcss/vite": "^4.0.17",
+		"domco": "^4.0.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"tailwindcss": "^4.0.14",
+		"tailwindcss": "^4.0.17",
 		"typescript": "^5.8.2",
-		"vite": "^6.2.1"
+		"vite": "^6.2.4"
 	},
 	"dependencies": {
-		"@robino/html": "^0.9.0",
-		"@robino/jsx": "^0.2.6",
-		"@robino/md": "^3.2.0",
+		"@robino/md": "^3.2.1",
 		"@robino/prettier": "^1.0.2",
-		"@robino/router": "^0.6.1",
 		"@robino/tsconfig": "^1.0.2",
 		"@shikijs/langs": "^3.2.1",
-		"openai": "^4.87.3",
-		"uico": "^0.6.3"
+		"openai": "^4.91.0",
+		"ovr": "^1.0.0",
+		"uico": "^0.7.0"
 	}
 }

@@ -114,13 +114,6 @@
 		@apply shadow transition-transform active:scale-97 active:shadow-none;
 	}
 
-	.loading {
-		opacity: 0;
-	}
-	body:not(:has(chat-response .chat-bubble)) .loading {
-		@apply animate-pulse;
-	}
-
 	/* remove the margin from the top/bottom of the prose */
 	.chat-bubble {
 		> *:first-child {

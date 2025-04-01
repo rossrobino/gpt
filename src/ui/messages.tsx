@@ -1,4 +1,4 @@
-import { escape } from "@robino/html";
+import { escape } from "ovr";
 
 export type MessageEntry = {
 	index: number;
