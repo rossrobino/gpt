@@ -106,11 +106,11 @@ app.post("/", async (c) => {
 
 				while (true) {
 					const { value, done } = await reader.read();
-					if (done) break;
 					if (value) {
 						yield value;
 						finalContent += value;
 					}
+					if (done) break;
 				}
 
 				yield "</div>";
