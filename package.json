@@ -12,11 +12,11 @@
 	},
 	"devDependencies": {
 		"@domcojs/vercel": "^2.0.0",
-		"@tailwindcss/vite": "^4.0.17",
+		"@tailwindcss/vite": "^4.1.0",
 		"domco": "^4.0.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"tailwindcss": "^4.0.17",
+		"tailwindcss": "^4.1.0",
 		"typescript": "^5.8.2",
 		"vite": "^6.2.4"
 	},
