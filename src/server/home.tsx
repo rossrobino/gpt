@@ -28,7 +28,7 @@ export const Home = (props: {
 
 const Header = () => {
 	return (
-		<header class="bg-background/75 sticky top-0 z-10 flex items-center justify-end p-4 backdrop-blur-xs">
+		<header class="sticky top-0 z-10 flex items-center justify-end p-4">
 			<a
 				href="/"
 				class="button icon destructive"
