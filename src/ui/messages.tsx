@@ -11,9 +11,17 @@ export type MessageEntry = {
 export const Messages = (props: { messages: MessageEntry[] }) => {
 	return (
 		<>
-			{props.messages.map((entry) => (
-				<Message md entry={entry} />
-			))}
+			{props.messages.map((entry, i) => {
+				if (i === props.messages.length - 1) {
+					// scroll to here - form action /#m
+					return (
+						<div id="m">
+							<Message md entry={entry} />
+						</div>
+					);
+				}
+				return <Message md entry={entry} />;
+			})}
 		</>
 	);
 };

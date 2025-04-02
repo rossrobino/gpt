@@ -59,7 +59,11 @@ app.post("/", async (c) => {
 
 	c.page(
 		<Home web={web} model={model}>
+			{/* required for safari streaming */}
+			<div style="width: 0; height: 0">{"\u200b".repeat(200)}</div>
+
 			<Messages messages={messages} />
+
 			{async function* () {
 				yield '<div class="py-6 chat-bubble">';
 

@@ -85,7 +85,7 @@
 	}
 
 	* {
-		scroll-padding-block-start: calc(var(--spacing) * 16);
+		scroll-padding-block-start: calc(var(--spacing) * 4);
 	}
 
 	@view-transition {

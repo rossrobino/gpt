@@ -10,7 +10,7 @@ export const Home = (props: {
 		<>
 			<Header />
 			<main class="p-4">
-				<form method="post" action="/#response">
+				<form method="post" action="/#m">
 					{props.children}
 					<div
 						class="my-4 flex justify-end gap-4"
