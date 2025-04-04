@@ -3,7 +3,7 @@ import { Home } from "@/server/home";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { html } from "client:page";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
-import { escape, Router, Suspense } from "ovr";
+import { escape, Router } from "ovr";
 
 const app = new Router({
 	start(c) {
