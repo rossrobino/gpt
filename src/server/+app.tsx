@@ -1,5 +1,6 @@
 import * as ai from "@/lib/ai";
 import { Home } from "@/server/home";
+import { Controls } from "@/ui/controls";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
 import { html } from "client:page";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
@@ -17,8 +18,9 @@ const app = new Router({
 
 app.get("/", (c) => {
 	c.page(
-		<Home model={ai.defaultModel}>
+		<Home>
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />
+			<Controls />
 		</Home>,
 	);
 });
@@ -34,8 +36,7 @@ app.post("/", async (c) => {
 
 	const web = data.get("web") === "on";
 
-	let model = String(data.get("model"));
-	if (!ai.models.includes(model)) model = "gpt-4o"; // default
+	const model = String(data.get("model"));
 
 	let newMessage = "";
 
@@ -58,7 +59,7 @@ app.post("/", async (c) => {
 	});
 
 	c.page(
-		<Home web={web} model={model}>
+		<Home>
 			<Messages messages={messages} />
 
 			{async function* () {
@@ -117,20 +118,20 @@ app.post("/", async (c) => {
 				yield "</div>";
 
 				yield (
-					<input
-						hidden
-						name={`content-${messages.length}`}
-						value={escape(finalContent, true)}
-					></input>
-				);
-
-				yield (
-					<Message
-						entry={{
-							index: messages.length + 1,
-							message: { role: "user", content: "" },
-						}}
-					/>
+					<>
+						<input
+							hidden
+							name={`content-${messages.length}`}
+							value={escape(finalContent, true)}
+						></input>
+						<Message
+							entry={{
+								index: messages.length + 1,
+								message: { role: "user", content: "" },
+							}}
+						/>
+						<Controls model={model} web={web} />
+					</>
 				);
 			}}
 		</Home>,
