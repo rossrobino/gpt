@@ -18,6 +18,7 @@ import langTsx from "@shikijs/langs/tsx";
 import langVue from "@shikijs/langs/vue";
 
 export const processor = new Processor({
+	anchor: false,
 	highlighter: {
 		langs: [
 			langCss,
