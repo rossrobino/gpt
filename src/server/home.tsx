@@ -5,9 +5,7 @@ export const Home = (props: { children: JSX.Element }) => {
 		<>
 			<Header />
 			<main class="p-4">
-				<form method="post" action="/#m">
-					{props.children}
-				</form>
+				<form method="post">{props.children}</form>
 			</main>
 		</>
 	);
