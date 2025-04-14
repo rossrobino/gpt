@@ -51,10 +51,7 @@ app.post("/", async (c) => {
 
 		return {
 			index: i,
-			message: {
-				role: i % 2 === 0 ? "user" : "assistant",
-				content,
-			},
+			message: { role: i % 2 === 0 ? "user" : "assistant", content },
 		};
 	});
 

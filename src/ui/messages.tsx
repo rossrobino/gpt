@@ -2,10 +2,7 @@ import { escape } from "ovr";
 
 export type MessageEntry = {
 	index: number;
-	message: {
-		role: "user" | "assistant";
-		content: string;
-	};
+	message: { role: "user" | "assistant"; content: string };
 };
 
 export const Messages = (props: { messages: MessageEntry[] }) => {
