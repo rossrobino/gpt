@@ -37,7 +37,8 @@ app.post("/", async (c) => {
 
 	const web = data.get("web") === "on";
 
-	const model = String(data.get("model"));
+	let model = ai.models.find((m) => m.name === data.get("model"));
+	if (!model) model = ai.defaultModel;
 
 	let newMessage = "";
 
@@ -68,10 +69,11 @@ app.post("/", async (c) => {
 				];
 
 				const response = await ai.openai.responses.create({
-					model,
+					model: model.name,
+					reasoning: model.reasoning ? { effort: "high" } : undefined,
 					input,
 					stream: true,
-					tools: web ? [{ type: "web_search_preview" }] : [],
+					tools: web && model.web ? [{ type: "web_search_preview" }] : [],
 				});
 
 				const htmlStream = processor.renderStream(

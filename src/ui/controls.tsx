@@ -1,6 +1,6 @@
-import { defaultModel, models } from "@/lib/ai";
+import { defaultModel, models, type Model } from "@/lib/ai";
 
-export const Controls = (props: { web?: boolean; model?: string }) => {
+export const Controls = (props: { web?: boolean; model?: Model }) => {
 	return (
 		<div
 			class="my-4 flex justify-end gap-4"
@@ -50,7 +50,7 @@ const Search = (props: { web?: boolean }) => (
 	</label>
 );
 
-const Model = (props: { model?: string }) => {
+const Model = (props: { model?: Model }) => {
 	let { model = defaultModel } = props;
 	if (!models.includes(model)) model = defaultModel;
 
@@ -60,9 +60,9 @@ const Model = (props: { model?: string }) => {
 			aria-label="select model"
 			class="h-9 w-36 px-2 py-1 shadow-sm"
 		>
-			{models.map((m) => (
-				<option value={m} selected={model === m}>
-					{m}
+			{models.map(({ name }) => (
+				<option value={name} selected={model.name === name}>
+					{name}
 				</option>
 			))}
 		</select>
