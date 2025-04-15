@@ -1,4 +1,5 @@
 import * as ai from "@/lib/ai";
+import systemPrompt from "@/lib/system-prompt.md?raw";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
@@ -60,28 +61,17 @@ app.post("/", async (c) => {
 			<Messages messages={messages} />
 
 			{async function* () {
-				const oModel = model.startsWith("o");
-
 				const input: ResponseInput = [
+					{ role: "system", content: systemPrompt },
 					...messages.map((v) => v.message).slice(0, -1),
 					{ role: "user", content: newMessage },
 				];
 
-				if (oModel) {
-					// needed for o3-mini for some reason
-					input.unshift({
-						role: "user",
-						content:
-							"Use markdown syntax for your responses. For example, surround codeblocks in three backticks with the language if you are writing code. I don't want you to put the entire message in a markdown codeblock just use the syntax to respond.",
-					});
-				}
-
 				const response = await ai.openai.responses.create({
 					model,
-					reasoning: oModel ? { effort: "high" } : undefined,
 					input,
 					stream: true,
-					tools: web && !oModel ? [{ type: "web_search_preview" }] : [],
+					tools: web ? [{ type: "web_search_preview" }] : [],
 				});
 
 				const htmlStream = processor.renderStream(

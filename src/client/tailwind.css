@@ -112,6 +112,28 @@
 		@apply shadow transition-transform active:scale-97 active:shadow-none;
 	}
 
+	details {
+		@media (prefers-reduced-motion: no-preference) {
+			interpolate-size: allow-keywords;
+		}
+
+		/* for safari */
+		summary::-webkit-details-marker {
+			display: none;
+		}
+
+		&::details-content {
+			transition:
+				content-visibility 300ms allow-discrete,
+				block-size 300ms;
+			block-size: 0;
+			overflow-y: clip;
+		}
+		&[open]::details-content {
+			block-size: auto;
+		}
+	}
+
 	/* remove the margin from the top/bottom of the prose */
 	.chat-bubble {
 		> *:first-child {

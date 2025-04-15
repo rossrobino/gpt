@@ -58,7 +58,7 @@ const Model = (props: { model?: string }) => {
 		<select
 			name="model"
 			aria-label="select model"
-			class="h-9 w-28 px-2 py-1 shadow-sm"
+			class="h-9 w-36 px-2 py-1 shadow-sm"
 		>
 			{models.map((m) => (
 				<option value={m} selected={model === m}>

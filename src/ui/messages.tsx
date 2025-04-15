@@ -1,3 +1,4 @@
+import { Details } from "@/ui/details";
 import { escape } from "ovr";
 
 export type MessageEntry = {
@@ -8,9 +9,15 @@ export type MessageEntry = {
 export const Messages = (props: { messages: MessageEntry[] }) => {
 	return (
 		<>
-			{props.messages.map((entry) => (
-				<Message md entry={entry} />
-			))}
+			{props.messages.length > 1 && (
+				<Details label="past messages">
+					{props.messages.slice(0, -1).map((entry) => (
+						<Message md entry={entry} />
+					))}
+				</Details>
+			)}
+
+			<Message md entry={props.messages.at(-1)!} />
 		</>
 	);
 };
