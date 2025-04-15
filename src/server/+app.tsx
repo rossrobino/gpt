@@ -37,8 +37,8 @@ app.post("/", async (c) => {
 
 	const web = data.get("web") === "on";
 
-	let model = ai.models.find((m) => m.name === data.get("model"));
-	if (!model) model = ai.defaultModel;
+	const model =
+		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 
 	let newMessage = "";
 
