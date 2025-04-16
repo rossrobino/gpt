@@ -31,7 +31,7 @@ app.get("/", (c) => {
 	);
 });
 
-app.post("/", async (c) => {
+app.post("/c", async (c) => {
 	const data = await c.req.formData();
 
 	const web = data.get("web") === "on";
