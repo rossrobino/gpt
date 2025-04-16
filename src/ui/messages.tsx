@@ -9,36 +9,27 @@ export type MessageEntry = {
 
 export const Messages = (props: { messages: MessageEntry[] }) => {
 	return (
-		<>
-			{props.messages.length > 1 && (
-				<Details summary="Previous messages">
-					{props.messages.slice(0, -1).map((entry) => (
-						<Message md entry={entry} />
-					))}
-				</Details>
-			)}
-
-			{props.messages.at(-1) && <Message md entry={props.messages.at(-1)!} />}
-		</>
+		<Details summary="Previous messages">
+			{props.messages.map((entry) => (
+				<Message md entry={entry} />
+			))}
+		</Details>
 	);
 };
 
 export const Message = (props: { md?: boolean; entry: MessageEntry }) => {
+	const content = props.entry.message.content;
 	return (
 		<div class={props.entry.message.role === "user" && props.md ? "pl-16" : ""}>
 			{props.md ? (
 				<>
-					<input
-						hidden
-						name="content"
-						value={escape(props.entry.message.content, true)}
-					></input>
+					<input hidden name="content" value={escape(content, true)}></input>
 
 					<div
-						class={`chat-bubble ${props.entry.message.role === "user" ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 shadow-sm dark:shadow-black/75" : "py-8"}`}
+						class={`chat-bubble ${props.entry.message.role === "user" ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
 						style={`view-transition-name: content-${props.entry.index}`}
 					>
-						{processor.render(props.entry.message.content)}
+						{processor.render(content)}
 					</div>
 				</>
 			) : (

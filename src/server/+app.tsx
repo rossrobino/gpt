@@ -1,5 +1,6 @@
 import * as ai from "@/lib/ai";
 import { processor } from "@/lib/md";
+import { render } from "@/lib/render";
 import systemPrompt from "@/lib/system-prompt.md?raw";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
@@ -8,6 +9,7 @@ import { time } from "build:time";
 import { html } from "client:page";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { escape, Router } from "ovr";
+import { z } from "zod";
 
 const app = new Router({
 	start(c) {
@@ -71,9 +73,28 @@ app.post("/c", async (c) => {
 
 	c.page(
 		<Home>
-			<Messages messages={messages} />
-
 			{async function* () {
+				if (messages.length > 1)
+					yield <Messages messages={messages.slice(0, -1)} />;
+
+				const latest = messages[messages.length - 1]!;
+				const [first, ...lines] = latest.message.content.trim().split("\n");
+
+				if (first) {
+					const [url, ...rest] = first.split(" ");
+					const result = z.string().url().safeParse(url);
+
+					if (result.success) {
+						const r = await render(result.data);
+						if (r.success) {
+							lines.unshift(`\n\n${rest.join(" ")}`);
+							latest.message.content = r.result + lines.join("\n");
+						}
+					}
+				}
+
+				yield <Message md entry={latest} />;
+
 				const input: ResponseInput = [
 					{ role: "system", content: systemPrompt },
 					...messages.map((v) => v.message),
