@@ -16,3 +16,7 @@ declare module "*.md" {
 	export const article: string;
 	export const headings: Heading[];
 }
+
+declare module "build:time" {
+	export const time: string;
+}

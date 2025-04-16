@@ -1,8 +1,10 @@
 import * as ai from "@/lib/ai";
+import { processor } from "@/lib/md";
 import systemPrompt from "@/lib/system-prompt.md?raw";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
 import { Messages, Message, type MessageEntry } from "@/ui/messages";
+import { time } from "build:time";
 import { html } from "client:page";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { escape, Router } from "ovr";
@@ -18,7 +20,9 @@ const app = new Router({
 });
 
 app.get("/", (c) => {
-	c.head(<title>New Message</title>);
+	if (c.etag(time) && !import.meta.env.DEV) return;
+
+	c.head(<title>New Messages</title>);
 	c.page(
 		<Home>
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />
@@ -28,8 +32,6 @@ app.get("/", (c) => {
 });
 
 app.post("/", async (c) => {
-	const { processor } = await import("@/lib/md");
-
 	const data = await c.req.formData();
 
 	const web = data.get("web") === "on";
@@ -52,18 +54,21 @@ app.post("/", async (c) => {
 	});
 
 	c.head(
-		<title>
-			{async () => {
-				if (title) return title;
+		<>
+			<title>
+				{async () => {
+					if (title) return title;
 
-				const response = await ai.openai.responses.create({
-					model: "gpt-4.1-nano",
-					input: `Create a title (<5 words) for this message:\n\n${messages[0]!.message.content}`,
-				});
+					const response = await ai.openai.responses.create({
+						model: "gpt-4.1-nano",
+						input: `Create a title (<5 words) for this message:\n\n${messages[0]!.message.content}`,
+					});
 
-				return (title = response.output_text);
-			}}
-		</title>,
+					return (title = response.output_text);
+				}}
+			</title>
+			<link rel="prefetch" as="document" href="/" />
+		</>,
 	);
 
 	c.page(

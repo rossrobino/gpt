@@ -10,7 +10,7 @@ export const models: Model[] = [
 	{ name: "gpt-4.1", web: true },
 	{ name: "gpt-4.1-mini", web: true },
 	{ name: "gpt-4.1-nano" },
-	{ name: "o3-mini", reasoning: true },
+	{ name: "o4-mini", reasoning: true },
 ];
 
 export const defaultModel = models[2]!;
