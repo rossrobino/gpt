@@ -11,14 +11,14 @@ export const Messages = (props: { messages: MessageEntry[] }) => {
 	return (
 		<>
 			{props.messages.length > 1 && (
-				<Details label="Past messages">
+				<Details summary="Previous messages">
 					{props.messages.slice(0, -1).map((entry) => (
 						<Message md entry={entry} />
 					))}
 				</Details>
 			)}
 
-			<Message md entry={props.messages.at(-1)!} />
+			{props.messages.at(-1) && <Message md entry={props.messages.at(-1)!} />}
 		</>
 	);
 };

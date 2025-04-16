@@ -1,15 +1,12 @@
 import type { JSX } from "ovr";
 
-export const Details = (
-	props: { children: JSX.Element } & ({ summary: string } | { label: string }),
-) => (
+export const Details = (props: { children: JSX.Element; summary: string }) => (
 	<details class="group mb-6 w-full">
-		<summary
-			aria-label={"label" in props ? props.label : undefined}
-			class="group flex list-none items-center justify-between gap-8 rounded py-2 transition-colors"
-		>
-			<span>{"summary" in props && props.summary}</span>
-			<div class="group-hover:bg-muted rounded-sm p-2 transition group-hover:shadow group-active:scale-97 group-active:shadow-none dark:shadow-black/75">
+		<summary class="group summary flex cursor-default list-none items-center justify-between gap-8 rounded pb-2 transition-colors">
+			<div class="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+				{props.summary}
+			</div>
+			<div class="hover:bg-muted rounded-sm p-2 transition hover:shadow active:scale-97 active:shadow-none dark:shadow-black/75">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 20 20"
