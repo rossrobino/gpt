@@ -105,12 +105,11 @@ app.post("/c", async (c) => {
 					}),
 				);
 
+				yield '<div class="py-6 chat-bubble">';
+
 				const reader = htmlStream.getReader();
-
-				for (let i = 0; ; i++) {
+				while (true) {
 					const { value, done } = await reader.read();
-					if (i === 0) yield '<div class="py-6 chat-bubble">'; // don't send early for loader
-
 					if (value) yield value;
 					if (done) break;
 				}
