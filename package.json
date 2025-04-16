@@ -21,6 +21,7 @@
 		"vite": "^6.3.0"
 	},
 	"dependencies": {
+		"@mdit/plugin-katex": "^0.16.7",
 		"@robino/md": "^3.2.5",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",

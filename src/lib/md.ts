@@ -1,3 +1,4 @@
+import { katex } from "@mdit/plugin-katex";
 import { Processor } from "@robino/md";
 import langAstro from "@shikijs/langs/astro";
 import langBash from "@shikijs/langs/bash";
@@ -41,4 +42,4 @@ export const processor = new Processor({
 		],
 		langAlias: { js: "tsx", ts: "tsx", jsx: "tsx", mdx: "md" },
 	},
-});
+}).use(katex);

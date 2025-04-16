@@ -1,11 +1,11 @@
 @layer theme, base, components, utilities;
 
 @import "uico";
+@import "katex/dist/katex.min.css";
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @theme {
-	--color-*: initial;
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-heading-foreground: var(--heading-foreground);
