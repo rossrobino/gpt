@@ -18,6 +18,7 @@ const app = new Router({
 });
 
 app.get("/", (c) => {
+	c.head(<title>New Message</title>);
 	c.page(
 		<Home>
 			<Message entry={{ index: 0, message: { role: "user", content: "" } }} />
@@ -36,7 +37,6 @@ app.post("/", async (c) => {
 	);
 
 	const web = data.get("web") === "on";
-
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 
@@ -56,6 +56,17 @@ app.post("/", async (c) => {
 			message: { role: i % 2 === 0 ? "user" : "assistant", content },
 		};
 	});
+
+	c.head(
+		<title>
+			{ai.openai.responses
+				.create({
+					model: "gpt-4.1-nano",
+					input: `Create a title (<5 words, separated by spaces) for this conversation that would go into a web page title element.\n\n${JSON.stringify(messages)}`,
+				})
+				.then((r) => r.output_text)}
+		</title>,
+	);
 
 	c.page(
 		<Home>
