@@ -1,0 +1,1 @@
+- Select the globe button to toggle web search capabilities (only supported on select models).

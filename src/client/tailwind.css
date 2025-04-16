@@ -1,7 +1,7 @@
 @layer theme, base, components, utilities;
 
 @import "uico";
-@import "katex/dist/katex.min.css";
+@import "katex/dist/katex.min.css" layer(base);
 @import "tailwindcss/theme.css" layer(theme);
 @import "tailwindcss/utilities.css" layer(utilities);
 
@@ -94,7 +94,7 @@
 	}
 
 	::view-transition-group(*) {
-		animation-duration: 250ms;
+		animation-duration: 400ms;
 		animation-timing-function: ease-in-out;
 	}
 
@@ -111,6 +111,10 @@
 	.button,
 	button {
 		@apply shadow transition-transform active:scale-97 active:shadow-none dark:shadow-black/75;
+	}
+
+	.ghost {
+		@apply shadow-none;
 	}
 
 	details {
@@ -155,5 +159,9 @@
 		> *:last-child {
 			margin-block-end: 0;
 		}
+	}
+
+	.katex-display {
+		margin-block: calc(var(--spacing) * 8);
 	}
 }

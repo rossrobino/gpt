@@ -36,15 +36,17 @@ export const Message = (props: { md?: boolean; entry: MessageEntry }) => {
 
 					<div
 						class={`chat-bubble ${props.entry.message.role === "user" ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 shadow-sm dark:shadow-black/75" : "py-8"}`}
+						style={`view-transition-name: content-${props.entry.index}`}
 					>
 						{processor.render(props.entry.message.content)}
 					</div>
 				</>
 			) : (
 				<textarea
+					tabindex={1}
 					name="content"
 					placeholder="Ask anything"
-					style="view-transition-name: textarea"
+					style={`view-transition-name: content-${props.entry.index}`}
 					class="bg-muted border-base-200 dark:border-base-800 mt-12 h-32 border shadow-sm transition outline-none focus:shadow-md dark:shadow-black/75"
 				></textarea>
 			)}
