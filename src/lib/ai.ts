@@ -13,4 +13,4 @@ export const models: Model[] = [
 	{ name: "o3-mini", reasoning: true },
 ];
 
-export const defaultModel = models[1]!;
+export const defaultModel = models[2]!;

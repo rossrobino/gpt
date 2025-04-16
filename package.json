@@ -18,10 +18,10 @@
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"tailwindcss": "^4.1.4",
 		"typescript": "^5.8.3",
-		"vite": "^6.2.6"
+		"vite": "^6.3.0"
 	},
 	"dependencies": {
-		"@robino/md": "^3.2.3",
+		"@robino/md": "^3.2.4",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",
 		"@shikijs/langs": "^3.2.2",
