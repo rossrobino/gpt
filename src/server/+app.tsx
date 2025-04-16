@@ -44,32 +44,29 @@ app.post("/c", async (c) => {
 		([name]) => name === "content",
 	);
 
-	const messages: MessageEntry[] = contentEntries.map(([, value], i) => {
+	const messages: MessageEntry[] = contentEntries.map(([, value], index) => {
 		return {
-			index: i,
+			index,
 			message: {
-				role: i % 2 === 0 ? "user" : "assistant",
+				role: index % 2 === 0 ? "user" : "assistant",
 				content: String(value).replaceAll("\\n", "\n").replaceAll("\\t", "\t"),
 			},
 		};
 	});
 
 	c.head(
-		<>
-			<title>
-				{async () => {
-					if (title) return title;
+		<title>
+			{async () => {
+				if (title) return title;
 
-					const response = await ai.openai.responses.create({
-						model: "gpt-4.1-nano",
-						input: `Create a title (<5 words) for this message:\n\n${messages[0]!.message.content}`,
-					});
+				const response = await ai.openai.responses.create({
+					model: "gpt-4.1-nano",
+					input: `Create a title (<5 words) for this message:\n\n${messages[0]!.message.content}`,
+				});
 
-					return (title = response.output_text);
-				}}
-			</title>
-			<link rel="prefetch" as="document" href="/" />
-		</>,
+				return (title = response.output_text);
+			}}
+		</title>,
 	);
 
 	c.page(
