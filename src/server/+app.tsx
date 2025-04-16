@@ -20,6 +20,7 @@ const app = new Router({
 });
 
 app.get("/", (c) => {
+	// best to not prerender to prevent cold start, at least etag
 	if (c.etag(time) && !import.meta.env.DEV) return;
 
 	c.head(<title>New Messages</title>);
