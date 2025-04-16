@@ -69,6 +69,7 @@
 
 @layer base {
 	:root {
+		--light-end: 0.12;
 		--accent: light-dark(var(--base-800), var(--base-500));
 
 		--shiki-foreground: var(--color-base-200);
