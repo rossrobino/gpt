@@ -21,7 +21,7 @@
 		"vite": "^6.3.0"
 	},
 	"dependencies": {
-		"@robino/md": "^3.2.4",
+		"@robino/md": "^3.2.5",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",
 		"@shikijs/langs": "^3.2.2",
