@@ -35,6 +35,7 @@ app.post("/", async (c) => {
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
+	let title = data.get("title");
 
 	const contentEntries = Array.from(data.entries()).filter(
 		([name]) => name === "content",
@@ -52,12 +53,16 @@ app.post("/", async (c) => {
 
 	c.head(
 		<title>
-			{ai.openai.responses
-				.create({
+			{async () => {
+				if (title) return title;
+
+				const response = await ai.openai.responses.create({
 					model: "gpt-4.1-nano",
-					input: `Create a title (<5 words) for all of the messages in this conversation.\n\n${JSON.stringify(messages)}`,
-				})
-				.then((r) => r.output_text)}
+					input: `Create a title (<5 words) for this message:\n\n${messages[0]!.message.content}`,
+				});
+
+				return (title = response.output_text);
+			}}
 		</title>,
 	);
 
@@ -111,6 +116,12 @@ app.post("/", async (c) => {
 
 				yield (
 					<>
+						<input
+							hidden
+							name="title"
+							value={title ? escape(title, true) : undefined}
+						></input>
+
 						<input
 							hidden
 							name="content"

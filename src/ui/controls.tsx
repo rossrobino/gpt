@@ -9,7 +9,7 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 			style="view-transition-name: controls"
 		>
 			<div class="flex gap-4">
-				<Model model={props.model} />
+				<SelectModel model={props.model} />
 				<Info />
 			</div>
 			<div class="flex gap-4">
@@ -40,7 +40,7 @@ const Search = (props: { web?: boolean }) => (
 	</label>
 );
 
-const Model = (props: { model?: Model }) => {
+const SelectModel = (props: { model?: Model }) => {
 	let { model = defaultModel } = props;
 	if (!models.includes(model)) model = defaultModel;
 
@@ -48,7 +48,7 @@ const Model = (props: { model?: Model }) => {
 		<select
 			name="model"
 			aria-label="select model"
-			class="h-9 w-36 px-2 py-1 shadow-sm dark:shadow-black/75"
+			class="border-base-200 dark:border-base-800 h-9 w-36 px-2 py-1 shadow-sm dark:shadow-black/75"
 		>
 			{models.map(({ name }) => (
 				<option value={name} selected={model.name === name}>
