@@ -32,28 +32,21 @@ app.post("/", async (c) => {
 
 	const data = await c.req.formData();
 
-	const contentEntries = Array.from(data.entries()).filter(([name]) =>
-		name.startsWith("content"),
-	);
-
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 
-	let newMessage = "";
+	const contentEntries = Array.from(data.entries()).filter(
+		([name]) => name === "content",
+	);
 
 	const messages: MessageEntry[] = contentEntries.map(([, value], i) => {
-		let content = String(value).replaceAll("\\n", "\n").replaceAll("\\t", "\t");
-
-		// render the new message
-		if (i === contentEntries.length - 1) {
-			newMessage = content;
-			content = processor.render(content);
-		}
-
 		return {
 			index: i,
-			message: { role: i % 2 === 0 ? "user" : "assistant", content },
+			message: {
+				role: i % 2 === 0 ? "user" : "assistant",
+				content: String(value).replaceAll("\\n", "\n").replaceAll("\\t", "\t"),
+			},
 		};
 	});
 
@@ -62,7 +55,7 @@ app.post("/", async (c) => {
 			{ai.openai.responses
 				.create({
 					model: "gpt-4.1-nano",
-					input: `Create a title (<5 words, separated by spaces) for this conversation that would go into a web page title element.\n\n${JSON.stringify(messages)}`,
+					input: `Create a title (<5 words) for all of the messages in this conversation.\n\n${JSON.stringify(messages)}`,
 				})
 				.then((r) => r.output_text)}
 		</title>,
@@ -75,8 +68,7 @@ app.post("/", async (c) => {
 			{async function* () {
 				const input: ResponseInput = [
 					{ role: "system", content: systemPrompt },
-					...messages.map((v) => v.message).slice(0, -1),
-					{ role: "user", content: newMessage },
+					...messages.map((v) => v.message),
 				];
 
 				const response = await ai.openai.responses.create({
@@ -87,12 +79,17 @@ app.post("/", async (c) => {
 					tools: web && model.web ? [{ type: "web_search_preview" }] : [],
 				});
 
+				let finalContent = "";
+
 				const htmlStream = processor.renderStream(
 					new ReadableStream<string>({
 						async start(c) {
 							for await (const event of response) {
 								if (event.type === "response.output_text.delta")
-									if (event.delta) c.enqueue(event.delta);
+									if (event.delta) {
+										c.enqueue(event.delta);
+										finalContent += event.delta;
+									}
 							}
 
 							c.close();
@@ -100,18 +97,13 @@ app.post("/", async (c) => {
 					}),
 				);
 
-				let finalContent = "";
-
 				const reader = htmlStream.getReader();
 
 				for (let i = 0; ; i++) {
 					const { value, done } = await reader.read();
 					if (i === 0) yield '<div class="py-6 chat-bubble">'; // don't send early for loader
 
-					if (value) {
-						yield value;
-						finalContent += value;
-					}
+					if (value) yield value;
 					if (done) break;
 				}
 
@@ -121,7 +113,7 @@ app.post("/", async (c) => {
 					<>
 						<input
 							hidden
-							name={`content-${messages.length}`}
+							name="content"
 							value={escape(finalContent, true)}
 						></input>
 						<Message

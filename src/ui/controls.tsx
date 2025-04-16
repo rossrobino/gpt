@@ -8,6 +8,7 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 		>
 			<Submit />
 			<Search web={props.web} />
+			<Refresh />
 			<Model model={props.model} />
 		</div>
 	);
@@ -58,7 +59,7 @@ const Model = (props: { model?: Model }) => {
 		<select
 			name="model"
 			aria-label="select model"
-			class="h-9 w-36 px-2 py-1 shadow-sm"
+			class="h-9 w-36 px-2 py-1 shadow-sm dark:shadow-black/75"
 		>
 			{models.map(({ name }) => (
 				<option value={name} selected={model.name === name}>
@@ -66,5 +67,25 @@ const Model = (props: { model?: Model }) => {
 				</option>
 			))}
 		</select>
+	);
+};
+
+const Refresh = () => {
+	return (
+		<a
+			href="/"
+			class="button icon destructive"
+			aria-label="Clear chat"
+			style="view-transition-name: clear"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 20 20"
+				fill="currentColor"
+				class="size-5"
+			>
+				<path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+			</svg>
+		</a>
 	);
 };

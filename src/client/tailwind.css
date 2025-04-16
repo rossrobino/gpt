@@ -109,7 +109,7 @@
 @layer components {
 	.button,
 	button {
-		@apply shadow transition-transform active:scale-97 active:shadow-none;
+		@apply shadow transition-transform active:scale-97 active:shadow-none dark:shadow-black/75;
 	}
 
 	details {
@@ -124,13 +124,24 @@
 
 		&::details-content {
 			transition:
-				content-visibility 300ms allow-discrete,
-				block-size 300ms;
+				content-visibility 700ms allow-discrete,
+				block-size 700ms;
 			block-size: 0;
 			overflow-y: clip;
 		}
 		&[open]::details-content {
 			block-size: auto;
+		}
+	}
+
+	pre {
+		margin-inline: calc(var(--spacing) * -4);
+		border: 1px solid var(--color-base-800);
+		border-radius: 0;
+
+		@media (min-width: 640px) {
+			margin-inline: 0;
+			border-radius: var(--radius-md);
 		}
 	}
 
