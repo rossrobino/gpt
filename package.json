@@ -26,6 +26,7 @@
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",
 		"@shikijs/langs": "^3.2.2",
+		"drab": "^6.2.1",
 		"openai": "^4.95.0",
 		"ovr": "^1.2.2",
 		"uico": "^0.7.0",
