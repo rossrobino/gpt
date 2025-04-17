@@ -5,13 +5,11 @@ import { render } from "@/lib/render";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
 import { GenerateTitle } from "@/ui/generate-title";
-import { Messages, Message } from "@/ui/messages";
+import { Input } from "@/ui/input";
+import { Message } from "@/ui/message";
+import { PastMessages } from "@/ui/past-messages";
 import { time } from "build:time";
 import { html } from "client:page";
-import type {
-	ResponseInputMessageItem,
-	ResponseOutputMessage,
-} from "openai/resources/responses/responses.mjs";
 import { escape, Router } from "ovr";
 import { z } from "zod";
 
@@ -32,7 +30,7 @@ app.get("/", (c) => {
 	c.head(<title>New Message</title>);
 	c.page(
 		<Home>
-			<Message message={{ role: "user", content: "" }} />
+			<Input index={0} />
 			<Controls />
 		</Home>,
 	);
@@ -47,44 +45,14 @@ app.post("/c", async (c) => {
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
+	const messageIndex = String(data.get("index"));
 
 	c.head(<GenerateTitle title={title} text={text} />);
 
 	c.page(
 		<Home>
-			{async () => {
-				if (id) {
-					const [previousInput, latestResponse] = await Promise.all([
-						ai.openai.responses.inputItems.list(id),
-						ai.openai.responses.retrieve(id),
-					]);
+			<PastMessages id={id} />
 
-					const fetchedMessages = previousInput.data
-						.reverse()
-						.filter((inp) => inp.type === "message")
-						.map((inp) => {
-							const message = inp as
-								| ResponseInputMessageItem
-								| ResponseOutputMessage;
-
-							return {
-								role: message.role,
-								content: (message.content[0] as { text: string }).text,
-							};
-						});
-
-					if (latestResponse.output[0]?.type === "message") {
-						if (latestResponse.output[0].content[0]?.type === "output_text") {
-							fetchedMessages.push({
-								role: "assistant",
-								content: latestResponse.output[0].content[0].text,
-							});
-						}
-					}
-
-					return <Messages messages={fetchedMessages} />;
-				}
-			}}
 			{async function* () {
 				const [first, ...lines] = text.trim().split("\n");
 
@@ -101,7 +69,12 @@ app.post("/c", async (c) => {
 					}
 				}
 
-				yield <Message md message={{ role: "user", content: text }} />;
+				yield (
+					<Message
+						transitionName={`m-${messageIndex}`}
+						message={{ role: "user", content: text }}
+					/>
+				);
 
 				const response = await ai.openai.responses.create({
 					input: [
@@ -156,7 +129,7 @@ app.post("/c", async (c) => {
 
 				yield (
 					<>
-						<Message message={{ role: "user", content: "" }} />
+						<Input index={parseInt(messageIndex) + 1} />
 						<Controls model={model} web={web} />
 
 						{title && (
