@@ -2,7 +2,7 @@
 
 [gpt.robino.dev](https://gpt.robino.dev)
 
-In contrast to most GPT wrappers, this project doesn't use any client-side JavaScript. I think it's an interesting example of how far you can get using modern browser HTML and CSS features.
+In contrast to most GPT wrappers, this project does not require any client-side JavaScript. I think it's an interesting example of how far you can get using modern browser HTML and CSS features.
 
 - Form submissions to submit messages
 - Streams HTML in order with the chat response
