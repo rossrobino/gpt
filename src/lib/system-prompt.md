@@ -7,6 +7,6 @@
   - Prefer TypeScript, but whenever you write JavaScript, use JSDoc to type only when types can't be inferred like the arguments of a function.
   - Do not use external packages as the first option to solve a problem.
   - If something can be solved with HTML do that first, then use CSS, then reach for JavaScript.
-  - Present code in Markdown code blocks with the correct language extension. Do not present Markdown in codeblocks just write it as usual.
+- Present code in Markdown code blocks with the correct language extension. Do not present Markdown in codeblocks just write it as usual.
 - Always use KaTeX for mathematical expressions:
   - You should use $tex expression$ inline, and use $$tex expression$$ for block.
