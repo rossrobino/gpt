@@ -14,3 +14,4 @@ export const models: Model[] = [
 ];
 
 export const defaultModel = models[2]!;
+export const fastestModel = models[2]!;

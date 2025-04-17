@@ -29,7 +29,7 @@ export const Message = (props: { md?: boolean; message: MessageEntry }) => {
 			) : (
 				<textarea
 					tabindex={1}
-					name="message"
+					name="text"
 					placeholder="Ask anything"
 					class="bg-muted border-base-200 dark:border-base-800 mt-12 h-32 border shadow-sm transition outline-none focus:shadow-md dark:shadow-black/75"
 				></textarea>

@@ -4,6 +4,7 @@ import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
+import { GenerateTitle } from "@/ui/generate-title";
 import { Messages, Message } from "@/ui/messages";
 import { time } from "build:time";
 import { html } from "client:page";
@@ -41,26 +42,13 @@ app.post("/c", async (c) => {
 	const data = await c.req.formData();
 
 	let id = data.get("id") ? z.string().parse(data.get("id")) : null;
+	let text = z.string().parse(data.get("text"));
+	let title = data.get("title") ? z.string().parse(data.get("title")) : null;
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
-	let title = data.get("title");
-	let input = z.string().describe("Message string").parse(data.get("message"));
 
-	c.head(
-		<title>
-			{async () => {
-				if (title) return title;
-
-				const response = await ai.openai.responses.create({
-					model: "gpt-4.1-nano",
-					input: `Create a title (<5 words) for this message:\n\n${input}`,
-				});
-
-				return (title = response.output_text);
-			}}
-		</title>,
-	);
+	c.head(<GenerateTitle title={title} text={text} />);
 
 	c.page(
 		<Home>
@@ -98,7 +86,7 @@ app.post("/c", async (c) => {
 				}
 			}}
 			{async function* () {
-				const [first, ...lines] = input.trim().split("\n");
+				const [first, ...lines] = text.trim().split("\n");
 
 				if (first) {
 					const [url, ...rest] = first.split(" ");
@@ -108,15 +96,17 @@ app.post("/c", async (c) => {
 						const r = await render(result.data);
 						if (r.success) {
 							lines.unshift(`\n\n${rest.join(" ")}`);
-							input = r.result + lines.join("\n");
+							text = r.result + lines.join("\n");
 						}
 					}
 				}
 
-				yield <Message md message={{ role: "user", content: input }} />;
+				yield <Message md message={{ role: "user", content: text }} />;
 
 				const response = await ai.openai.responses.create({
-					input,
+					input: [
+						{ role: "user", content: [{ type: "input_text", text: text }] },
+					],
 					instructions,
 					model: model.name,
 					reasoning: model.reasoning ? { effort: "medium" } : undefined,
