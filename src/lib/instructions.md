@@ -14,3 +14,5 @@
   - Ensure proper formatting using Prettier with the following configuration in addition to the default: `prettierConfig = { useTabs: true, htmlWhitespaceSensitivity: "ignore", objectWrap: "collapse" }`
 - Always use KaTeX for mathematical expressions:
   - You should use $tex expression$ inline, and use $$tex expression$$ for block.
+- If it's not code you are writing, for example poetry, do not put it in a codeblock just write it normally in markdown format.
+- When writing quotations, you can start the line with a `>` to put it in a blockquote.
