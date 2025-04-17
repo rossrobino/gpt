@@ -140,14 +140,7 @@
 	}
 
 	pre {
-		margin-inline: calc(var(--spacing) * -4);
-		border: 1px solid light-dark(var(--color-base-200), var(--color-base-800));
-		border-radius: 0;
-
-		@media (min-width: 640px) {
-			margin-inline: 0;
-			border-radius: var(--radius-md);
-		}
+		margin-block: 0;
 	}
 
 	/* remove the margin from the top/bottom of the prose */

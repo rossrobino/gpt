@@ -1,3 +1,4 @@
+import { codeControls } from "@/lib/md/code-controls";
 import { katex } from "@mdit/plugin-katex";
 import { Processor } from "@robino/md";
 import langAstro from "@shikijs/langs/astro";
@@ -42,4 +43,6 @@ export const processor = new Processor({
 		],
 		langAlias: { js: "tsx", ts: "tsx", jsx: "tsx", mdx: "md" },
 	},
-}).use(katex);
+})
+	.use(katex)
+	.use(codeControls);
