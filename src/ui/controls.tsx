@@ -29,7 +29,7 @@ const Submit = () => (
 
 const Search = (props: { web?: boolean }) => (
 	<label class="button secondary icon has-checked:bg-primary has-checked:text-primary-foreground m-0 has-focus-within:ring has-focus-within:ring-offset-1">
-		<svg.Globe />
+		<svg.Web />
 		<input
 			type="checkbox"
 			class="sr-only"
