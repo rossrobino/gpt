@@ -15,7 +15,3 @@ In contrast to most GPT wrappers, this project does not require any client-side 
 - Create a `.env` file and add your `VITE_OPENAI_API_KEY`
 - `npm i`
 - `npm run dev`
-
-## LICENSE
-
-MIT
