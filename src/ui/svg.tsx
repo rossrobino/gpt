@@ -3,7 +3,7 @@ export const Arrow = () =>
 
 export const X = () => `<span class="icon-[lucide--x]"></span>`;
 
-export const Web = () => `<span class="icon-[lucide--file-search]"></span>`;
+export const Web = () => `<span class="icon-[lucide--globe]"></span>`;
 
 export const Info = () => `<span class="icon-[lucide--info]"></span>`;
 
