@@ -23,8 +23,8 @@ export const codeControls = async (md: MarkdownIt) => {
 	<div class="flex justify-between items-center p-2 border-b border-base-800 gap-2">
 		<div class="font-mono px-2 text-base-100 text-sm">${lang}</div>
 		<div class="flex gap-2">
-			${copy(escaped)}
-			${download({ fileName, encoded })}
+			${Copy(escaped)}
+			${Download({ fileName, encoded })}
 		</div>
 	</div>
 	${code}
@@ -33,7 +33,8 @@ export const codeControls = async (md: MarkdownIt) => {
 	};
 };
 
-const download = (props: { fileName: string; encoded: string }) => /* html */ `
+const Download = (props: { fileName: string; encoded: string }) =>
+	/* html */ `
 <a 
 	class="button icon"
 	aria-label="Download"
@@ -42,9 +43,9 @@ const download = (props: { fileName: string; encoded: string }) => /* html */ `
 >
 	${svg.FolderDown()}
 </a>
-`;
+`.trim();
 
-const copy = (value: string) =>
+const Copy = (value: string) =>
 	/* html */ `
 <drab-copy value="${value}">
 	<button
@@ -53,7 +54,7 @@ const copy = (value: string) =>
 		class="icon"
 		aria-label="copy code to clipboard"
 	>
-		<span data-content>${svg.Copy()}</span>
+		<span data-content class="contents">${svg.Copy()}</span>
 		<template data-swap>${svg.CopyComplete()}</template>
 	</button>
 </drab-copy>
