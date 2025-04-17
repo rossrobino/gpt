@@ -10,6 +10,7 @@ import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
 import { time } from "build:time";
 import { html } from "client:page";
+import type { ResponseInputItem } from "openai/resources/responses/responses.mjs";
 import { escape, Router } from "ovr";
 import { z } from "zod";
 
@@ -54,17 +55,22 @@ app.post("/c", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
+				let imageUrl: string | null = null;
+
 				const [first, ...lines] = text.trim().split("\n");
 
 				if (first) {
 					const [url, ...rest] = first.split(" ");
 					const result = z.string().url().safeParse(url);
+					lines.unshift(`\n\n${rest.join(" ")}`);
+					const remaining = lines.join("\n");
 
 					if (result.success) {
-						const r = await render(result.data);
-						if (r.success) {
-							lines.unshift(`\n\n${rest.join(" ")}`);
-							text = r.result + lines.join("\n");
+						if (/\.(png|jpe?g|webp|gif)$/i.test(result.data)) {
+							imageUrl = result.data;
+						} else {
+							const r = await render(result.data);
+							if (r.success) text = r.result + remaining;
 						}
 					}
 				}
@@ -76,10 +82,21 @@ app.post("/c", async (c) => {
 					/>
 				);
 
+				const input: ResponseInputItem = {
+					role: "user",
+					content: [{ type: "input_text", text }],
+				};
+
+				if (imageUrl && input.content instanceof Array) {
+					input.content.unshift({
+						type: "input_image",
+						image_url: imageUrl,
+						detail: "auto",
+					});
+				}
+
 				const response = await ai.openai.responses.create({
-					input: [
-						{ role: "user", content: [{ type: "input_text", text: text }] },
-					],
+					input: [input],
 					instructions,
 					model: model.name,
 					reasoning: model.reasoning ? { effort: "medium" } : undefined,
