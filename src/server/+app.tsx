@@ -102,7 +102,7 @@ app.post("/c", async (c) => {
 
 				const response = await ai.openai.responses.create({
 					model: model.name,
-					reasoning: model.reasoning ? { effort: "high" } : undefined,
+					reasoning: model.reasoning ? { effort: "medium" } : undefined,
 					input,
 					stream: true,
 					tools: web && model.web ? [{ type: "web_search_preview" }] : [],
