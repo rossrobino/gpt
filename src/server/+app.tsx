@@ -25,7 +25,7 @@ const app = new Router({
 
 app.get("/", (c) => {
 	// best to not prerender to prevent cold start, at least etag
-	if (c.etag(time) && !import.meta.env.DEV) return;
+	if (c.etag(time) && import.meta.env.PROD) return;
 
 	c.head(<title>New Message</title>);
 	c.page(
@@ -71,16 +71,17 @@ app.post("/c", async (c) => {
 
 				if (first) {
 					const [url, ...rest] = first.split(" ");
-					const result = z.string().url().safeParse(url);
-					lines.unshift(`\n\n${rest.join(" ")}`);
-					const remaining = lines.join("\n");
+					const parsed = z.string().url().safeParse(url);
 
-					if (result.success) {
-						if (/\.(png|jpe?g|webp|gif)$/i.test(result.data)) {
-							imageUrl = result.data;
+					if (parsed.success) {
+						if (/\.(png|jpe?g|webp|gif)$/i.test(parsed.data)) {
+							imageUrl = parsed.data;
 						} else {
-							const r = await render(result.data);
-							if (r.success) text = r.result + remaining;
+							const result = await render(parsed.data);
+							if (result.success) {
+								lines.unshift(`\n\n${rest.join(" ")}`);
+								text = result.result + lines.join("\n");
+							}
 						}
 					}
 				}

@@ -27,6 +27,11 @@ export const codeControls = async (md: MarkdownIt) => {
 			${Download({ fileName, encoded })}
 		</div>
 	</div>
+	${
+		lang === "html"
+			? /* html */ `<iframe class="bg-base-50 w-full my-0 border-x-2 border-base-800 border-b h-72 resize-y" srcdoc="${escaped}"></iframe>`
+			: ""
+	}
 	${code}
 </div>
 `.trim();

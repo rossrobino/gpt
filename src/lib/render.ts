@@ -11,9 +11,6 @@ export const render = async (
 ): Promise<
 	{ success: true; result: string } | { success: false; error: string }
 > => {
-	"https://github.com/rossrobino/robino/blob/main/packages/md/src/processor/index.ts";
-	"https://raw.githubusercontent.com/rossrobino/robino/refs/heads/main/packages/md/src/processor/index.ts";
-
 	if (url.startsWith("https://github.com/")) {
 		url = url
 			.replace("github.com", "raw.githubusercontent.com")
@@ -31,6 +28,7 @@ export const render = async (
 
 		return { success: true, result: `\`\`\`${lang}\n${code}\n\`\`\`` };
 	}
+
 	const apiKey = import.meta.env.VITE_CF_API_KEY;
 	const accountId = import.meta.env.VITE_CF_ACCOUNT_ID;
 
