@@ -1,5 +1,6 @@
-import { Info } from "./info";
+import { html } from "@/content/info.md";
 import { defaultModel, models, type Model } from "@/lib/ai";
+import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 
 export const Controls = (props: { web?: boolean; model?: Model }) => {
@@ -20,6 +21,8 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 		</div>
 	);
 };
+
+const Info = () => <Popover title="Features">{html}</Popover>;
 
 const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>

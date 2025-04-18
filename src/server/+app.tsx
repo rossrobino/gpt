@@ -1,10 +1,9 @@
+import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
-import instructions from "@/lib/instructions.md?raw";
 import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
 import { Home } from "@/server/home";
 import { Controls } from "@/ui/controls";
-import { GenerateTitle } from "@/ui/generate-title";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
@@ -48,7 +47,18 @@ app.post("/c", async (c) => {
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const messageIndex = String(data.get("index"));
 
-	c.head(<GenerateTitle title={title} text={text} />);
+	c.head(async () => {
+		if (!title) {
+			title = (
+				await ai.openai.responses.create({
+					model: ai.fastestModel.name,
+					input: `Create a title (<5 words) for this message:\n\n${text}`,
+				})
+			).output_text;
+		}
+
+		return <title>{title}</title>;
+	});
 
 	c.page(
 		<Home>
@@ -149,11 +159,12 @@ app.post("/c", async (c) => {
 						<Input index={parseInt(messageIndex) + 1} />
 						<Controls model={model} web={web} />
 
-						{title && (
-							<input hidden name="title" value={escape(title, true)}></input>
-						)}
-
-						{id && <input type="hidden" name="id" value={id} />}
+						<input
+							type="hidden"
+							name="title"
+							value={escape(title, true)}
+						></input>
+						<input type="hidden" name="id" value={escape(id, true)} />
 					</>
 				);
 			}}
