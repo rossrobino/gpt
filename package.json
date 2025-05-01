@@ -11,27 +11,27 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
-		"@domcojs/vercel": "^2.0.0",
-		"@iconify-json/lucide": "^1.2.37",
+		"@domcojs/vercel": "^2.0.1",
+		"@iconify-json/lucide": "^1.2.39",
 		"@iconify/tailwind4": "^1.0.6",
-		"@tailwindcss/vite": "^4.1.4",
+		"@tailwindcss/vite": "^4.1.5",
 		"domco": "^4.1.1",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
-		"tailwindcss": "^4.1.4",
+		"tailwindcss": "^4.1.5",
 		"typescript": "^5.8.3",
-		"vite": "^6.3.1"
+		"vite": "^6.3.4"
 	},
 	"dependencies": {
-		"@mdit/plugin-katex": "^0.16.7",
-		"@robino/md": "^3.2.5",
+		"@mdit/plugin-katex": "^0.17.0",
+		"@robino/md": "^3.2.6",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",
-		"@shikijs/langs": "^3.2.2",
-		"drab": "^6.2.1",
-		"openai": "^4.95.0",
-		"ovr": "^1.2.2",
-		"uico": "^0.7.0",
+		"@shikijs/langs": "^3.3.0",
+		"drab": "^7.0.0",
+		"openai": "^4.96.2",
+		"ovr": "^1.2.4",
+		"uico": "^0.10.1",
 		"zod": "^3.24.3"
 	}
 }

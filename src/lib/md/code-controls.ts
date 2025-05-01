@@ -23,7 +23,7 @@ export const codeControls = async (md: MarkdownIt) => {
 	<div class="flex justify-between items-center p-2 border-b border-base-800 gap-2">
 		<div class="font-mono px-2 text-base-100 text-sm">${lang}</div>
 		<div class="flex gap-2">
-			${Copy(escaped)}
+			${Share(escaped)}
 			${Download({ fileName, encoded })}
 		</div>
 	</div>
@@ -50,9 +50,9 @@ const Download = (props: { fileName: string; encoded: string }) =>
 </a>
 `.trim();
 
-const Copy = (value: string) =>
+const Share = (value: string) =>
 	/* html */ `
-<drab-copy value="${value}">
+<drab-share text="${value}">
 	<button
 		data-trigger
 		type="button"
@@ -62,5 +62,5 @@ const Copy = (value: string) =>
 		<span data-content class="contents">${svg.Copy()}</span>
 		<template data-swap>${svg.CopyComplete()}</template>
 	</button>
-</drab-copy>
+</drab-share>
 `.trim();

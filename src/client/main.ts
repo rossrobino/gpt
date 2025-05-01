@@ -1,1 +1,1 @@
-import "drab/copy/define";
+import "drab/share/define";
