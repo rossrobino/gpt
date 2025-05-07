@@ -118,7 +118,7 @@ app.post("/c", async (c) => {
 					input: [input],
 					instructions,
 					model: model.name,
-					reasoning: model.reasoning ? { effort: "high" } : undefined,
+					reasoning: model.reasoning ? { effort: "medium" } : undefined,
 					tools: web && model.web ? [{ type: "web_search_preview" }] : [],
 					stream: true,
 					truncation: "auto",
