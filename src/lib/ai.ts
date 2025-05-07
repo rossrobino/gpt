@@ -1,8 +1,9 @@
+import "dotenv/config";
 import { OpenAI } from "openai";
 
-export const openai = new OpenAI({
-	apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-});
+if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
+
+export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export type Model = { name: string; web?: boolean; reasoning?: boolean };
 

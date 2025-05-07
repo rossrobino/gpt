@@ -66,6 +66,7 @@ app.post("/c", async (c) => {
 
 			{async function* () {
 				let imageUrl: string | null = null;
+				let urlContent: string | null = null;
 
 				const [first, ...lines] = text.trim().split("\n");
 
@@ -79,8 +80,9 @@ app.post("/c", async (c) => {
 						} else {
 							const result = await render(parsed.data);
 							if (result.success) {
-								lines.unshift(`\n\n${rest.join(" ")}`);
-								text = result.result + lines.join("\n");
+								lines.unshift(rest.join(" "));
+								text = lines.join("\n");
+								urlContent = result.result;
 							}
 						}
 					}
@@ -98,12 +100,18 @@ app.post("/c", async (c) => {
 					content: [{ type: "input_text", text }],
 				};
 
-				if (imageUrl && input.content instanceof Array) {
-					input.content.unshift({
-						type: "input_image",
-						image_url: imageUrl,
-						detail: "auto",
-					});
+				if (input.content instanceof Array) {
+					if (urlContent) {
+						input.content.unshift({ type: "input_text", text: urlContent });
+					}
+
+					if (imageUrl) {
+						input.content.unshift({
+							type: "input_image",
+							image_url: imageUrl,
+							detail: "auto",
+						});
+					}
 				}
 
 				const response = await ai.openai.responses.create({

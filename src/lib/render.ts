@@ -1,4 +1,8 @@
+import "dotenv/config";
 import { z } from "zod";
+
+if (!process.env.CF_API_KEY) throw new Error("CF_API_KEY is not set.");
+if (!process.env.CF_ACCOUNT_ID) throw new Error("CF_ACCOUNT_ID is not set.");
 
 const RenderSchema = z.object({ success: z.boolean(), result: z.string() });
 
@@ -29,23 +33,13 @@ export const render = async (
 		return { success: true, result: `\`\`\`${lang}\n${code}\n\`\`\`` };
 	}
 
-	const apiKey = import.meta.env.VITE_CF_API_KEY;
-	const accountId = import.meta.env.VITE_CF_ACCOUNT_ID;
-
-	if (!apiKey) {
-		throw new Error("Missing CF_BROWSER_RENDERING environment variable");
-	}
-	if (!accountId) {
-		throw new Error("Missing CF_ACCOUNT_ID environment variable");
-	}
-
 	const res = await fetch(
-		`https://api.cloudflare.com/client/v4/accounts/${accountId}/browser-rendering/markdown`,
+		`https://api.cloudflare.com/client/v4/accounts/${process.env.CF_ACCOUNT_ID}/browser-rendering/markdown`,
 		{
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${apiKey}`,
+				Authorization: `Bearer ${process.env.CF_API_KEY}`,
 			},
 			body: JSON.stringify({ url: url }),
 		},
