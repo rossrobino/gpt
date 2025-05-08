@@ -88,13 +88,6 @@ app.post("/c", async (c) => {
 					}
 				}
 
-				yield (
-					<Message
-						transitionName={`m-${messageIndex}`}
-						message={{ role: "user", content: text }}
-					/>
-				);
-
 				const input: ResponseInputItem = {
 					role: "user",
 					content: [{ type: "input_text", text }],
@@ -111,6 +104,19 @@ app.post("/c", async (c) => {
 							image_url: imageUrl,
 							detail: "auto",
 						});
+					}
+
+					let i = parseInt(messageIndex);
+					for (const message of input.content) {
+						if (message.type === "input_text") {
+							yield (
+								<Message
+									transitionName={`m-${i}`}
+									message={{ role: "user", content: message.text }}
+								/>
+							);
+							i++;
+						}
 					}
 				}
 

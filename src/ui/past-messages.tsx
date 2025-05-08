@@ -7,39 +7,43 @@ import type {
 } from "openai/resources/responses/responses.mjs";
 
 export const PastMessages = async (props: { id: string | null }) => {
-	if (props.id) {
-		const [previousInput, latestResponse] = await Promise.all([
-			ai.openai.responses.inputItems.list(props.id),
-			ai.openai.responses.retrieve(props.id),
-		]);
+	if (!props.id) return null;
 
-		const fetchedMessages = previousInput.data
-			.reverse()
-			.filter((inp) => inp.type === "message")
-			.map((inp) => {
-				const message = inp as ResponseInputMessageItem | ResponseOutputMessage;
+	return (
+		<Details summary="Previous messages">
+			{async () => {
+				if (!props.id) return null;
 
-				return {
-					role: message.role,
-					content: (message.content[0] as { text: string }).text,
-				};
-			});
+				const [previousInput, latestResponse] = await Promise.all([
+					ai.openai.responses.inputItems.list(props.id),
+					ai.openai.responses.retrieve(props.id),
+				]);
 
-		if (latestResponse.output[0]?.type === "message") {
-			if (latestResponse.output[0].content[0]?.type === "output_text") {
-				fetchedMessages.push({
-					role: "assistant",
-					content: latestResponse.output[0].content[0].text,
-				});
-			}
-		}
+				const fetchedMessages = previousInput.data
+					.reverse()
+					.filter((inp) => inp.type === "message")
+					.map((inp) => {
+						const message = inp as
+							| ResponseInputMessageItem
+							| ResponseOutputMessage;
 
-		return (
-			<Details summary="Previous messages">
-				{fetchedMessages.map((entry) => (
-					<Message message={entry} />
-				))}
-			</Details>
-		);
-	}
+						return {
+							role: message.role,
+							content: (message.content[0] as { text: string }).text,
+						};
+					});
+
+				if (latestResponse.output[0]?.type === "message") {
+					if (latestResponse.output[0].content[0]?.type === "output_text") {
+						fetchedMessages.push({
+							role: "assistant",
+							content: latestResponse.output[0].content[0].text,
+						});
+					}
+				}
+
+				return fetchedMessages.map((entry) => <Message message={entry} />);
+			}}
+		</Details>
+	);
 };
