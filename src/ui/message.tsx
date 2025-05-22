@@ -1,27 +1,36 @@
 import { processor } from "@/lib/md";
+import type { ChatMessage } from "@/lib/types";
 
 export const Message = (props: {
-	message: {
-		role: "user" | "assistant" | "system" | "developer";
-		content: string;
-	};
+	message: ChatMessage;
 	transitionName?: string;
 }) => {
 	const { content, role } = props.message;
+	const user = role === "user";
 
-	if (role === "user" || role === "assistant") {
-		return (
-			<div class={role === "user" ? "pl-16" : ""}>
-				<div
-					class={`chat-bubble ${role === "user" ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
-					style={
-						props.transitionName &&
-						`view-transition-name: ${props.transitionName}`
-					}
-				>
-					{processor.render(content ?? "")}
-				</div>
+	return (
+		<div class={user ? "pl-16" : ""}>
+			<div
+				class={`chat-bubble ${user ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
+				style={
+					props.transitionName &&
+					`view-transition-name: ${props.transitionName}`
+				}
+			>
+				{processor.render(
+					content
+						.map((c) => {
+							if (c.type === "input_text" || c.type === "output_text") {
+								return c.text;
+							} else if (c.type === "input_image") {
+								return c.image_url ?? "";
+							}
+
+							return "";
+						})
+						.join("\n\n"),
+				)}
 			</div>
-		);
-	}
+		</div>
+	);
 };

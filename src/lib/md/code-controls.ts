@@ -19,10 +19,10 @@ export const codeControls = async (md: MarkdownIt) => {
 		const encoded = encodeURIComponent(token.content);
 
 		return /* html */ `
-<div class="bg-base-900 rounded-none sm:rounded-md -mx-4 sm:mx-0 my-6">
-	<div class="flex justify-between items-center p-2 border-b border-base-800 gap-2">
-		<div class="font-mono px-2 text-base-100 text-sm">${lang}</div>
-		<div class="flex gap-2">
+<div class="bg-base-800 rounded-none sm:rounded-md -mx-4 sm:mx-0 my-6">
+	<div class="flex justify-between items-center pt-px px-4 sm:px-2 border-b border-base-700 gap-2re">
+		<div class="font-mono px-2 text-base-200 text-sm">${lang}</div>
+		<div class="flex">
 			${Share(escaped)}
 			${Download({ fileName, encoded })}
 		</div>

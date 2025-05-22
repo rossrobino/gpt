@@ -1,10 +1,7 @@
 import * as ai from "@/lib/ai";
+import type { ChatMessage } from "@/lib/types";
 import { Details } from "@/ui/details";
 import { Message } from "@/ui/message";
-import type {
-	ResponseInputMessageItem,
-	ResponseOutputMessage,
-} from "openai/resources/responses/responses.mjs";
 
 export const PastMessages = async (props: { id: string | null }) => {
 	if (!props.id) return null;
@@ -19,26 +16,13 @@ export const PastMessages = async (props: { id: string | null }) => {
 					ai.openai.responses.retrieve(props.id),
 				]);
 
-				const fetchedMessages = previousInput.data
+				const fetchedMessages: ChatMessage[] = previousInput.data
 					.reverse()
-					.filter((inp) => inp.type === "message")
-					.map((inp) => {
-						const message = inp as
-							| ResponseInputMessageItem
-							| ResponseOutputMessage;
+					.filter((inp) => inp.type === "message") as ChatMessage[];
 
-						return {
-							role: message.role,
-							content: (message.content[0] as { text: string }).text,
-						};
-					});
-
-				if (latestResponse.output[0]?.type === "message") {
-					if (latestResponse.output[0].content[0]?.type === "output_text") {
-						fetchedMessages.push({
-							role: "assistant",
-							content: latestResponse.output[0].content[0].text,
-						});
+				for (const output of latestResponse.output) {
+					if (output.type === "message") {
+						fetchedMessages.push(output);
 					}
 				}
 

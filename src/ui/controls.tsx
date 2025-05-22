@@ -22,7 +22,7 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 	);
 };
 
-const Info = () => <Popover title="Features">{html}</Popover>;
+const Info = () => <Popover title="Feature Overview">{html}</Popover>;
 
 const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>
@@ -51,7 +51,7 @@ const SelectModel = (props: { model?: Model }) => {
 		<select
 			name="model"
 			aria-label="select model"
-			class="border-base-200 dark:border-base-800 w-36 px-2 py-1 shadow-sm dark:shadow-black/75"
+			class="border-base-200 dark:border-base-800 w-36 px-2 py-1 shadow-xs dark:shadow-black/75"
 		>
 			{models.map(({ name }) => (
 				<option value={name} selected={model.name === name}>
@@ -64,13 +64,16 @@ const SelectModel = (props: { model?: Model }) => {
 
 const Refresh = () => {
 	return (
-		<a
-			href="/"
-			class="button icon destructive"
-			aria-label="Clear chat"
-			style="view-transition-name: clear"
-		>
-			<svg.X />
-		</a>
+		<drab-prefetch prerender>
+			<a
+				data-trigger
+				href="/"
+				class="button icon destructive"
+				aria-label="Clear chat"
+				style="view-transition-name: clear"
+			>
+				<svg.X />
+			</a>
+		</drab-prefetch>
 	);
 };
