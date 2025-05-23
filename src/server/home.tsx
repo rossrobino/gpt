@@ -42,7 +42,7 @@ export const action = new Action("/c", async (c) => {
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
-	const messageIndex = String(data.get("index"));
+	const messageIndex = z.string().parse(data.get("index"));
 
 	c.head(<title>{title}</title>);
 
