@@ -2,14 +2,18 @@ import { generateId } from "@/lib/generate-id";
 import * as svg from "@/ui/svg";
 import type { JSX } from "ovr";
 
-export const Popover = (props: { title?: string; children?: JSX.Element }) => {
-	const { title = "", children } = props;
+export const Popover = (props: {
+	title?: string;
+	children?: JSX.Element;
+	icon?: JSX.Element;
+}) => {
+	const { title = "", children, icon } = props;
 
 	const id = `popover-${generateId()}`;
 
 	return (
 		<>
-			<Trigger id={id} />
+			<Trigger icon={icon} id={id} />
 
 			<div
 				id={id}

@@ -6,14 +6,15 @@ import * as svg from "@/ui/svg";
 export const Controls = (props: { web?: boolean; model?: Model }) => {
 	return (
 		<div
-			class="my-3 flex flex-wrap-reverse justify-end gap-3"
+			class="my-3 flex flex-wrap-reverse justify-between gap-3"
 			style="view-transition-name: controls"
 		>
 			<div class="flex gap-3">
 				<SelectModel model={props.model} />
+				<Info />
 			</div>
 			<div class="flex gap-3">
-				<Info />
+				<Attachments />
 				<Refresh />
 				<Search web={props.web} />
 				<Submit />
@@ -21,6 +22,30 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 		</div>
 	);
 };
+
+const Attachments = () => {
+	return (
+		<Popover title="Attachments" icon={svg.Paperclip}>
+			<div className="pt-4">
+				<p>Add attachments to your message.</p>
+				<File />
+			</div>
+		</Popover>
+	);
+};
+
+const File = () => (
+	<>
+		<label htmlFor="files">Files</label>
+		<input
+			type="file"
+			id="files"
+			name="files"
+			aria-label="File upload"
+			multiple
+		/>
+	</>
+);
 
 const Info = () => <Popover>{html}</Popover>;
 

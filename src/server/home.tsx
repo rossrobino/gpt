@@ -14,7 +14,7 @@ import type {
 } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 import { escape } from "ovr";
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const page = new Page("/", (c) => {
 	// best to not prerender to prevent cold start, at least etag
@@ -30,19 +30,22 @@ export const page = new Page("/", (c) => {
 	);
 });
 
-const NullableString = z.string().nullable();
+const NullableStringSchema = z.string().nullable();
+const FilesSchema = z.array(z.file());
 
 export const action = new Action("/c", async (c) => {
 	const data = await c.req.formData();
 
-	let id = NullableString.parse(data.get("id"));
+	let id = NullableStringSchema.parse(data.get("id"));
 	let text = z.string().parse(data.get("text"));
 	let title =
-		NullableString.parse(data.get("title")) ?? (await generateTitle(text));
+		NullableStringSchema.parse(data.get("title")) ??
+		(await generateTitle(text));
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const messageIndex = z.string().parse(data.get("index"));
+	const files = FilesSchema.parse(data.getAll("files"));
 
 	c.head(<title>{title}</title>);
 
@@ -91,17 +94,34 @@ export const action = new Action("/c", async (c) => {
 					});
 				}
 
+				for (const file of files) {
+					if (file.size) {
+						if (file.type === "application/pdf") {
+							const upload = await ai.openai.files.create({
+								file,
+								purpose: "user_data",
+							});
+
+							input.content.unshift({ type: "input_file", file_id: upload.id });
+						} else {
+							input.content.unshift({
+								type: "input_text",
+								text: `${file.name}:\n\n${await file.text()}\n\n---\n\n`,
+							});
+						}
+					}
+				}
+
 				let i = parseInt(messageIndex);
 				for (const message of input.content) {
-					if (message.type === "input_text" || message.type === "input_image") {
-						yield (
-							<Message
-								transitionName={`m-${i}`}
-								message={{ role: "user", content: [message] }}
-							/>
-						);
-						i++;
-					}
+					yield (
+						<Message
+							transitionName={`m-${i}`}
+							message={{ role: "user", content: [message] }}
+						/>
+					);
+
+					i++;
 				}
 
 				yield (

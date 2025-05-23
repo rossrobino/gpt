@@ -23,7 +23,9 @@ export const Message = (props: {
 							if (c.type === "input_text" || c.type === "output_text") {
 								return c.text;
 							} else if (c.type === "input_image") {
-								return c.image_url ?? "";
+								return c.image_url ?? "Image";
+							} else if (c.type === "input_file") {
+								return c.filename ?? "File";
 							}
 
 							return "";
