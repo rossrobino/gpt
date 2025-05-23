@@ -41,7 +41,7 @@ export const codeControls = async (md: MarkdownIt) => {
 const Download = (props: { fileName: string; encoded: string }) =>
 	/* html */ `
 <a 
-	class="button icon"
+	class="button icon bg-base-800 text-base-200 shadow-none"
 	aria-label="Download"
 	download="${props.fileName}"
 	href="data:text/plain;charset=utf-8,${props.encoded}"
@@ -56,7 +56,7 @@ const Share = (value: string) =>
 	<button
 		data-trigger
 		type="button"
-		class="icon"
+		class="icon bg-base-800 text-base-200 shadow-none"
 		aria-label="copy code to clipboard"
 	>
 		<span data-content class="contents">${svg.Copy()}</span>

@@ -12,5 +12,7 @@ export const FolderDown = () =>
 
 export const Copy = () => `<span class="icon-[lucide--clipboard-copy]"></span>`;
 
+export const Refresh = () => `<span class="icon-[lucide--rotate-cw]"></span>`;
+
 export const CopyComplete = () =>
 	`<span class="icon-[lucide--clipboard-check]"></span>`;

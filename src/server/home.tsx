@@ -37,20 +37,14 @@ export const action = new Action("/c", async (c) => {
 
 	let id = NullableString.parse(data.get("id"));
 	let text = z.string().parse(data.get("text"));
-	let title = NullableString.parse(data.get("title"));
+	let title =
+		NullableString.parse(data.get("title")) ?? (await generateTitle(text));
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const messageIndex = String(data.get("index"));
 
-	c.head(
-		<title>
-			{async () => {
-				if (!title) title = await generateTitle(text);
-				return title;
-			}}
-		</title>,
-	);
+	c.head(<title>{title}</title>);
 
 	return (
 		<>
@@ -170,16 +164,19 @@ export const action = new Action("/c", async (c) => {
 
 						<Input index={parseInt(messageIndex) + 1} />
 						<Controls model={model} web={web} />
+					</>
+				);
 
+				yield (
+					<>
 						<input
 							type="hidden"
 							name="title"
 							value={escape(title, true)}
 						></input>
+						<input type="hidden" name="id" value={escape(id, true)} />
 					</>
 				);
-
-				yield <input type="hidden" name="id" value={escape(id, true)} />;
 			}}
 		</>
 	);

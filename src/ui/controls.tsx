@@ -6,23 +6,23 @@ import * as svg from "@/ui/svg";
 export const Controls = (props: { web?: boolean; model?: Model }) => {
 	return (
 		<div
-			class="my-4 flex justify-between gap-4"
+			class="my-3 flex flex-wrap-reverse justify-end gap-3"
 			style="view-transition-name: controls"
 		>
-			<div class="flex gap-4">
+			<div class="flex gap-3">
 				<SelectModel model={props.model} />
-				<Info />
 			</div>
-			<div class="flex gap-4">
-				<Submit />
-				<Search web={props.web} />
+			<div class="flex gap-3">
+				<Info />
 				<Refresh />
+				<Search web={props.web} />
+				<Submit />
 			</div>
 		</div>
 	);
 };
 
-const Info = () => <Popover title="Feature Overview">{html}</Popover>;
+const Info = () => <Popover>{html}</Popover>;
 
 const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>
@@ -51,7 +51,7 @@ const SelectModel = (props: { model?: Model }) => {
 		<select
 			name="model"
 			aria-label="select model"
-			class="border-base-200 dark:border-base-800 w-36 px-2 py-1 shadow-xs dark:shadow-black/75"
+			class="border-base-200 dark:border-base-800 w-34 px-2 py-1 shadow-xs dark:shadow-black/75"
 		>
 			{models.map(({ name }) => (
 				<option value={name} selected={model.name === name}>
@@ -72,7 +72,7 @@ const Refresh = () => {
 				aria-label="Clear chat"
 				style="view-transition-name: clear"
 			>
-				<svg.X />
+				<svg.Refresh />
 			</a>
 		</drab-prefetch>
 	);
