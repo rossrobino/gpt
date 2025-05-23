@@ -28,13 +28,13 @@ const Attachments = () => {
 		<Popover title="Attachments" icon={svg.Paperclip}>
 			<div className="pt-4">
 				<p>Add attachments to your message.</p>
-				<File />
+				<Files />
 			</div>
 		</Popover>
 	);
 };
 
-const File = () => (
+const Files = () => (
 	<>
 		<label htmlFor="files">Files</label>
 		<input
@@ -43,6 +43,7 @@ const File = () => (
 			name="files"
 			aria-label="File upload"
 			multiple
+			webkitdirectory
 		/>
 	</>
 );

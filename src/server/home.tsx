@@ -106,7 +106,7 @@ export const action = new Action("/c", async (c) => {
 						} else {
 							input.content.unshift({
 								type: "input_text",
-								text: `${file.name}:\n\n${await file.text()}\n\n---\n\n`,
+								text: `${file.name}\n\`\`\`${file.name.split(".").at(-1)}\n${await file.text()}\n\`\`\`\n`,
 							});
 						}
 					}

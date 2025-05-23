@@ -9,7 +9,7 @@ export const Message = (props: {
 	const user = role === "user";
 
 	return (
-		<div class={user ? "pl-16" : ""}>
+		<div class={user ? "my-2 pl-12" : ""}>
 			<div
 				class={`chat-bubble ${user ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
 				style={
