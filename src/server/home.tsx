@@ -61,7 +61,7 @@ export const action = new Action("/c", async (c) => {
 
 				if (first) {
 					const [url, ...rest] = first.split(" ");
-					const parsed = z.string().url().safeParse(url);
+					const parsed = z.url().safeParse(url);
 
 					if (parsed.success) {
 						if (/\.(png|jpe?g|webp|gif)$/i.test(parsed.data)) {
@@ -94,23 +94,28 @@ export const action = new Action("/c", async (c) => {
 					});
 				}
 
-				for (const file of files) {
-					if (file.size) {
-						if (file.type === "application/pdf") {
-							const upload = await ai.openai.files.create({
-								file,
-								purpose: "user_data",
-							});
+				await Promise.all(
+					files.map(async (file) => {
+						if (file.size) {
+							if (file.type === "application/pdf") {
+								const upload = await ai.openai.files.create({
+									file,
+									purpose: "user_data",
+								});
 
-							input.content.unshift({ type: "input_file", file_id: upload.id });
-						} else {
-							input.content.unshift({
-								type: "input_text",
-								text: `${file.name}\n\`\`\`${file.name.split(".").at(-1)}\n${await file.text()}\n\`\`\`\n`,
-							});
+								input.content.unshift({
+									type: "input_file",
+									file_id: upload.id,
+								});
+							} else {
+								input.content.unshift({
+									type: "input_text",
+									text: `${file.name}\n\`\`\`${file.name.split(".").at(-1)}\n${await file.text()}\n\`\`\`\n`,
+								});
+							}
 						}
-					}
-				}
+					}),
+				);
 
 				let i = parseInt(messageIndex);
 				for (const message of input.content) {
