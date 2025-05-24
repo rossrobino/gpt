@@ -1,8 +1,10 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
+import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
 import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
+import { NullableStringSchema } from "@/lib/schema";
 import { Controls } from "@/ui/controls";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
@@ -30,22 +32,20 @@ export const page = new Page("/", (c) => {
 	);
 });
 
-const NullableStringSchema = z.string().nullable();
-const FilesSchema = z.array(z.file());
-
 export const action = new Action("/c", async (c) => {
 	const data = await c.req.formData();
 
 	let id = NullableStringSchema.parse(data.get("id"));
 	let text = z.string().parse(data.get("text"));
-	let title =
-		NullableStringSchema.parse(data.get("title")) ??
-		(await generateTitle(text));
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const messageIndex = z.string().parse(data.get("index"));
-	const files = FilesSchema.parse(data.getAll("files"));
+
+	const [title, files] = await Promise.all([
+		generateTitle(data.get("title"), text),
+		fileInput(data.getAll("files")),
+	]);
 
 	c.head(<title>{title}</title>);
 
@@ -79,46 +79,25 @@ export const action = new Action("/c", async (c) => {
 				}
 
 				// current message input
-				const content: ResponseInputContent[] = [{ type: "input_text", text }];
-				const input = { role: "user", content } satisfies ResponseInput[number];
+				const content: ResponseInputContent[] = [
+					...files,
+					{ type: "input_text", text },
+				];
 
 				if (urlContent) {
-					input.content.unshift({ type: "input_text", text: urlContent });
+					content.unshift({ type: "input_text", text: urlContent });
 				}
 
 				if (imageUrl) {
-					input.content.unshift({
+					content.unshift({
 						type: "input_image",
 						image_url: imageUrl,
 						detail: "auto",
 					});
 				}
 
-				await Promise.all(
-					files.map(async (file) => {
-						if (file.size) {
-							if (file.type === "application/pdf") {
-								const upload = await ai.openai.files.create({
-									file,
-									purpose: "user_data",
-								});
-
-								input.content.unshift({
-									type: "input_file",
-									file_id: upload.id,
-								});
-							} else {
-								input.content.unshift({
-									type: "input_text",
-									text: `${file.name}\n\`\`\`${file.name.split(".").at(-1)}\n${await file.text()}\n\`\`\`\n`,
-								});
-							}
-						}
-					}),
-				);
-
 				let i = parseInt(messageIndex);
-				for (const message of input.content) {
+				for (const message of content) {
 					yield (
 						<Message
 							transitionName={`m-${i}`}
@@ -137,7 +116,7 @@ export const action = new Action("/c", async (c) => {
 									new ReadableStream<string>({
 										async start(c) {
 											const response = await ai.openai.responses.create({
-												input: [input],
+												input: [{ role: "user", content }],
 												instructions,
 												model: model.name,
 												reasoning: model.reasoning
