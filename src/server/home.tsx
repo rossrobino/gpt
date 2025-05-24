@@ -10,10 +10,7 @@ import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
 import { time } from "build:time";
-import type {
-	ResponseInput,
-	ResponseInputContent,
-} from "openai/resources/responses/responses.mjs";
+import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 import { escape } from "ovr";
 import { z } from "zod/v4";
