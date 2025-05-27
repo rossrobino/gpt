@@ -26,27 +26,63 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 const Attachments = () => {
 	return (
 		<Popover title="Attachments" icon={svg.Paperclip}>
-			<div className="pt-4">
-				<p>Add attachments to your message.</p>
+			<div className="flex flex-col gap-3 pt-4">
+				<Website />
+				<Image />
 				<Files />
+				<Directory />
 			</div>
 		</Popover>
 	);
 };
 
 const Files = () => (
-	<>
-		<label htmlFor="files">Files</label>
+	<div>
+		<label for="files">Files</label>
+		<input type="file" id="files" name="files" multiple />
+	</div>
+);
+
+const Directory = () => (
+	<div>
+		<label for="directory">Directory</label>
 		<input
 			type="file"
-			id="files"
-			name="files"
-			aria-label="File upload"
+			id="directory"
+			name="directory"
 			multiple
 			webkitdirectory
 		/>
-	</>
+	</div>
 );
+
+const Image = () => {
+	return (
+		<div>
+			<label for="image">Image</label>
+			<input
+				type="url"
+				name="image"
+				id="image"
+				placeholder="https://link-to-image"
+			/>
+		</div>
+	);
+};
+
+const Website = () => {
+	return (
+		<div>
+			<label for="website">Website</label>
+			<input
+				type="url"
+				name="website"
+				id="website"
+				placeholder="https://website-to-include"
+			/>
+		</div>
+	);
+};
 
 const Info = () => <Popover>{html}</Popover>;
 

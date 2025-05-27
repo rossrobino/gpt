@@ -11,10 +11,12 @@ const RenderSchema = z.object({ success: z.boolean(), result: z.string() });
  * @returns Markdown content
  */
 export const render = async (
-	url: string,
+	url: string | null,
 ): Promise<
-	{ success: true; result: string } | { success: false; error: string }
+	{ success: true; md: string } | { success: false; error: string }
 > => {
+	if (!url) return { success: false, error: "No URL provided" };
+
 	if (url.startsWith("https://github.com/")) {
 		url = url
 			.replace("github.com", "raw.githubusercontent.com")
@@ -30,7 +32,7 @@ export const render = async (
 		const code = await res.text();
 		const lang = url.split(".").at(-1);
 
-		return { success: true, result: `\`\`\`${lang}\n${code}\n\`\`\`` };
+		return { success: true, md: `\`\`\`${lang}\n${code}\n\`\`\`` };
 	}
 
 	const res = await fetch(
@@ -55,7 +57,7 @@ export const render = async (
 	const result = RenderSchema.safeParse(await res.json());
 
 	if (result.data?.success) {
-		return { success: true, result: result.data.result };
+		return { success: true, md: result.data.result };
 	}
 
 	return {

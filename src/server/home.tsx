@@ -31,11 +31,13 @@ export const action = new Action("/chat", async (c) => {
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
-	let text = schema.StringSchema.parse(data.get("text"));
+	const text = schema.StringSchema.parse(data.get("text"));
+	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
+	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
 	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
 
-	const newId = new Deferred<string>();
 	const finalMessageIndex = new Deferred<number>();
+	const newId = new Deferred<string>();
 
 	c.head(<title>{generateTitle(data)}</title>);
 
@@ -44,31 +46,10 @@ export const action = new Action("/chat", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
-				let imageUrl: string | null = null;
-				let urlContent: string | null = null;
-
-				const [first, ...lines] = text.trim().split("\n");
-
-				if (first) {
-					const [url, ...rest] = first.split(" ");
-					const parsed = schema.URLSchema.safeParse(url);
-
-					if (parsed.success) {
-						if (/\.(png|jpe?g|webp|gif)$/i.test(parsed.data)) {
-							imageUrl = parsed.data;
-						} else {
-							const result = await render(parsed.data);
-
-							if (result.success) {
-								lines.unshift(rest.join(" "));
-								text = lines.join("\n");
-								urlContent = result.result;
-							}
-						}
-					}
-				}
-
-				const files = await fileInput(data);
+				const [files, renderResult] = await Promise.all([
+					fileInput(data),
+					render(website),
+				]);
 
 				// current message input
 				const content: ResponseInputContent[] = [
@@ -76,14 +57,14 @@ export const action = new Action("/chat", async (c) => {
 					{ type: "input_text", text },
 				];
 
-				if (urlContent) {
-					content.unshift({ type: "input_text", text: urlContent });
+				if (renderResult.success) {
+					content.unshift({ type: "input_text", text: renderResult.md });
 				}
 
-				if (imageUrl) {
+				if (image) {
 					content.unshift({
 						type: "input_image",
-						image_url: imageUrl,
+						image_url: image,
 						detail: "auto",
 					});
 				}
@@ -126,7 +107,7 @@ export const action = new Action("/chat", async (c) => {
 												event.type === "response.output_item.added" &&
 												event.item.type === "reasoning"
 											) {
-												c.enqueue("Reasoning...\n\n");
+												c.enqueue("Reasoning...<hr>");
 											} else if (event.type === "response.output_text.delta") {
 												if (event.delta) c.enqueue(event.delta);
 											} else if (event.type === "response.completed") {
