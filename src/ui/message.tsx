@@ -5,17 +5,15 @@ export const Message = (props: {
 	message: ChatMessage;
 	transitionName?: string;
 }) => {
-	const { content, role } = props.message;
+	const { transitionName, message } = props;
+	const { content, role } = message;
 	const user = role === "user";
 
 	return (
 		<div class={user ? "my-2 pl-12" : ""}>
 			<div
 				class={`chat-bubble ${user ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
-				style={
-					props.transitionName &&
-					`view-transition-name: ${props.transitionName}`
-				}
+				style={transitionName && `view-transition-name: ${transitionName}`}
 			>
 				{processor.render(
 					content

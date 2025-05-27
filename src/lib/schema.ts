@@ -5,3 +5,5 @@ export const StringSchema = z.string();
 export const NullableStringSchema = z.string().nullable();
 
 export const FilesSchema = z.array(z.file());
+
+export const URLSchema = z.url();

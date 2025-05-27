@@ -1,18 +1,17 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
+import { Deferred } from "@/lib/deferred";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
 import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
-import { NullableStringSchema } from "@/lib/schema";
+import * as schema from "@/lib/schema";
 import { Controls } from "@/ui/controls";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
 import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
-import { escape } from "ovr";
-import { z } from "zod/v4";
 
 export const page = new Page("/", (c) => {
 	c.head(<title>New Message</title>);
@@ -25,15 +24,17 @@ export const page = new Page("/", (c) => {
 	);
 });
 
-export const action = new Action("/c", async (c) => {
+export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
-	let id = NullableStringSchema.parse(data.get("id"));
-	let text = z.string().parse(data.get("text"));
+	const id = schema.NullableStringSchema.parse(data.get("id"));
+	const newId = new Deferred<string>();
+
+	let text = schema.StringSchema.parse(data.get("text"));
 	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
-	const messageIndex = z.string().parse(data.get("index"));
+	const messageIndex = schema.StringSchema.parse(data.get("index"));
 
 	c.head(<title>{generateTitle(data)}</title>);
 
@@ -49,7 +50,7 @@ export const action = new Action("/c", async (c) => {
 
 				if (first) {
 					const [url, ...rest] = first.split(" ");
-					const parsed = z.url().safeParse(url);
+					const parsed = schema.URLSchema.safeParse(url);
 
 					if (parsed.success) {
 						if (/\.(png|jpe?g|webp|gif)$/i.test(parsed.data)) {
@@ -86,6 +87,7 @@ export const action = new Action("/c", async (c) => {
 					});
 				}
 
+				// yield current messages
 				let i = parseInt(messageIndex);
 				for (const message of content) {
 					yield (
@@ -110,7 +112,7 @@ export const action = new Action("/c", async (c) => {
 												instructions,
 												model: model.name,
 												reasoning: model.reasoning
-													? { effort: "high" }
+													? { effort: "medium" }
 													: undefined,
 												tools:
 													web && model.web
@@ -122,8 +124,6 @@ export const action = new Action("/c", async (c) => {
 												previous_response_id: id,
 											});
 
-											let finalContent = "";
-
 											for await (const event of response) {
 												if (
 													event.type === "response.output_item.added" &&
@@ -133,12 +133,9 @@ export const action = new Action("/c", async (c) => {
 												} else if (
 													event.type === "response.output_text.delta"
 												) {
-													if (event.delta) {
-														c.enqueue(event.delta);
-														finalContent += event.delta;
-													}
+													if (event.delta) c.enqueue(event.delta);
 												} else if (event.type === "response.completed") {
-													id = event.response.id;
+													newId.resolve(event.response.id);
 												}
 											}
 
@@ -158,17 +155,18 @@ export const action = new Action("/c", async (c) => {
 
 						<Input index={parseInt(messageIndex) + 1} />
 						<Controls model={model} web={web} />
-					</>
-				);
 
-				yield (
-					<>
-						<input
-							type="hidden"
-							name="title"
-							value={await generateTitle(data)}
-						></input>
-						<input type="hidden" name="id" value={escape(id, true)} />
+						{async () => (
+							<input
+								type="hidden"
+								name="title"
+								value={await generateTitle(data)}
+							></input>
+						)}
+
+						{async () => (
+							<input type="hidden" name="id" value={await newId.promise} />
+						)}
 					</>
 				);
 			}}
