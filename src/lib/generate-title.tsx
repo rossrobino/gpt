@@ -2,7 +2,7 @@ import { NullableStringSchema, StringSchema } from "./schema";
 import * as ai from "@/lib/ai";
 import { Context, escape } from "ovr";
 
-export const generateTitle = async (data: FormData) => {
+export const generateTitle = (data: FormData) => {
 	const c = Context.get();
 	return c.memo(gen)(data);
 };
