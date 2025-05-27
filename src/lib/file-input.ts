@@ -2,8 +2,8 @@ import { FilesSchema } from "./schema";
 import * as ai from "@/lib/ai";
 import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 
-export const fileInput = async (data: FormDataEntryValue[]) => {
-	const files = FilesSchema.parse(data);
+export const fileInput = async (data: FormData) => {
+	const files = FilesSchema.parse(data.getAll("files"));
 
 	return Promise.all(
 		files

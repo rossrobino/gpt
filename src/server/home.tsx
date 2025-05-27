@@ -9,16 +9,12 @@ import { Controls } from "@/ui/controls";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { time } from "build:time";
 import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 import { escape } from "ovr";
 import { z } from "zod/v4";
 
 export const page = new Page("/", (c) => {
-	// best to not prerender to prevent cold start, at least etag
-	if (c.etag(time) && import.meta.env.PROD) return;
-
 	c.head(<title>New Message</title>);
 
 	return (
@@ -39,12 +35,7 @@ export const action = new Action("/c", async (c) => {
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const messageIndex = z.string().parse(data.get("index"));
 
-	const [title, files] = await Promise.all([
-		generateTitle(data.get("title"), text),
-		fileInput(data.getAll("files")),
-	]);
-
-	c.head(<title>{title}</title>);
+	c.head(<title>{generateTitle(data)}</title>);
 
 	return (
 		<>
@@ -74,6 +65,8 @@ export const action = new Action("/c", async (c) => {
 						}
 					}
 				}
+
+				const files = await fileInput(data);
 
 				// current message input
 				const content: ResponseInputContent[] = [
@@ -173,7 +166,7 @@ export const action = new Action("/c", async (c) => {
 						<input
 							type="hidden"
 							name="title"
-							value={escape(title, true)}
+							value={await generateTitle(data)}
 						></input>
 						<input type="hidden" name="id" value={escape(id, true)} />
 					</>

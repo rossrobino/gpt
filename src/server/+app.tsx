@@ -18,4 +18,6 @@ app.use((c, next) => {
 	return next();
 });
 
+app.prerender = [home.page.pattern];
+
 export default app;
