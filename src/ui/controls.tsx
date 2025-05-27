@@ -15,7 +15,7 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 			</div>
 			<div class="flex gap-3">
 				<Attachments />
-				<Refresh />
+				<Clear />
 				<Search web={props.web} />
 				<Submit />
 			</div>
@@ -88,7 +88,7 @@ const SelectModel = (props: { model?: Model }) => {
 	);
 };
 
-const Refresh = () => {
+const Clear = () => {
 	return (
 		<drab-prefetch prerender>
 			<a
@@ -98,7 +98,7 @@ const Refresh = () => {
 				aria-label="Clear chat"
 				style="view-transition-name: clear"
 			>
-				<svg.Refresh />
+				<svg.X />
 			</a>
 		</drab-prefetch>
 	);
