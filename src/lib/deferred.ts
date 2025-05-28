@@ -1,14 +1,12 @@
 export class Deferred<T> {
 	promise: Promise<T>;
-	#resolve!: (value: T) => void;
+	resolve!: (value: T) => void;
+	reject!: (reason?: any) => void;
 
 	constructor() {
-		this.promise = new Promise<T>((resolve) => {
-			this.#resolve = resolve;
+		this.promise = new Promise<T>((resolve, reject) => {
+			this.resolve = resolve;
+			this.reject = reject;
 		});
-	}
-
-	resolve(value: T) {
-		this.#resolve(value);
 	}
 }
