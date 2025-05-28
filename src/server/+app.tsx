@@ -1,5 +1,5 @@
-import { Layout } from "./layout";
 import * as home from "@/server/home";
+import { Layout } from "@/server/layout";
 import { html } from "client:page";
 import { App } from "ovr";
 

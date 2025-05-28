@@ -1,12 +1,12 @@
-import { FilesSchema } from "./schema";
 import * as ai from "@/lib/ai";
+import * as schema from "@/lib/schema";
 import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 
 const supportedImages = ["image/png", "image/jpeg", "image/webp", "image/gif"];
 
 export const fileInput = async (data: FormData) => {
-	const files = FilesSchema.parse(data.getAll("files"));
-	const directory = FilesSchema.parse(data.getAll("directory"));
+	const files = schema.FilesSchema.parse(data.getAll("files"));
+	const directory = schema.FilesSchema.parse(data.getAll("directory"));
 
 	files.push(...directory);
 

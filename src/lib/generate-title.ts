@@ -1,5 +1,5 @@
-import { NullableStringSchema, StringSchema } from "./schema";
 import * as ai from "@/lib/ai";
+import * as schema from "@/lib/schema";
 import { Context, escape } from "ovr";
 
 export const generateTitle = (data: FormData) => {
@@ -8,11 +8,11 @@ export const generateTitle = (data: FormData) => {
 };
 
 const gen = async (data: FormData) => {
-	const title = NullableStringSchema.parse(data.get("title"));
+	const title = schema.NullableStringSchema.parse(data.get("title"));
 
 	if (title) return title;
 
-	const text = StringSchema.parse(data.get("text"));
+	const text = schema.StringSchema.parse(data.get("text"));
 
 	const res = await ai.openai.responses.create({
 		model: ai.fastestModel.name,
