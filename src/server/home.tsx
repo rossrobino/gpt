@@ -90,7 +90,7 @@ export const action = new Action("/chat", async (c) => {
 											instructions,
 											model: model.name,
 											reasoning: model.reasoning
-												? { effort: "medium" }
+												? { effort: "high" }
 												: undefined,
 											tools:
 												web && model.web
@@ -107,7 +107,7 @@ export const action = new Action("/chat", async (c) => {
 												event.type === "response.output_item.added" &&
 												event.item.type === "reasoning"
 											) {
-												c.enqueue("Reasoning...<hr>");
+												c.enqueue("Reasoning...\n\n");
 											} else if (event.type === "response.output_text.delta") {
 												if (event.delta) c.enqueue(event.delta);
 											} else if (event.type === "response.completed") {
