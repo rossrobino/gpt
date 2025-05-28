@@ -84,7 +84,7 @@ const Website = () => {
 	);
 };
 
-const Info = () => <Popover>{html}</Popover>;
+const Info = () => <Popover title="Overview">{html}</Popover>;
 
 const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>

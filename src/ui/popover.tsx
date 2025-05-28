@@ -24,7 +24,7 @@ export const Popover = (props: {
 					<div class="text-xl font-bold">{title}</div>
 					<Trigger id={id} hide />
 				</div>
-				<div class="*:mt-0">{children}</div>
+				<div class="pt-2">{children}</div>
 			</div>
 		</>
 	);

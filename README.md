@@ -12,6 +12,6 @@ In contrast to most GPT wrappers, this project does not require any client-side 
 ## Run locally
 
 - Clone repo to local machine
-- Create a `.env` file and add your `VITE_OPENAI_API_KEY`
+- Create a `.env` file and add your `OPENAI_API_KEY`, for browser rendering add both `CF_API_KEY` and `CF_ACCOUNT_ID`
 - `npm i`
 - `npm run dev`

@@ -1,7 +1,3 @@
-#### Models
-
+- This project is open source and MIT Licensed, you can find the source code on [GitHub](https://github.com/rossrobino/gpt).
 - The latest [OpenAI](https://platform.openai.com/docs/models) models are available to use.
-
-#### Web
-
 - Select the globe button to toggle web **search** capabilities (only supported on select models).
