@@ -2,7 +2,7 @@ import { adapter } from "@domcojs/vercel";
 import { md } from "@robino/md";
 import tailwindcss from "@tailwindcss/vite";
 import { domco } from "domco";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 
 export default defineConfig({
 	build: { minify: true },
