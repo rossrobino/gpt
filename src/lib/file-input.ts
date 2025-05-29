@@ -34,13 +34,13 @@ export const fileInput = async (data: FormData) => {
 
 					return { type: "input_image", file_id: upload.id, detail: "auto" };
 				} else if (file.type === mime.docx) {
-					const [mammoth, arrayBuffer] = await Promise.all([
-						import("mammoth/mammoth.browser.js"),
-						file.arrayBuffer(),
-					]);
-
 					try {
-						const { value } = await mammoth.convertToHtml({ arrayBuffer });
+						const [mammoth, arrayBuffer] = await Promise.all([
+							import("mammoth/mammoth.browser.js"),
+							file.arrayBuffer(),
+						]);
+
+						const { value } = await mammoth.extractRawText({ arrayBuffer });
 
 						return { type: "input_text", text: `**${file.name}**\n\n${value}` };
 					} catch (error) {
