@@ -1,5 +1,4 @@
 import * as ai from "@/lib/ai";
-import * as schema from "@/lib/schema";
 import type {
 	ResponseInputContent,
 	ResponseInputItem,
@@ -12,12 +11,13 @@ const mime = {
 	csv: "text/csv" as const,
 };
 
-export const fileInput = async (data: FormData) => {
-	const files = schema.FilesSchema.parse([
-		...data.getAll("files"),
-		...data.getAll("directory"),
-	]).filter((file) => file.size);
-
+export const fileInput = async ({
+	files,
+	text,
+}: {
+	files: File[];
+	text: string;
+}) => {
 	const user: ResponseInputContent[] = [];
 	const fn: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] = [];
 
@@ -47,31 +47,21 @@ export const fileInput = async (data: FormData) => {
 				user.push({ type: "input_text", text: "Failed to convert docx file." });
 			}
 		} else if (file.type === mime.csv) {
-			const [{ default: csv }, analyze, text] = await Promise.all([
+			const [{ default: csv }, { analyze }, fileText] = await Promise.all([
 				import("papaparse"),
 				import("@/lib/analyze"),
 				file.text(),
 			]);
 
-			const csvResult = csv.parse(text, {
+			const csvResult = csv.parse(fileText, {
 				header: true,
 				skipEmptyLines: true,
 				dynamicTyping: true,
 			});
 
-			const { data: records } = schema.UnknownRecordArraySchema.safeParse(
-				csvResult.data,
-			);
+			const outputs = await analyze({ records: csvResult.data, text });
 
-			if (records) {
-				const outputs = await analyze.tool(
-					records,
-					csvResult.meta.fields ?? [],
-					schema.StringSchema.parse(data.get("text")),
-				);
-
-				fn.push(...outputs);
-			}
+			fn.push(...outputs);
 		} else {
 			// fallback to text
 			user.push({

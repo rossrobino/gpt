@@ -34,6 +34,12 @@ export const action = new Action("/chat", async (c) => {
 	const text = schema.StringSchema.parse(data.get("text"));
 	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
 	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
+	const files = (
+		schema.FilesSchema.safeParse([
+			...data.getAll("files"),
+			...data.getAll("directory"),
+		]).data ?? []
+	).filter((file) => file.size);
 	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
 
 	const finalMessageIndex = new Deferred<number>();
@@ -46,14 +52,14 @@ export const action = new Action("/chat", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
-				const [files, renderResult] = await Promise.all([
-					fileInput(data),
+				const [filesContent, renderResult] = await Promise.all([
+					fileInput({ files, text }),
 					render(website),
 				]);
 
 				// current message input
 				const content: ResponseInputContent[] = [
-					...files.user,
+					...filesContent.user,
 					{ type: "input_text", text },
 				];
 
@@ -86,7 +92,7 @@ export const action = new Action("/chat", async (c) => {
 								new ReadableStream<string>({
 									async start(c) {
 										const response = await ai.openai.responses.create({
-											input: [...files.fn, { role: "user", content }],
+											input: [...filesContent.fn, { role: "user", content }],
 											instructions,
 											model: model.name,
 											reasoning: model.reasoning
