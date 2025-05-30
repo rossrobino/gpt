@@ -14,9 +14,11 @@ const mime = {
 export const fileInput = async ({
 	files,
 	text,
+	id,
 }: {
 	files: File[];
 	text: string;
+	id: string | null;
 }) => {
 	const user: ResponseInputContent[] = [];
 	const fn: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] = [];
@@ -59,7 +61,7 @@ export const fileInput = async ({
 				dynamicTyping: true,
 			});
 
-			const outputs = await analyze({ records: csvResult.data, text });
+			const outputs = await analyze({ records: csvResult.data, text, id });
 
 			fn.push(...outputs);
 		} else {

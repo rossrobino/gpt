@@ -53,7 +53,7 @@ export const action = new Action("/chat", async (c) => {
 
 			{async function* () {
 				const [filesContent, renderResult] = await Promise.all([
-					fileInput({ files, text }),
+					fileInput({ files, text, id }),
 					render(website),
 				]);
 

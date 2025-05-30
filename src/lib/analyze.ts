@@ -40,7 +40,13 @@ const method = <S extends z.ZodObject, R>(options: {
 	return { ArgsSchema: options.ArgsSchema, tool, run: options.run };
 };
 
-export const analyze = async (options: { records: unknown; text: unknown }) => {
+export const analyze = async (options: {
+	records: unknown;
+	text: unknown;
+	id: string | null;
+}) => {
+	const { id, ...rest } = options;
+
 	const OptionsSchema = z
 		.object({
 			records: z.array(z.record(z.string(), z.unknown())),
@@ -55,7 +61,7 @@ export const analyze = async (options: { records: unknown; text: unknown }) => {
 			return { ...o, allFeatures };
 		});
 
-	const { records, allFeatures, text } = OptionsSchema.parse(options);
+	const { records, allFeatures, text } = OptionsSchema.parse(rest);
 
 	const AnyFeatureSchema = z.enum(allFeatures);
 
@@ -238,6 +244,7 @@ export const analyze = async (options: { records: unknown; text: unknown }) => {
 	const response = await ai.openai.responses.create({
 		model: "gpt-4.1",
 		input: `${text}\n\ndata sample:\n\n\`\`\`json${JSON.stringify(records.slice(0, 10))}\n\`\`\``,
+		previous_response_id: id,
 		tools: methods.map((method) => method.tool),
 	});
 
