@@ -73,11 +73,7 @@ export const fileInput = async ({
 		}
 	};
 
-	const promises: Promise<void>[] = [];
-
-	for (const file of files) promises.push(handleFile(file));
-
-	await Promise.all(promises);
+	await Promise.all(files.map(async (file) => handleFile(file)));
 
 	return { user, fn };
 };
