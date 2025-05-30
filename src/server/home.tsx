@@ -53,7 +53,7 @@ export const action = new Action("/chat", async (c) => {
 
 				// current message input
 				const content: ResponseInputContent[] = [
-					...files,
+					...files.user,
 					{ type: "input_text", text },
 				];
 
@@ -86,7 +86,7 @@ export const action = new Action("/chat", async (c) => {
 								new ReadableStream<string>({
 									async start(c) {
 										const response = await ai.openai.responses.create({
-											input: [{ role: "user", content }],
+											input: [...files.fn, { role: "user", content }],
 											instructions,
 											model: model.name,
 											reasoning: model.reasoning
