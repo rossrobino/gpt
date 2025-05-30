@@ -257,7 +257,9 @@ export const analyze = async (options: { records: unknown; text: unknown }) => {
 
 				const result = method.run(args as any);
 
-				console.log(result);
+				if (import.meta.env.DEV) {
+					console.log(`${method.tool.name}: ${result}`);
+				}
 
 				outputs.push({
 					type: "function_call_output",
