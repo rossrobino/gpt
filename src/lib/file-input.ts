@@ -76,7 +76,6 @@ export const fileInput = async ({
 	for (const file of files) promises.push(handleFile(file));
 
 	await Promise.all(promises);
-	console.log(fn);
 
 	return { user, fn };
 };
