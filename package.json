@@ -14,6 +14,7 @@
 		"@iconify-json/lucide": "^1.2.45",
 		"@iconify/tailwind4": "^1.0.6",
 		"@tailwindcss/vite": "^4.1.8",
+		"@types/papaparse": "^5.3.16",
 		"domco": "^4.1.3",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
@@ -32,6 +33,8 @@
 		"mammoth": "^1.9.1",
 		"openai": "^5.0.1",
 		"ovr": "^2.0.2",
+		"papaparse": "^5.5.3",
+		"simple-statistics": "^7.8.8",
 		"uico": "^0.10.1",
 		"zod": "^3.25.36"
 	}
