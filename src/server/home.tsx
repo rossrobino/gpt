@@ -28,7 +28,6 @@ export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
 	const id = schema.NullableStringSchema.parse(data.get("id"));
-	const web = data.get("web") === "on";
 	const model =
 		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const text = schema.StringSchema.parse(data.get("text"));
@@ -98,10 +97,7 @@ export const action = new Action("/chat", async (c) => {
 											reasoning: model.reasoning
 												? { effort: "high" }
 												: undefined,
-											tools:
-												web && model.web
-													? [{ type: "web_search_preview" }]
-													: [],
+											tools: model.web ? [{ type: "web_search_preview" }] : [],
 											stream: true,
 											truncation: "auto",
 											store: true,
@@ -139,7 +135,7 @@ export const action = new Action("/chat", async (c) => {
 
 			{async () => <Input index={await finalMessageIndex.promise} />}
 
-			<Controls model={model} web={web} />
+			<Controls model={model} />
 
 			{async () => (
 				<input

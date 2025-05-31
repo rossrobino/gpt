@@ -3,7 +3,7 @@ import { defaultModel, models, type Model } from "@/lib/ai";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 
-export const Controls = (props: { web?: boolean; model?: Model }) => {
+export const Controls = (props: { model?: Model }) => {
 	return (
 		<div
 			class="my-3 flex flex-wrap-reverse justify-between gap-3"
@@ -16,7 +16,6 @@ export const Controls = (props: { web?: boolean; model?: Model }) => {
 			<div class="flex gap-3">
 				<Attachments />
 				<Clear />
-				<Search web={props.web} />
 				<Submit />
 			</div>
 		</div>
@@ -90,19 +89,6 @@ const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>
 		<svg.Arrow />
 	</button>
-);
-
-const Search = (props: { web?: boolean }) => (
-	<label class="button secondary icon has-checked:bg-primary has-checked:text-primary-foreground m-0 has-focus-within:ring has-focus-within:ring-offset-1">
-		<svg.Web />
-		<input
-			type="checkbox"
-			class="sr-only"
-			name="web"
-			aria-label="web search"
-			checked={props.web}
-		/>
-	</label>
 );
 
 const SelectModel = (props: { model?: Model }) => {

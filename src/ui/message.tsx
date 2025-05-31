@@ -1,5 +1,6 @@
 import { processor } from "@/lib/md";
 import type { ChatMessage } from "@/lib/types";
+import { clsx } from "clsx";
 
 export const Message = (props: {
 	message: ChatMessage;
@@ -10,9 +11,14 @@ export const Message = (props: {
 	const user = role === "user";
 
 	return (
-		<div class={user ? "my-2 pl-8" : ""}>
+		<div class={clsx(user && "my-2 flex justify-end pl-8")}>
 			<div
-				class={`chat-bubble ${user ? "bg-muted border-base-200 dark:border-base-800 rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75" : "py-8"}`}
+				class={clsx(
+					"chat-bubble",
+					user &&
+						"bg-muted border-base-200 dark:border-base-800 w-fit rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75",
+					!user && "py-8",
+				)}
 				style={transitionName && `view-transition-name: ${transitionName}`}
 			>
 				{processor.render(

@@ -28,6 +28,7 @@
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",
 		"@shikijs/langs": "^3.4.2",
+		"clsx": "^2.1.1",
 		"dotenv": "^16.5.0",
 		"drab": "^7.0.1",
 		"mammoth": "^1.9.1",
