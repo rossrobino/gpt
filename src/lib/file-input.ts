@@ -1,9 +1,5 @@
 import * as ai from "@/lib/ai";
-import type {
-	ResponseInputContent,
-	ResponseInputItem,
-	ResponseOutputItem,
-} from "openai/resources/responses/responses.mjs";
+import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 
 const mime = {
 	image: ["image/png", "image/jpeg", "image/webp", "image/gif"],
@@ -11,17 +7,10 @@ const mime = {
 	csv: "text/csv" as const,
 };
 
-export const fileInput = async ({
-	files,
-	text,
-	id,
-}: {
-	files: File[];
-	text: string;
-	id: string | null;
-}) => {
-	const user: ResponseInputContent[] = [];
-	const fn: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] = [];
+export const fileInput = async ({ files }: { files: File[] }) => {
+	const fileInputs: ResponseInputContent[] = [];
+	const datasets: unknown[] = [];
+	// const fn: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] = [];
 
 	const handleFile = async (file: File) => {
 		if (file.type === "application/pdf") {
@@ -30,11 +19,15 @@ export const fileInput = async ({
 				purpose: "user_data",
 			});
 
-			user.push({ type: "input_file", file_id: upload.id });
+			fileInputs.push({ type: "input_file", file_id: upload.id });
 		} else if (mime.image.includes(file.type)) {
 			const upload = await ai.openai.files.create({ file, purpose: "vision" });
 
-			user.push({ type: "input_image", file_id: upload.id, detail: "auto" });
+			fileInputs.push({
+				type: "input_image",
+				file_id: upload.id,
+				detail: "auto",
+			});
 		} else if (file.type === mime.docx) {
 			try {
 				const [mammoth, arrayBuffer] = await Promise.all([
@@ -44,29 +37,32 @@ export const fileInput = async ({
 
 				const { value } = await mammoth.extractRawText({ arrayBuffer });
 
-				user.push({ type: "input_text", text: `**${file.name}**\n\n${value}` });
+				fileInputs.push({
+					type: "input_text",
+					text: `**${file.name}**\n\n${value}`,
+				});
 			} catch (error) {
-				user.push({ type: "input_text", text: "Failed to convert docx file." });
+				fileInputs.push({
+					type: "input_text",
+					text: "Failed to convert docx file.",
+				});
 			}
 		} else if (file.type === mime.csv) {
-			const [{ default: csv }, { analyze }, fileText] = await Promise.all([
+			const [{ default: csv }, fileText] = await Promise.all([
 				import("papaparse"),
-				import("@/lib/analyze"),
 				file.text(),
 			]);
 
 			const csvResult = csv.parse(fileText, {
-				header: true,
 				skipEmptyLines: true,
 				dynamicTyping: true,
+				header: true,
 			});
 
-			const outputs = await analyze({ records: csvResult.data, text, id });
-
-			fn.push(...outputs);
+			datasets.push(csvResult.data);
 		} else {
 			// fallback to text
-			user.push({
+			fileInputs.push({
 				type: "input_text",
 				text: `**${file.name}**\n\n\`\`\`${file.name.split(".").at(-1)}\n${await file.text()}\n\`\`\`\n`,
 			});
@@ -75,5 +71,5 @@ export const fileInput = async ({
 
 	await Promise.all(files.map((file) => handleFile(file)));
 
-	return { user, fn };
+	return { fileInputs, datasets };
 };

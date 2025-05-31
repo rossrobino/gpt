@@ -1,5 +1,6 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
+import { analyze } from "@/lib/analyze";
 import { Deferred } from "@/lib/deferred";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
@@ -51,14 +52,14 @@ export const action = new Action("/chat", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
-				const [filesContent, renderResult] = await Promise.all([
-					fileInput({ files, text, id }),
+				const [{ fileInputs, datasets }, renderResult] = await Promise.all([
+					fileInput({ files }),
 					render(website),
 				]);
 
 				// current message input
 				const content: ResponseInputContent[] = [
-					...filesContent.user,
+					...fileInputs,
 					{ type: "input_text", text },
 				];
 
@@ -74,7 +75,7 @@ export const action = new Action("/chat", async (c) => {
 					});
 				}
 
-				// yield current messages
+				// yield current message(s)
 				yield content.map((message) => (
 					<Message
 						transitionName={`m-${messageIndex++}`}
@@ -90,31 +91,43 @@ export const action = new Action("/chat", async (c) => {
 							const htmlStream = processor.renderStream(
 								new ReadableStream<string>({
 									async start(c) {
-										const response = await ai.openai.responses.create({
-											input: [...filesContent.fn, { role: "user", content }],
-											instructions,
-											model: model.name,
-											reasoning: model.reasoning
-												? { effort: "high" }
-												: undefined,
-											tools: model.web ? [{ type: "web_search_preview" }] : [],
-											stream: true,
-											truncation: "auto",
-											store: true,
-											previous_response_id: id,
+										const fnOutputs = await Promise.all(
+											datasets.map(async (records) => {
+												const gen = analyze({ records, text, id });
+
+												while (true) {
+													const { value, done } = await gen.next();
+
+													if (done) {
+														return value.outputs;
+													} else {
+														c.enqueue(value);
+													}
+												}
+											}),
+										);
+
+										const handle = ai.handleStream({
+											body: {
+												input: [...fnOutputs.flat(), { role: "user", content }],
+												instructions,
+												model: model.name,
+												reasoning: model.reasoning
+													? { effort: "high" }
+													: undefined,
+												truncation: "auto",
+												store: true,
+												previous_response_id: id,
+											},
 										});
 
-										for await (const event of response) {
-											if (
-												event.type === "response.output_item.added" &&
-												event.item.type === "reasoning"
-											) {
-												c.enqueue("Reasoning...\n\n");
-											} else if (event.type === "response.output_text.delta") {
-												if (event.delta) c.enqueue(event.delta);
-											} else if (event.type === "response.completed") {
-												newId.resolve(event.response.id);
-											}
+										while (true) {
+											const { value, done } = await handle.next();
+
+											if (done) {
+												newId.resolve(value.id);
+												break;
+											} else c.enqueue(value);
 										}
 
 										c.close();

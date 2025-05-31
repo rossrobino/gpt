@@ -1,9 +1,4 @@
 import * as ai from "@/lib/ai";
-import type {
-	FunctionTool,
-	ResponseInputItem,
-	ResponseOutputItem,
-} from "openai/resources/responses/responses.mjs";
 import { linearRegression } from "simple-statistics";
 import * as z from "zod/v4";
 
@@ -23,28 +18,11 @@ const divide = (numbers: number[]) =>
 		? 0
 		: numbers.slice(1).reduce((acc, curr) => acc / curr, numbers[0]!);
 
-const method = <S extends z.ZodObject, R>(options: {
-	ArgsSchema: S;
-	name: string;
-	description: string;
-	run: (args: z.infer<S>) => R;
-}) => {
-	const tool: FunctionTool = {
-		type: "function",
-		name: options.name,
-		description: options.description,
-		strict: true,
-		parameters: z.toJSONSchema(options.ArgsSchema),
-	};
-
-	return { ArgsSchema: options.ArgsSchema, tool, run: options.run };
-};
-
-export const analyze = async (options: {
+export async function* analyze(options: {
 	records: unknown;
 	text: unknown;
 	id: string | null;
-}) => {
+}) {
 	const { id, ...rest } = options;
 
 	const OptionsSchema = z
@@ -65,8 +43,8 @@ export const analyze = async (options: {
 
 	const AnyFeatureSchema = z.enum(allFeatures);
 
-	const methods = [
-		method({
+	const tools = [
+		ai.toolHelper({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
 			ArgsSchema: z.object({
@@ -84,55 +62,55 @@ export const analyze = async (options: {
 				return linearRegression(pairs);
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "minimum",
 			description: "Find the minimum value of a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => Math.min(...toArray(records, feature)),
 		}),
-		method({
+		ai.toolHelper({
 			name: "maximum",
 			description: "Find the maximum value of a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => Math.max(...toArray(records, feature)),
 		}),
-		method({
+		ai.toolHelper({
 			name: "count",
 			description: "Find the total count of entries for a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => toArray(records, feature).length,
 		}),
-		method({
+		ai.toolHelper({
 			name: "total",
 			description: "Find the sum of entries for a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => add(toArray(records, feature)),
 		}),
-		method({
+		ai.toolHelper({
 			name: "add",
 			description: "Add numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
 			run: ({ numbers }) => add(numbers),
 		}),
-		method({
+		ai.toolHelper({
 			name: "subtract",
 			description: "Subtract numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
 			run: ({ numbers }) => subtract(numbers),
 		}),
-		method({
+		ai.toolHelper({
 			name: "multiply",
 			description: "Multiply numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
 			run: ({ numbers }) => multiply(numbers),
 		}),
-		method({
+		ai.toolHelper({
 			name: "divide",
 			description: "Divide numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
 			run: ({ numbers }) => divide(numbers),
 		}),
-		method({
+		ai.toolHelper({
 			name: "mean",
 			description: "Calculate the mean for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
@@ -141,7 +119,7 @@ export const analyze = async (options: {
 				return values.length === 0 ? null : add(values) / values.length;
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "median",
 			description: "Calculate the median for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
@@ -155,7 +133,7 @@ export const analyze = async (options: {
 				return (values[n / 2]! + values[n / 2 - 1]!) / 2;
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "mode",
 			description: "Find the mode (most frequent) value for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
@@ -174,7 +152,7 @@ export const analyze = async (options: {
 				return mode;
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "standard_deviation",
 			description: "Calculate the standard deviation for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
@@ -187,7 +165,7 @@ export const analyze = async (options: {
 				return Math.sqrt(variance);
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "unique_count",
 			description: "Count unique/distinct values for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
@@ -196,7 +174,7 @@ export const analyze = async (options: {
 				return new Set(values).size;
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "percentile",
 			description: "Find a percentile for a given feature.",
 			ArgsSchema: z.object({
@@ -210,16 +188,18 @@ export const analyze = async (options: {
 				return values[idx];
 			},
 		}),
-		method({
+		ai.toolHelper({
 			name: "correlation",
 			description: "Calculate Pearson correlation between two features.",
 			ArgsSchema: z.object({
-				feature1: AnyFeatureSchema,
-				feature2: AnyFeatureSchema,
+				features: z.object({
+					independent: AnyFeatureSchema,
+					dependent: AnyFeatureSchema,
+				}),
 			}),
-			run: ({ feature1, feature2 }) => {
-				const x = toArray(records, feature1);
-				const y = toArray(records, feature2);
+			run: ({ features }) => {
+				const x = toArray(records, features.independent);
+				const y = toArray(records, features.dependent);
 
 				const n = x.length;
 
@@ -241,41 +221,22 @@ export const analyze = async (options: {
 		}),
 	];
 
-	const response = await ai.openai.responses.create({
-		model: "gpt-4.1",
-		input: `${text}\n\ndata sample:\n\n\`\`\`json${JSON.stringify(records.slice(0, 10))}\n\`\`\``,
-		previous_response_id: id,
-		tools: methods.map((method) => method.tool),
+	const gen = ai.handleStream({
+		body: {
+			model: "gpt-4.1",
+			input: `${text}\n\ndata sample:\n\n\`\`\`json${JSON.stringify(records.slice(0, 10))}\n\`\`\``,
+			previous_response_id: id,
+		},
+		toolHelpers: tools,
 	});
 
-	const outputs: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] =
-		[];
+	while (true) {
+		const { value, done } = await gen.next();
 
-	for (const output of response.output) {
-		if (output.type === "message") {
-			outputs.push(output);
-		} else if (output.type === "function_call") {
-			const method = methods.find((method) => output.name === method.tool.name);
-
-			if (method) {
-				outputs.push(output);
-
-				const args = method.ArgsSchema.parse(JSON.parse(output.arguments));
-
-				const result = method.run(args as any);
-
-				if (import.meta.env.DEV) {
-					console.log(`${method.tool.name}: ${result}`);
-				}
-
-				outputs.push({
-					type: "function_call_output",
-					call_id: output.call_id,
-					output: JSON.stringify(result),
-				});
-			}
+		if (done) {
+			return value;
+		} else {
+			yield value;
 		}
 	}
-
-	return outputs;
-};
+}
