@@ -1,6 +1,6 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
-import { analyze } from "@/lib/ai/tools/statistics";
+import * as tools from "@/lib/ai/tools";
 import { Deferred } from "@/lib/deferred";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
@@ -29,8 +29,6 @@ export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
 	const id = schema.NullableStringSchema.parse(data.get("id"));
-	const model =
-		ai.models.find((m) => m.name === data.get("model")) ?? ai.defaultModel;
 	const text = schema.StringSchema.parse(data.get("text"));
 	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
 	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
@@ -93,36 +91,37 @@ export const action = new Action("/chat", async (c) => {
 									async start(c) {
 										const fnOutputs = await Promise.all(
 											datasets.map(async (records) => {
-												const gen = await analyze({ records, text, id });
+												const dataTools = tools.data({ records });
+
+												const dataGen = ai.generate({
+													model: "gpt-4.1",
+													input: [
+														{ role: "user", content: text },
+														...dataTools.input,
+													],
+													previous_response_id: id,
+													toolHelpers: dataTools.helpers,
+												});
 
 												while (true) {
-													const { value, done } = await gen.next();
+													const { value, done } = await dataGen.next();
 
-													if (done) {
-														return value.outputs;
-													} else {
-														c.enqueue(value);
-													}
+													if (done) return value.outputs;
+													else c.enqueue(value);
 												}
 											}),
 										);
 
-										const handle = ai.handleStream({
-											body: {
-												input: [{ role: "user", content }, ...fnOutputs.flat()],
-												instructions,
-												model: model.name,
-												reasoning: model.reasoning
-													? { effort: "high" }
-													: undefined,
-												truncation: "auto",
-												store: true,
-												previous_response_id: id,
-											},
+										const mainGen = ai.generate({
+											input: [{ role: "user", content }, ...fnOutputs.flat()],
+											instructions,
+											model: "gpt-4.1-mini",
+											store: true,
+											previous_response_id: id,
 										});
 
 										while (true) {
-											const { value, done } = await handle.next();
+											const { value, done } = await mainGen.next();
 
 											if (done) {
 												newId.resolve(value.id);
@@ -148,7 +147,7 @@ export const action = new Action("/chat", async (c) => {
 
 			{async () => <Input index={await finalMessageIndex.promise} />}
 
-			<Controls model={model} />
+			<Controls />
 
 			{async () => (
 				<input

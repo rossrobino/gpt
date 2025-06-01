@@ -23,25 +23,6 @@ export const models: Model[] = [
 export const defaultModel = models[0]!;
 export const fastestModel = models[0]!;
 
-export const toolHelper = <
-	S extends z.ZodObject = z.ZodObject<any, any>,
->(options: {
-	ArgsSchema: S;
-	name: string;
-	description: string;
-	run: (args: z.infer<S>) => any;
-}) => {
-	const tool: FunctionTool = {
-		type: "function",
-		name: options.name,
-		description: options.description,
-		strict: true,
-		parameters: z.toJSONSchema(options.ArgsSchema),
-	};
-
-	return { ArgsSchema: options.ArgsSchema, tool, run: options.run };
-};
-
 const jsFormat = (obj: unknown): string => {
 	if (typeof obj === "object" && obj != null) {
 		return `{ ${Object.entries(obj)
@@ -53,29 +34,34 @@ const jsFormat = (obj: unknown): string => {
 
 	return String(obj);
 };
-export async function* handleStream(options: {
-	body: Omit<
+
+export async function* generate(
+	options: Omit<
 		OpenAI.Responses.ResponseCreateParamsStreaming,
-		"tools" | "stream"
-	>;
-	toolHelpers?: {
-		ArgsSchema: z.ZodObject;
-		tool: FunctionTool;
-		run: (...args: any[]) => any;
-	}[];
-}) {
-	const { body, toolHelpers } = options;
+		"tools" | "stream" | "reasoning" | "truncation"
+	> & {
+		toolHelpers?: {
+			ArgsSchema: z.ZodObject;
+			tool: FunctionTool;
+			run: (...args: any[]) => any;
+		}[];
+	},
+) {
+	const { toolHelpers, model, ...rest } = options;
 
 	const tools: OpenAI.Responses.Tool[] = toolHelpers?.map((t) => t.tool) ?? [];
 
-	if (models.find((model) => model.name === body.model)?.web) {
-		tools.unshift({ type: "web_search_preview" });
-	}
+	const resolvedModel = models.find((m) => m.name === model) ?? defaultModel;
+
+	if (resolvedModel.web) tools.unshift({ type: "web_search_preview" });
 
 	const response = await openai.responses.create({
 		tools,
+		model: resolvedModel.name,
 		stream: true,
-		...body,
+		truncation: "auto",
+		reasoning: resolvedModel.reasoning ? { effort: "high" } : undefined,
+		...rest,
 	});
 
 	const outputs: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] =

@@ -1,19 +1,23 @@
 import { generateId } from "@/lib/generate-id";
 import * as svg from "@/ui/svg";
+import clsx from "clsx";
 import type { JSX } from "ovr";
 
 export const Popover = (props: {
 	title?: string;
 	children?: JSX.Element;
-	icon?: JSX.Element;
+	trigger: TriggerProps;
 }) => {
-	const { title = "", children, icon } = props;
+	const { title = "", children, trigger } = props;
+	const { children: triggerChildren, ...triggerRest } = trigger;
 
 	const id = `popover-${generateId()}`;
 
 	return (
 		<>
-			<Trigger icon={icon} id={id} />
+			<Trigger id={id} {...triggerRest}>
+				{triggerChildren}
+			</Trigger>
 
 			<div
 				id={id}
@@ -22,7 +26,7 @@ export const Popover = (props: {
 			>
 				<div class="flex items-center justify-between">
 					<div class="text-xl font-bold">{title}</div>
-					<Trigger id={id} hide />
+					<Trigger id={id}>{<svg.X />}</Trigger>
 				</div>
 				<div class="pt-2">{children}</div>
 			</div>
@@ -30,17 +34,19 @@ export const Popover = (props: {
 	);
 };
 
-const Trigger = (props: { hide?: boolean; icon?: JSX.Element; id: string }) => {
-	const { hide, icon = <svg.Info />, id } = props;
+type TriggerProps = JSX.IntrinsicElements["button"];
+
+const Trigger = (props: TriggerProps) => {
+	const { id, class: className, children, ...rest } = props;
 
 	return (
 		<button
 			popovertarget={id}
 			type="button"
-			class="icon ghost"
-			aria-label={`${props.hide ? "hide" : "show"} information`}
+			class={clsx(!className && "icon ghost", className)}
+			{...rest}
 		>
-			{hide ? <svg.X /> : icon}
+			{children}
 		</button>
 	);
 };

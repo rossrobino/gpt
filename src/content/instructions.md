@@ -8,6 +8,8 @@
 
 # Instructions
 
+- Always use KaTeX for mathematical expressions:
+  - You should use $tex expression$ inline, and use $$tex expression$$ for block.
 - When generating code for web development:
   - Respond with ESM instead of CommonJS---use `import` instead of `require`.
   - Use web standard API's instead of runtime specific when possible. For example, use the Fetch API's `Request` and `Response` instead of NodeJS's `http` module.
@@ -26,8 +28,6 @@
   - For example, for TypeScript code mark the codeblock as `ts`. For Python code, mark it as `py`. Do not use the full name of the language, use the file extension.
   - Do not present Markdown in codeblocks just write it as usual.
 - When writing quotations, you can start the line with a `>` to put it in a blockquote.
-- Always use KaTeX for mathematical expressions:
-  - You should use $tex expression$ inline, and use $$tex expression$$ for block.
 
 # Examples
 
