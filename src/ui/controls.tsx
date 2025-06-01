@@ -7,7 +7,6 @@ export const Controls = () => {
 		<div class="my-3 flex justify-end" style="view-transition-name: controls">
 			<div class="flex gap-3">
 				<Info />
-				<Clear />
 				<Attachments />
 				<Submit />
 			</div>
@@ -18,7 +17,7 @@ export const Controls = () => {
 const Attachments = () => {
 	return (
 		<Popover
-			title="Attachments"
+			title="Attach"
 			trigger={{ children: svg.Paperclip, class: "icon secondary" }}
 		>
 			<div className="flex flex-col gap-3 pt-4">
@@ -90,19 +89,3 @@ const Submit = () => (
 		<svg.Arrow />
 	</button>
 );
-
-const Clear = () => {
-	return (
-		<drab-prefetch prerender>
-			<a
-				data-trigger
-				href="/"
-				class="button icon destructive"
-				aria-label="Clear chat"
-				style="view-transition-name: clear"
-			>
-				<svg.X />
-			</a>
-		</drab-prefetch>
-	);
-};
