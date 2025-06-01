@@ -99,10 +99,12 @@ export async function* handleStream(options: {
 
 					const result = tool.run(args as any);
 
-					yield `\`\`\`function\n${output.name}(${jsFormat(args)}) = ${jsFormat(result)}\n\`\`\`\n`;
+					const summary = `${output.name}(${jsFormat(args)}) = ${jsFormat(result)}`;
+
+					yield `\`\`\`function\n${summary}\n\`\`\`\n`;
 
 					if (import.meta.env.DEV) {
-						console.log(`${tool.tool.name}: ${result}`);
+						console.log(summary);
 					}
 
 					outputs.push({

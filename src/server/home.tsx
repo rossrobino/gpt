@@ -1,6 +1,6 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
-import { analyze } from "@/lib/analyze";
+import { analyze } from "@/lib/ai/tools/statistics";
 import { Deferred } from "@/lib/deferred";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
@@ -93,7 +93,7 @@ export const action = new Action("/chat", async (c) => {
 									async start(c) {
 										const fnOutputs = await Promise.all(
 											datasets.map(async (records) => {
-												const gen = analyze({ records, text, id });
+												const gen = await analyze({ records, text, id });
 
 												while (true) {
 													const { value, done } = await gen.next();
@@ -109,7 +109,7 @@ export const action = new Action("/chat", async (c) => {
 
 										const handle = ai.handleStream({
 											body: {
-												input: [...fnOutputs.flat(), { role: "user", content }],
+												input: [{ role: "user", content }, ...fnOutputs.flat()],
 												instructions,
 												model: model.name,
 												reasoning: model.reasoning

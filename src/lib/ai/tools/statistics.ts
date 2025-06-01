@@ -18,11 +18,11 @@ const divide = (numbers: number[]) =>
 		? 0
 		: numbers.slice(1).reduce((acc, curr) => acc / curr, numbers[0]!);
 
-export async function* analyze(options: {
+export const analyze = async (options: {
 	records: unknown;
 	text: unknown;
 	id: string | null;
-}) {
+}) => {
 	const { id, ...rest } = options;
 
 	const OptionsSchema = z
@@ -43,7 +43,7 @@ export async function* analyze(options: {
 
 	const AnyFeatureSchema = z.enum(allFeatures);
 
-	const tools = [
+	const toolHelpers = [
 		ai.toolHelper({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
@@ -221,22 +221,12 @@ export async function* analyze(options: {
 		}),
 	];
 
-	const gen = ai.handleStream({
+	return ai.handleStream({
 		body: {
 			model: "gpt-4.1",
 			input: `${text}\n\ndata sample:\n\n\`\`\`json${JSON.stringify(records.slice(0, 10))}\n\`\`\``,
 			previous_response_id: id,
 		},
-		toolHelpers: tools,
+		toolHelpers,
 	});
-
-	while (true) {
-		const { value, done } = await gen.next();
-
-		if (done) {
-			return value;
-		} else {
-			yield value;
-		}
-	}
-}
+};
