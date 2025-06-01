@@ -1,3 +1,5 @@
+import type { helper } from "@/lib/ai/tools";
+import { Chart } from "@/ui/chart";
 import "dotenv/config";
 import { OpenAI } from "openai";
 import type {
@@ -5,6 +7,7 @@ import type {
 	ResponseInputItem,
 	ResponseOutputItem,
 } from "openai/resources/responses/responses.mjs";
+import * as ovr from "ovr";
 import * as z from "zod/v4";
 
 if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
@@ -83,11 +86,17 @@ export async function* generate(
 
 					const args = tool.ArgsSchema.parse(JSON.parse(output.arguments));
 
-					const result = tool.run(args as any);
+					const { result, chartOptions } = tool.run(args as any) as ReturnType<
+						ReturnType<typeof helper>["run"]
+					>;
 
 					const summary = `${output.name}(${jsFormat(args)}) = ${jsFormat(result)}`;
 
 					yield `\`\`\`function\n${summary}\n\`\`\`\n`;
+
+					if (chartOptions) {
+						yield ovr.toString(Chart({ options: chartOptions }));
+					}
 
 					if (import.meta.env.DEV) {
 						console.log(summary);

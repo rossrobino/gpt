@@ -1,3 +1,4 @@
+import type { EChartsOption } from "echarts";
 import type { FunctionTool } from "openai/resources/responses/responses.mjs";
 import * as z from "zod/v4";
 
@@ -8,7 +9,7 @@ export const helper = <S extends z.ZodObject = z.ZodObject<any, any>>(options: {
 	ArgsSchema: S;
 	name: string;
 	description: string;
-	run: (args: z.infer<S>) => any;
+	run: (args: z.infer<S>) => { result?: any; chartOptions?: EChartsOption };
 }) => {
 	const tool: FunctionTool = {
 		type: "function",

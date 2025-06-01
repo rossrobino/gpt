@@ -1,7 +1,7 @@
 import { add } from "./math";
 import * as tools from "@/lib/ai/tools";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
-import { linearRegression } from "simple-statistics";
+import * as stats from "simple-statistics";
 import * as z from "zod/v4";
 
 const toArray = (records: Record<string, unknown>[], feature: string) => {
@@ -32,32 +32,69 @@ export const data = (records: Record<string, string | number>[]) => {
 
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
 
-				return linearRegression(pairs);
+				const regression = stats.linearRegression(pairs);
+				const regressionLine = stats.linearRegressionLine(regression);
+
+				const iMin = stats.min(independent);
+				const iMax = stats.max(independent);
+
+				return {
+					result: regression,
+					chartOptions: {
+						xAxis: {
+							type: "value",
+							name: features.independent,
+							min: "dataMin",
+							max: "dataMax",
+						},
+						yAxis: {
+							type: "value",
+							name: features.dependent,
+							min: "dataMin",
+							max: "dataMax",
+						},
+						tooltip: { trigger: "axis" },
+						series: [
+							{ symbolSize: 10, data: pairs, type: "scatter" },
+							{
+								type: "line",
+								data: [
+									[iMin, regressionLine(iMin)],
+									[iMax, regressionLine(iMax)],
+								],
+							},
+						],
+					},
+				};
 			},
 		}),
 		tools.helper({
 			name: "minimum",
 			description: "Find the minimum value of a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
-			run: ({ feature }) => Math.min(...toArray(records, feature)),
+			run: ({ feature }) => ({
+				result: Math.min(...toArray(records, feature)),
+			}),
 		}),
 		tools.helper({
 			name: "maximum",
 			description: "Find the maximum value of a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
-			run: ({ feature }) => Math.max(...toArray(records, feature)),
+			run: ({ feature }) => ({
+				result: Math.max(...toArray(records, feature)),
+			}),
 		}),
 		tools.helper({
 			name: "count",
 			description: "Find the total count of entries for a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
-			run: ({ feature }) => toArray(records, feature).length,
+			run: ({ feature }) => ({ result: toArray(records, feature).length }),
 		}),
 		tools.helper({
 			name: "total",
 			description: "Find the sum of entries for a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
-			run: ({ feature }) => add(toArray(records, feature)),
+			run: ({ feature }) => ({ result: add(toArray(records, feature)) }),
 		}),
 		tools.helper({
 			name: "mean",
@@ -65,7 +102,8 @@ export const data = (records: Record<string, string | number>[]) => {
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => {
 				const values = toArray(records, feature);
-				return values.length === 0 ? null : add(values) / values.length;
+				const result = values.length === 0 ? null : add(values) / values.length;
+				return { result };
 			},
 		}),
 		tools.helper({
@@ -76,10 +114,16 @@ export const data = (records: Record<string, string | number>[]) => {
 				const values = toArray(records, feature)
 					.slice()
 					.sort((a, b) => a - b);
+
 				const n = values.length;
-				if (n === 0) return null;
-				if (n % 2 === 1) return values[Math.floor(n / 2)];
-				return (values[n / 2]! + values[n / 2 - 1]!) / 2;
+
+				if (n === 0) return { result: null };
+
+				if (n % 2 === 1) return { result: values[Math.floor(n / 2)] };
+
+				const result = (values[n / 2]! + values[n / 2 - 1]!) / 2;
+
+				return { result };
 			},
 		}),
 		tools.helper({
@@ -98,7 +142,7 @@ export const data = (records: Record<string, string | number>[]) => {
 						mode = Number(val);
 					}
 				});
-				return mode;
+				return { result: mode };
 			},
 		}),
 		tools.helper({
@@ -111,7 +155,7 @@ export const data = (records: Record<string, string | number>[]) => {
 				const variance =
 					values.reduce((sum, val) => sum + (val - mean) ** 2, 0) /
 					values.length;
-				return Math.sqrt(variance);
+				return { result: Math.sqrt(variance) };
 			},
 		}),
 		tools.helper({
@@ -120,7 +164,7 @@ export const data = (records: Record<string, string | number>[]) => {
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => {
 				const values = toArray(records, feature);
-				return new Set(values).size;
+				return { result: new Set(values).size };
 			},
 		}),
 		tools.helper({
@@ -132,9 +176,10 @@ export const data = (records: Record<string, string | number>[]) => {
 			}),
 			run: ({ feature, percentile }) => {
 				const values = toArray(records, feature).sort((a, b) => a - b);
-				if (values.length === 0) return null;
+				if (values.length === 0) return { result: null };
+
 				const idx = Math.floor((percentile / 100) * (values.length - 1));
-				return values[idx];
+				return { result: values[idx] };
 			},
 		}),
 		tools.helper({
@@ -165,7 +210,7 @@ export const data = (records: Record<string, string | number>[]) => {
 					y.reduce((sum, yi) => sum + (yi - meanY) ** 2, 0) / n,
 				);
 
-				return cov / (stdX * stdY);
+				return { result: cov / (stdX * stdY) };
 			},
 		}),
 	];

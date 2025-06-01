@@ -18,7 +18,7 @@ export const Controls = () => {
 const Attachments = () => {
 	return (
 		<Popover
-			title="Attach"
+			title="Attachments"
 			trigger={{ children: svg.Paperclip, class: "icon secondary" }}
 		>
 			<div className="flex flex-col gap-3 pt-4">

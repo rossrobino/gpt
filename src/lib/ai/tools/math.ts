@@ -20,25 +20,25 @@ export const math = () => {
 			name: "add",
 			description: "Add numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => add(numbers),
+			run: ({ numbers }) => ({ result: add(numbers) }),
 		}),
 		tools.helper({
 			name: "subtract",
 			description: "Subtract numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => subtract(numbers),
+			run: ({ numbers }) => ({ result: subtract(numbers) }),
 		}),
 		tools.helper({
 			name: "multiply",
 			description: "Multiply numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => multiply(numbers),
+			run: ({ numbers }) => ({ result: multiply(numbers) }),
 		}),
 		tools.helper({
 			name: "divide",
 			description: "Divide numbers with precision.",
 			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => divide(numbers),
+			run: ({ numbers }) => ({ result: divide(numbers) }),
 		}),
 	];
 
