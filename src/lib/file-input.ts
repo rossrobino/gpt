@@ -1,16 +1,9 @@
 import * as ai from "@/lib/ai";
+import * as mime from "@/lib/mime";
 import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 
-const mime = {
-	image: ["image/png", "image/jpeg", "image/webp", "image/gif"],
-	docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" as const,
-	csv: "text/csv" as const,
-};
-
-export const fileInput = async ({ files }: { files: File[] }) => {
+export const fileInput = async (files: File[]) => {
 	const fileInputs: ResponseInputContent[] = [];
-	const datasets: unknown[] = [];
-	// const fn: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] = [];
 
 	const handleFile = async (file: File) => {
 		if (file.type === "application/pdf") {
@@ -20,7 +13,7 @@ export const fileInput = async ({ files }: { files: File[] }) => {
 			});
 
 			fileInputs.push({ type: "input_file", file_id: upload.id });
-		} else if (mime.image.includes(file.type)) {
+		} else if (mime.types.image.includes(file.type)) {
 			const upload = await ai.openai.files.create({ file, purpose: "vision" });
 
 			fileInputs.push({
@@ -28,7 +21,7 @@ export const fileInput = async ({ files }: { files: File[] }) => {
 				file_id: upload.id,
 				detail: "auto",
 			});
-		} else if (file.type === mime.docx) {
+		} else if (file.type === mime.types.docx) {
 			try {
 				const [mammoth, arrayBuffer] = await Promise.all([
 					import("mammoth/mammoth.browser.js"),
@@ -47,19 +40,6 @@ export const fileInput = async ({ files }: { files: File[] }) => {
 					text: "Failed to convert docx file.",
 				});
 			}
-		} else if (file.type === mime.csv) {
-			const [{ default: csv }, fileText] = await Promise.all([
-				import("papaparse"),
-				file.text(),
-			]);
-
-			const csvResult = csv.parse(fileText, {
-				skipEmptyLines: true,
-				dynamicTyping: true,
-				header: true,
-			});
-
-			datasets.push(csvResult.data);
 		} else {
 			// fallback to text
 			fileInputs.push({
@@ -71,5 +51,5 @@ export const fileInput = async ({ files }: { files: File[] }) => {
 
 	await Promise.all(files.map((file) => handleFile(file)));
 
-	return { fileInputs, datasets };
+	return fileInputs;
 };

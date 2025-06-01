@@ -7,6 +7,7 @@ export const Controls = () => {
 		<div class="my-3 flex justify-end" style="view-transition-name: controls">
 			<div class="flex gap-3">
 				<Info />
+				<Clear />
 				<Attachments />
 				<Submit />
 			</div>
@@ -21,14 +22,22 @@ const Attachments = () => {
 			trigger={{ children: svg.Paperclip, class: "icon secondary" }}
 		>
 			<div className="flex flex-col gap-3 pt-4">
-				<Website />
-				<Image />
+				<Dataset />
 				<Files />
 				<Directory />
+				<Website />
+				<Image />
 			</div>
 		</Popover>
 	);
 };
+
+const Dataset = () => (
+	<div>
+		<label for="dataset">Dataset</label>
+		<input type="file" id="dataset" name="dataset" accept=".csv,.json" />
+	</div>
+);
 
 const Files = () => (
 	<div>
@@ -89,3 +98,19 @@ const Submit = () => (
 		<svg.Arrow />
 	</button>
 );
+
+const Clear = () => {
+	return (
+		<drab-prefetch prerender>
+			<a
+				data-trigger
+				href="/"
+				class="button icon destructive"
+				aria-label="Clear chat"
+				style="view-transition-name: clear"
+			>
+				<svg.X />
+			</a>
+		</drab-prefetch>
+	);
+};

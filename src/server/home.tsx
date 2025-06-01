@@ -1,6 +1,7 @@
 import instructions from "@/content/instructions.md?raw";
 import * as ai from "@/lib/ai";
 import * as tools from "@/lib/ai/tools";
+import { parseDataset } from "@/lib/dataset";
 import { Deferred } from "@/lib/deferred";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
@@ -11,7 +12,10 @@ import { Controls } from "@/ui/controls";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
+import type {
+	ResponseInput,
+	ResponseInputContent,
+} from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 
 export const page = new Page("/", (c) => {
@@ -32,13 +36,12 @@ export const action = new Action("/chat", async (c) => {
 	const text = schema.StringSchema.parse(data.get("text"));
 	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
 	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
-	const files = (
-		schema.FilesSchema.safeParse([
-			...data.getAll("files"),
-			...data.getAll("directory"),
-		]).data ?? []
-	).filter((file) => file.size);
+	const files = schema.FilesSchema.parse([
+		...data.getAll("files"),
+		...data.getAll("directory"),
+	]);
 	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
+	const dataFile = schema.FileSchema.nullable().parse(data.get("dataset"));
 
 	const finalMessageIndex = new Deferred<number>();
 	const newId = new Deferred<string>();
@@ -50,8 +53,9 @@ export const action = new Action("/chat", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
-				const [{ fileInputs, datasets }, renderResult] = await Promise.all([
-					fileInput({ files }),
+				const [fileInputs, dataset, renderResult] = await Promise.all([
+					fileInput(files),
+					parseDataset(dataFile),
 					render(website),
 				]);
 
@@ -89,31 +93,34 @@ export const action = new Action("/chat", async (c) => {
 							const htmlStream = processor.renderStream(
 								new ReadableStream<string>({
 									async start(c) {
-										const fnOutputs = await Promise.all(
-											datasets.map(async (records) => {
-												const dataTools = tools.data({ records });
+										const input: ResponseInput = [{ role: "user", content }];
 
-												const dataGen = ai.generate({
-													model: "gpt-4.1",
-													input: [
-														{ role: "user", content: text },
-														...dataTools.input,
-													],
-													previous_response_id: id,
-													toolHelpers: dataTools.helpers,
-												});
+										if (dataset) {
+											const dataTools = tools.data(dataset);
 
-												while (true) {
-													const { value, done } = await dataGen.next();
+											const dataGen = ai.generate({
+												model: "gpt-4.1",
+												input: [
+													{ role: "user", content: text },
+													...dataTools.input,
+												],
+												previous_response_id: id,
+												toolHelpers: dataTools.helpers,
+											});
 
-													if (done) return value.outputs;
-													else c.enqueue(value);
-												}
-											}),
-										);
+											while (true) {
+												const { value, done } = await dataGen.next();
+
+												if (done) {
+													// add function calls to the input
+													input.push(...value.outputs);
+													break;
+												} else c.enqueue(value); // enqueue any streamed text
+											}
+										}
 
 										const mainGen = ai.generate({
-											input: [{ role: "user", content }, ...fnOutputs.flat()],
+											input,
 											instructions,
 											model: "gpt-4.1-mini",
 											store: true,

@@ -8,19 +8,11 @@ const toArray = (records: Record<string, unknown>[], feature: string) => {
 	return z.array(z.number()).parse(records.map((record) => record[feature]));
 };
 
-export const data = (options: { records: unknown }) => {
-	const OptionsSchema = z
-		.object({ records: z.array(z.record(z.string(), z.unknown())) })
-		.transform((o) => {
-			const firstRecord = o.records.at(0);
+export const data = (records: Record<string, string | number>[]) => {
+	const firstRecord = records.at(0);
 
-			const allFeatures: string[] = [];
-			if (firstRecord) allFeatures.push(...Object.keys(firstRecord));
-
-			return { ...o, allFeatures };
-		});
-
-	const { records, allFeatures } = OptionsSchema.parse(options);
+	const allFeatures: string[] = [];
+	if (firstRecord) allFeatures.push(...Object.keys(firstRecord));
 
 	const AnyFeatureSchema = z.enum(allFeatures);
 
