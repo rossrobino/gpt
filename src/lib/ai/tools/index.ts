@@ -2,6 +2,7 @@ import type { FunctionTool } from "openai/resources/responses/responses.mjs";
 import * as z from "zod/v4";
 
 export { data } from "@/lib/ai/tools/data";
+export { math } from "@/lib/ai/tools/math";
 
 export const helper = <S extends z.ZodObject = z.ZodObject<any, any>>(options: {
 	ArgsSchema: S;

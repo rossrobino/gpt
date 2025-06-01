@@ -1,3 +1,4 @@
+import { add } from "./math";
 import * as tools from "@/lib/ai/tools";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import { linearRegression } from "simple-statistics";
@@ -6,18 +7,6 @@ import * as z from "zod/v4";
 const toArray = (records: Record<string, unknown>[], feature: string) => {
 	return z.array(z.number()).parse(records.map((record) => record[feature]));
 };
-
-const add = (numbers: number[]) => numbers.reduce((arr, curr) => arr + curr, 0);
-const subtract = (numbers: number[]) =>
-	numbers.length === 0
-		? 0
-		: numbers.slice(1).reduce((acc, curr) => acc - curr, numbers[0]!);
-const multiply = (numbers: number[]) =>
-	numbers.reduce((arr, curr) => arr * curr, 0);
-const divide = (numbers: number[]) =>
-	numbers.length === 0
-		? 0
-		: numbers.slice(1).reduce((acc, curr) => acc / curr, numbers[0]!);
 
 export const data = (options: { records: unknown }) => {
 	const OptionsSchema = z
@@ -35,7 +24,7 @@ export const data = (options: { records: unknown }) => {
 
 	const AnyFeatureSchema = z.enum(allFeatures);
 
-	const dataTools = [
+	const helpers = [
 		tools.helper({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
@@ -77,30 +66,6 @@ export const data = (options: { records: unknown }) => {
 			description: "Find the sum of entries for a certain feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => add(toArray(records, feature)),
-		}),
-		tools.helper({
-			name: "add",
-			description: "Add numbers with precision.",
-			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => add(numbers),
-		}),
-		tools.helper({
-			name: "subtract",
-			description: "Subtract numbers with precision.",
-			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => subtract(numbers),
-		}),
-		tools.helper({
-			name: "multiply",
-			description: "Multiply numbers with precision.",
-			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => multiply(numbers),
-		}),
-		tools.helper({
-			name: "divide",
-			description: "Divide numbers with precision.",
-			ArgsSchema: z.object({ numbers: z.array(z.number()) }),
-			run: ({ numbers }) => divide(numbers),
 		}),
 		tools.helper({
 			name: "mean",
@@ -220,5 +185,5 @@ export const data = (options: { records: unknown }) => {
 		},
 	];
 
-	return { helpers: dataTools, input };
+	return { helpers, input };
 };
