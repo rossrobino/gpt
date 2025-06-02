@@ -1,5 +1,6 @@
 import * as tools from "@/lib/ai/tools";
 import * as math from "@/lib/math";
+import { toCodeBlock } from "@/lib/md/to-code-block";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import * as stats from "simple-statistics";
 import * as z from "zod/v4";
@@ -208,7 +209,7 @@ export const data = (records: Record<string, string | number>[]) => {
 	const input: ResponseInput = [
 		{
 			role: "user",
-			content: `data sample:\n\n\`\`\`json${JSON.stringify(records.slice(0, 10))}\n\`\`\``,
+			content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(records.slice(0, 10)))}`,
 		},
 	];
 

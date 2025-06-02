@@ -1,9 +1,5 @@
-import type {
-	ResponseInputMessageItem,
-	ResponseOutputMessage,
-} from "openai/resources/responses/responses.mjs";
+import type { OpenAI } from "openai";
 
-export type ChatMessage = Omit<
-	ResponseInputMessageItem | ResponseOutputMessage,
-	"id"
->;
+export type ChatMessage =
+	| OpenAI.Responses.ResponseOutputItem
+	| OpenAI.Responses.ResponseInputItem;

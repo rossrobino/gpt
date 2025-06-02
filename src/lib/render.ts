@@ -1,3 +1,4 @@
+import { toCodeBlock } from "./md/to-code-block";
 import "dotenv/config";
 import { z } from "zod";
 
@@ -32,7 +33,7 @@ export const render = async (
 		const code = await res.text();
 		const lang = url.split(".").at(-1);
 
-		return { success: true, md: `\`\`\`${lang}\n${code}\n\`\`\`` };
+		return { success: true, md: toCodeBlock(lang, code) };
 	}
 
 	const res = await fetch(

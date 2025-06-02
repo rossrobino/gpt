@@ -15,6 +15,7 @@ import { PastMessages } from "@/ui/past-messages";
 import type {
 	ResponseInput,
 	ResponseInputContent,
+	ResponseInputItem,
 } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 
@@ -77,13 +78,17 @@ export const action = new Action("/chat", async (c) => {
 					});
 				}
 
-				// yield current message(s)
-				yield content.map((message) => (
-					<Message
-						transitionName={`m-${messageIndex++}`}
-						message={{ role: "user", content: [message] }}
-					/>
-				));
+				const message: ResponseInputItem = {
+					role: "user",
+					type: "message",
+					status: "completed",
+					content,
+				};
+
+				// yield current message
+				yield (
+					<Message transitionName={`m-${messageIndex++}`} message={message} />
+				);
 
 				finalMessageIndex.resolve(messageIndex);
 
@@ -93,7 +98,7 @@ export const action = new Action("/chat", async (c) => {
 							const htmlStream = processor.renderStream(
 								new ReadableStream<string>({
 									async start(c) {
-										const input: ResponseInput = [{ role: "user", content }];
+										const input: ResponseInput = [message];
 
 										if (dataset) {
 											const dataTools = tools.data(dataset);

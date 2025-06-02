@@ -1,6 +1,7 @@
-import type { helper } from "@/lib/ai/tools";
+import { toCodeBlock } from "../md/to-code-block";
 import { Chart } from "@/ui/chart";
 import "dotenv/config";
+import type { EChartsOption } from "echarts";
 import { OpenAI } from "openai";
 import type {
 	FunctionTool,
@@ -34,7 +35,10 @@ export async function* generate(
 		toolHelpers?: {
 			ArgsSchema: z.ZodObject;
 			tool: FunctionTool;
-			run: (...args: any[]) => any;
+			run: (...args: any[]) => {
+				result?: Record<string, unknown>;
+				chartOptions?: EChartsOption;
+			};
 		}[];
 	},
 ) {
@@ -46,10 +50,9 @@ export async function* generate(
 
 	if (resolvedModel.web) tools.unshift({ type: "web_search_preview" });
 
-	const response = await openai.responses.create({
+	const response = openai.responses.stream({
 		tools,
 		model: resolvedModel.name,
-		stream: true,
 		truncation: "auto",
 		reasoning: resolvedModel.reasoning ? { effort: "high" } : undefined,
 		...rest,
@@ -64,7 +67,9 @@ export async function* generate(
 				yield "Reasoning...\n\n";
 			}
 		} else if (event.type === "response.output_item.done") {
-			if (event.item.type === "function_call" && toolHelpers) {
+			if (event.item.type === "message" && toolHelpers) {
+				outputs.push(event.item);
+			} else if (event.item.type === "function_call" && toolHelpers) {
 				const output = event.item;
 
 				const tool = toolHelpers.find((t) => output.name === t.tool.name);
@@ -74,28 +79,29 @@ export async function* generate(
 
 					const args = tool.ArgsSchema.parse(JSON.parse(output.arguments));
 
-					const { result, chartOptions } = tool.run(args as any) as ReturnType<
-						ReturnType<typeof helper>["run"]
-					>;
-
-					const summary = `${JSON.stringify(result, null, 4)}`;
-
-					yield `\`\`\`json\n${summary}\n\`\`\`\n`;
-
-					if (chartOptions) {
-						yield ovr.toString(Chart({ options: chartOptions }));
-						yield "\n\n";
-					}
-
-					if (import.meta.env.DEV) {
-						console.log(summary);
-					}
+					const { result, chartOptions } = tool.run(args);
 
 					outputs.push({
 						type: "function_call_output",
 						call_id: output.call_id,
 						output: JSON.stringify(result),
 					});
+
+					yield toCodeBlock("function", JSON.stringify(result, null, 4));
+
+					if (chartOptions) {
+						const chart = `${await ovr.toString(Chart({ options: chartOptions }))}\n\n`;
+
+						outputs.push({
+							id: undefined as unknown as string, // hack to save chart -- id is created
+							status: "completed",
+							type: "message",
+							role: "assistant",
+							content: [{ type: "output_text", annotations: [], text: chart }],
+						});
+
+						yield chart; // stream in current message
+					}
 				}
 			}
 		} else if (event.type === "response.output_text.delta") {
