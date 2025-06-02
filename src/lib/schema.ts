@@ -11,3 +11,7 @@ export const FilesSchema = z.array(FileSchema.nullable()).transform((files) => {
 });
 
 export const URLSchema = z.url();
+
+export const DataSchema = z.array(
+	z.record(z.string(), z.union([z.string(), z.number()])),
+);

@@ -19,7 +19,6 @@ import type {
 	ResponseInputItem,
 } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
-import * as z from "zod/v4";
 
 export const page = new Page("/", (c) => {
 	c.head(<title>New Message</title>);
@@ -45,8 +44,8 @@ export const action = new Action("/chat", async (c) => {
 	]);
 	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
 	const dataFile = schema.FileSchema.nullable().parse(data.get("dataset"));
-	const existingData = schema.NullableStringSchema.parse(
-		data.get("existing-data"),
+	const existing = schema.NullableStringSchema.parse(
+		data.get("existing-dataset"),
 	);
 
 	const finalMessageIndex = new Deferred<number>();
@@ -61,7 +60,7 @@ export const action = new Action("/chat", async (c) => {
 			{async function* () {
 				let [fileInputs, dataset, renderResult] = await Promise.all([
 					fileInput(files),
-					parseDataset(dataFile, existingData),
+					parseDataset(dataFile, existing),
 					render(website),
 				]);
 

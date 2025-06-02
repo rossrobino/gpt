@@ -9,7 +9,7 @@ import type {
 	ResponseOutputItem,
 } from "openai/resources/responses/responses.mjs";
 import * as ovr from "ovr";
-import * as z from "zod/v4";
+import type * as z from "zod/v4";
 
 if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
 

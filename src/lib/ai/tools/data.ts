@@ -1,16 +1,17 @@
 import * as tools from "@/lib/ai/tools";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/to-code-block";
+import type { Dataset } from "@/lib/types";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import * as stats from "simple-statistics";
 import * as z from "zod/v4";
 
-const toArray = (records: Record<string, unknown>[], feature: string) => {
-	return z.array(z.number()).parse(records.map((record) => record[feature]));
+const toArray = (dataset: Record<string, unknown>[], feature: string) => {
+	return z.array(z.number()).parse(dataset.map((record) => record[feature]));
 };
 
-export const data = (records: Record<string, string | number>[]) => {
-	const firstRecord = records.at(0);
+export const data = (dataset: NonNullable<Dataset>) => {
+	const firstRecord = dataset.at(0);
 
 	const allFeatures: string[] = [];
 	if (firstRecord) allFeatures.push(...Object.keys(firstRecord));
@@ -52,8 +53,8 @@ export const data = (records: Record<string, string | number>[]) => {
 				}),
 			}),
 			run: ({ features }) => {
-				const independent = toArray(records, features.independent);
-				const dependent = toArray(records, features.dependent);
+				const independent = toArray(dataset, features.independent);
+				const dependent = toArray(dataset, features.dependent);
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
 				const regression = stats.linearRegression(pairs);
 				const regressionLine = stats.linearRegressionLine(regression);
@@ -92,7 +93,7 @@ export const data = (records: Record<string, string | number>[]) => {
 			name: "count",
 			ArgsSchema: z.object(),
 			description: "Find the total count of records in the dataset.",
-			run: () => ({ result: { length: records.length } }),
+			run: () => ({ result: { length: dataset.length } }),
 		}),
 		tools.helper({
 			name: "describe",
@@ -100,14 +101,14 @@ export const data = (records: Record<string, string | number>[]) => {
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => {
-				const count = records.length;
-				const values = toArray(records, feature);
+				const count = dataset.length;
+				const values = toArray(dataset, feature);
 
 				const mean = stats.mean(values);
 				const median = stats.median(values);
 				const mode = stats.mode(values);
 				const standardDeviation = stats.standardDeviation(values);
-				const total = stats.sum(toArray(records, feature));
+				const total = stats.sum(toArray(dataset, feature));
 				const uniqueCount = new Set(values).size;
 
 				const q1 = stats.quantile(values, 0.25);
@@ -185,7 +186,7 @@ export const data = (records: Record<string, string | number>[]) => {
 			description: "Find a percentile for a given feature.",
 			ArgsSchema: z.object({ feature: AnyFeatureSchema, percentile: z.int() }),
 			run: ({ feature, percentile }) => {
-				const values = toArray(records, feature);
+				const values = toArray(dataset, feature);
 				return {
 					result: { percentile: stats.quantile(values, percentile / 100) },
 				};
@@ -198,8 +199,8 @@ export const data = (records: Record<string, string | number>[]) => {
 				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
 			run: ({ features }) => {
-				const x = toArray(records, features.x);
-				const y = toArray(records, features.y);
+				const x = toArray(dataset, features.x);
+				const y = toArray(dataset, features.y);
 
 				return { result: { correlation: stats.sampleCorrelation(x, y) } };
 			},
@@ -209,7 +210,7 @@ export const data = (records: Record<string, string | number>[]) => {
 	const input: ResponseInput = [
 		{
 			role: "user",
-			content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(records.slice(0, 10)))}`,
+			content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
 		},
 	];
 
