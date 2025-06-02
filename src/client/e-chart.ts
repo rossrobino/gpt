@@ -7,15 +7,19 @@ class EChart extends Lifecycle() {
 
 		if (!attr) throw new Error("Options not set.");
 
-		return JSON.parse(attr).options as echarts.EChartsOption;
+		return JSON.parse(attr) as echarts.EChartsOption;
 	}
 
 	override mount() {
 		const chart = echarts.init(this);
 
-		console.log(this.options);
-
 		chart.setOption(this.options);
+
+		const observer = new ResizeObserver(() => {
+			chart.resize();
+		});
+
+		observer.observe(this);
 	}
 }
 

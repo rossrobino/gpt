@@ -26,18 +26,6 @@ export const models: Model[] = [
 export const defaultModel = models[0]!;
 export const fastestModel = models[0]!;
 
-const jsFormat = (obj: unknown): string => {
-	if (typeof obj === "object" && obj != null) {
-		return `{ ${Object.entries(obj)
-			.map(([k, v]) => `${k}: ${jsFormat(v)}`)
-			.join(", ")} }`;
-	} else if (typeof obj === "string") {
-		return JSON.stringify(obj);
-	}
-
-	return String(obj);
-};
-
 export async function* generate(
 	options: Omit<
 		OpenAI.Responses.ResponseCreateParamsStreaming,
@@ -90,12 +78,13 @@ export async function* generate(
 						ReturnType<typeof helper>["run"]
 					>;
 
-					const summary = `${output.name}(${jsFormat(args)}) = ${jsFormat(result)}`;
+					const summary = `${JSON.stringify(result, null, 4)}`;
 
-					yield `\`\`\`function\n${summary}\n\`\`\`\n`;
+					yield `\`\`\`json\n${summary}\n\`\`\`\n`;
 
 					if (chartOptions) {
 						yield ovr.toString(Chart({ options: chartOptions }));
+						yield "\n\n";
 					}
 
 					if (import.meta.env.DEV) {
