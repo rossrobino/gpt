@@ -26,5 +26,15 @@ export const Chart = (props: ovr.JSX.IntrinsicElements["span"]) => {
 	);
 };
 
+export const MessageDashed = (props: ovr.JSX.IntrinsicElements["span"]) => {
+	const { class: className, ...rest } = props;
+	return (
+		<span
+			class={clsx("icon-[lucide--message-circle-dashed]", className)}
+			{...rest}
+		/>
+	);
+};
+
 export const CopyComplete = () =>
 	`<span class="icon-[lucide--clipboard-check]"></span>`;

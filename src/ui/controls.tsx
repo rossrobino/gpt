@@ -9,6 +9,7 @@ export const Controls = () => {
 				<Info />
 				<Clear />
 				<Attachments />
+				<Store />
 				<Submit />
 			</div>
 		</div>
@@ -114,3 +115,16 @@ const Clear = () => {
 		</drab-prefetch>
 	);
 };
+
+const Store = (props: { store?: boolean }) => (
+	<label class="button secondary icon has-checked:bg-primary has-checked:text-primary-foreground m-0 has-focus-within:ring has-focus-within:ring-offset-1">
+		<svg.MessageDashed />
+		<input
+			type="checkbox"
+			class="sr-only"
+			name="web"
+			aria-label="Store chat"
+			checked={props.store}
+		/>
+	</label>
+);

@@ -47,6 +47,7 @@ export const action = new Action("/chat", async (c) => {
 	const existing = schema.NullableStringSchema.parse(
 		data.get("existing-dataset"),
 	);
+	const store = data.get("store") === "on";
 
 	const finalMessageIndex = new Deferred<number>();
 	const newId = new Deferred<string>();
@@ -134,7 +135,7 @@ export const action = new Action("/chat", async (c) => {
 											input,
 											instructions,
 											model: "gpt-4.1-mini",
-											store: true,
+											store,
 											previous_response_id: id,
 										});
 
@@ -175,9 +176,10 @@ export const action = new Action("/chat", async (c) => {
 				></input>
 			)}
 
-			{async () => (
-				<input type="hidden" name="id" value={await newId.promise} />
-			)}
+			{async () => {
+				if (store)
+					return <input type="hidden" name="id" value={await newId.promise} />;
+			}}
 		</>
 	);
 });
