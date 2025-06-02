@@ -9,6 +9,7 @@ import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
 import * as schema from "@/lib/schema";
 import { Controls } from "@/ui/controls";
+import { ExistingData } from "@/ui/existing-data";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
@@ -18,6 +19,7 @@ import type {
 	ResponseInputItem,
 } from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
+import * as z from "zod/v4";
 
 export const page = new Page("/", (c) => {
 	c.head(<title>New Message</title>);
@@ -43,6 +45,9 @@ export const action = new Action("/chat", async (c) => {
 	]);
 	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
 	const dataFile = schema.FileSchema.nullable().parse(data.get("dataset"));
+	const existingData = schema.NullableStringSchema.parse(
+		data.get("existing-data"),
+	);
 
 	const finalMessageIndex = new Deferred<number>();
 	const newId = new Deferred<string>();
@@ -54,11 +59,13 @@ export const action = new Action("/chat", async (c) => {
 			<PastMessages id={id} />
 
 			{async function* () {
-				const [fileInputs, dataset, renderResult] = await Promise.all([
+				let [fileInputs, dataset, renderResult] = await Promise.all([
 					fileInput(files),
-					parseDataset(dataFile),
+					parseDataset(dataFile, existingData),
 					render(website),
 				]);
+
+				yield <ExistingData dataset={dataset} />;
 
 				// current message input
 				const content: ResponseInputContent[] = [

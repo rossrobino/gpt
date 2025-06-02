@@ -5,12 +5,22 @@ const DataSchema = z.array(
 	z.record(z.string(), z.union([z.string(), z.number()])),
 );
 
-export const parseDataset = async (file: File | null) => {
+export const parseDataset = async (
+	file: File | null,
+	existing: string | null,
+) => {
 	let data: z.infer<typeof DataSchema> | null = null;
 
-	if (!file) return data;
-
-	if (file.type === mime.types.csv) {
+	if (!file?.size) {
+		if (existing) {
+			try {
+				const parsed = DataSchema.parse(JSON.parse(existing));
+				return parsed;
+			} catch (error) {
+				console.error(error);
+			}
+		}
+	} else if (file.type === mime.types.csv) {
 		const [{ default: csv }, fileText] = await Promise.all([
 			import("papaparse"),
 			file.text(),
