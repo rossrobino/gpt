@@ -6,10 +6,13 @@ export const files = () =>
 	z.array(fileOrNull()).transform((files) => files.filter(Boolean) as File[]);
 
 export const fileOrNull = () =>
-	z.file().transform((file) => {
-		if (!file.size) return null;
-		return file;
-	});
+	z
+		.file()
+		.nullable()
+		.transform((file) => {
+			if (!file?.size) return null;
+			return file;
+		});
 
 export const data = () =>
 	z.array(z.record(z.string(), z.union([z.string(), z.number()])));
@@ -18,12 +21,13 @@ export const httpUrl = () =>
 	z.union([
 		z.url({ protocol: /^https?$/, hostname: z.regexes.domain }),
 		z.literal("").transform(() => null),
+		z.null(),
 	]);
 
 export const checkbox = () =>
 	z.union([
 		z.literal("on").transform(() => true),
-		z.null().transform(() => false),
+		z.any().transform(() => false),
 	]);
 
 export const formData = <S extends Record<string, z.ZodType>>(shape: S) =>
