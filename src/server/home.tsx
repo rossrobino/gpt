@@ -42,14 +42,13 @@ export const action = new Action("/chat", async (c) => {
 		...data.getAll("files"),
 		...data.getAll("directory"),
 	]);
-	let messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
+	const messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
 	const dataFile = schema.FileSchema.nullable().parse(data.get("dataset"));
 	const existing = schema.NullableStringSchema.parse(
 		data.get("existing-dataset"),
 	);
 	const store = data.get("store") === "on";
 
-	const finalMessageIndex = new Deferred<number>();
 	const newId = new Deferred<string>();
 
 	c.head(<title>{generateTitle(data)}</title>);
@@ -93,10 +92,8 @@ export const action = new Action("/chat", async (c) => {
 
 				// yield current message
 				yield (
-					<Message transitionName={`m-${messageIndex++}`} message={message} />
+					<Message transitionName={`m-${messageIndex}`} message={message} />
 				);
-
-				finalMessageIndex.resolve(messageIndex);
 
 				yield (
 					<div class="chat-bubble py-6">
@@ -163,8 +160,7 @@ export const action = new Action("/chat", async (c) => {
 				);
 			}}
 
-			{async () => <Input index={await finalMessageIndex.promise} />}
-
+			<Input index={messageIndex + 1} />
 			<Controls />
 
 			{async () => (
