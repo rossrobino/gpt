@@ -34,7 +34,7 @@ export const page = new Page("/", (c) => {
 export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
-	const id = schema.NullableStringSchema.parse(data.get("id"));
+	let id = schema.NullableStringSchema.parse(data.get("id"));
 	const title = schema.NullableStringSchema.parse(data.get("title"));
 	const text = schema.StringSchema.parse(data.get("text"));
 	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
@@ -65,8 +65,6 @@ export const action = new Action("/chat", async (c) => {
 					render(website),
 				]);
 
-				yield <ExistingData dataset={dataset} />;
-
 				// current message input
 				const content: ResponseInputContent[] = [
 					...fileInputs,
@@ -91,78 +89,79 @@ export const action = new Action("/chat", async (c) => {
 					content,
 				};
 
-				// yield current message
 				yield (
-					<Message transitionName={`m-${messageIndex}`} message={message} />
-				);
+					<>
+						<Message transitionName={`m-${messageIndex}`} message={message} />
 
-				yield (
-					<div class="chat-bubble py-6">
-						{async function* () {
-							const htmlStream = processor.renderStream(
-								new ReadableStream<string>({
-									async start(c) {
-										const input: ResponseInput = [message];
+						<div class="chat-bubble py-6">
+							{async function* () {
+								const htmlStream = processor.renderStream(
+									new ReadableStream<string>({
+										async start(c) {
+											const input: ResponseInput = [message];
 
-										if (dataset) {
-											const dataTools = tools.data(dataset);
+											if (dataset) {
+												const dataTools = tools.data(dataset);
 
-											const dataGen = ai.generate({
-												model: "gpt-4.1",
-												input: [
-													{ role: "user", content: text },
-													...dataTools.input,
-												],
+												const dataGen = ai.generate({
+													model: "gpt-4.1",
+													input: [
+														{ role: "user", content: text },
+														...dataTools.input,
+													],
+													previous_response_id: id,
+													toolHelpers: dataTools.helpers,
+												});
+
+												while (true) {
+													const { value, done } = await dataGen.next();
+
+													if (done) {
+														// add function calls to the input
+														input.push(...value.outputs);
+														break;
+													} else c.enqueue(value); // enqueue any streamed text
+												}
+											}
+
+											const mainGen = ai.generate({
+												input,
+												instructions,
+												model: "gpt-4.1-mini",
+												store,
 												previous_response_id: id,
-												toolHelpers: dataTools.helpers,
 											});
 
 											while (true) {
-												const { value, done } = await dataGen.next();
+												const { value, done } = await mainGen.next();
 
 												if (done) {
-													// add function calls to the input
-													input.push(...value.outputs);
+													newId.resolve(value.id);
 													break;
-												} else c.enqueue(value); // enqueue any streamed text
+												} else c.enqueue(value);
 											}
-										}
 
-										const mainGen = ai.generate({
-											input,
-											instructions,
-											model: "gpt-4.1-mini",
-											store,
-											previous_response_id: id,
-										});
+											c.close();
+										},
+									}),
+								);
 
-										while (true) {
-											const { value, done } = await mainGen.next();
+								const reader = htmlStream.getReader();
+								while (true) {
+									const { value, done } = await reader.read();
+									if (value) yield value;
+									if (done) break;
+								}
+							}}
+						</div>
 
-											if (done) {
-												newId.resolve(value.id);
-												break;
-											} else c.enqueue(value);
-										}
+						<Input index={messageIndex + 1} />
+						<Controls store={store} />
 
-										c.close();
-									},
-								}),
-							);
-
-							const reader = htmlStream.getReader();
-							while (true) {
-								const { value, done } = await reader.read();
-								if (value) yield value;
-								if (done) break;
-							}
-						}}
-					</div>
+						<ExistingData dataset={dataset} />
+					</>
 				);
 			}}
-
-			<Input index={messageIndex + 1} />
-			<Controls store={store} />
 
 			{async () => (
 				<input
