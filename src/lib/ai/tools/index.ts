@@ -1,14 +1,16 @@
+import * as schema from "@/lib/schema";
 import type { EChartsOption } from "echarts";
 import type { FunctionTool } from "openai/resources/responses/responses.mjs";
-import * as z from "zod/v4";
 
 export { data } from "@/lib/ai/tools/data";
 
-export const helper = <S extends z.ZodObject = z.ZodObject<any, any>>(options: {
+export const helper = <
+	S extends schema.ZodObject = schema.ZodObject<any, any>,
+>(options: {
 	ArgsSchema: S;
 	name: string;
 	description: string;
-	run: (args: z.infer<S>) => {
+	run: (args: schema.infer<S>) => {
 		result?: Record<string, unknown>;
 		chartOptions?: EChartsOption;
 	};
@@ -18,7 +20,7 @@ export const helper = <S extends z.ZodObject = z.ZodObject<any, any>>(options: {
 		name: options.name,
 		description: options.description,
 		strict: true,
-		parameters: z.toJSONSchema(options.ArgsSchema),
+		parameters: schema.toJSONSchema(options.ArgsSchema),
 	};
 
 	return { ArgsSchema: options.ArgsSchema, tool, run: options.run };

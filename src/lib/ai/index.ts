@@ -1,4 +1,5 @@
 import { toCodeBlock } from "../md/to-code-block";
+import type * as schema from "@/lib/schema";
 import { Chart } from "@/ui/chart";
 import "dotenv/config";
 import type { EChartsOption } from "echarts";
@@ -9,7 +10,6 @@ import type {
 	ResponseOutputItem,
 } from "openai/resources/responses/responses.mjs";
 import * as ovr from "ovr";
-import type * as z from "zod/v4";
 
 if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
 
@@ -33,7 +33,7 @@ export async function* generate(
 		"tools" | "stream" | "reasoning" | "truncation"
 	> & {
 		toolHelpers?: {
-			ArgsSchema: z.ZodObject;
+			ArgsSchema: schema.ZodObject;
 			tool: FunctionTool;
 			run: (...args: any[]) => {
 				result?: Record<string, unknown>;

@@ -34,20 +34,21 @@ export const page = new Page("/", (c) => {
 export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
-	let id = schema.NullableStringSchema.parse(data.get("id"));
-	const title = schema.NullableStringSchema.parse(data.get("title"));
-	const text = schema.StringSchema.parse(data.get("text"));
-	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
-	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
+	let id = schema.string().nullable().parse(data.get("id"));
+	const title = schema.string().nullable().parse(data.get("title"));
+	const text = schema.string().parse(data.get("text"));
+	const image = schema.url().safeParse(data.get("image")).data ?? null;
+	const website = schema.url().safeParse(data.get("website")).data ?? null;
 	const files = schema.FilesSchema.parse([
 		...data.getAll("files"),
 		...data.getAll("directory"),
 	]);
-	const messageIndex = parseInt(schema.StringSchema.parse(data.get("index")));
-	const dataFile = schema.FileSchema.nullable().parse(data.get("dataset"));
-	const existing = schema.NullableStringSchema.parse(
-		data.get("existing-dataset"),
-	);
+	const messageIndex = parseInt(schema.string().parse(data.get("index")));
+	const dataFile = schema.file().nullable().parse(data.get("dataset"));
+	const existing = schema
+		.string()
+		.nullable()
+		.parse(data.get("existing-dataset"));
 	const store = data.get("no-store") !== "on";
 
 	const newId = new Deferred<string>();

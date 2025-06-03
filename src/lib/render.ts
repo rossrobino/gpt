@@ -1,11 +1,14 @@
 import { toCodeBlock } from "./md/to-code-block";
+import * as schema from "@/lib/schema";
 import "dotenv/config";
-import { z } from "zod";
 
 if (!process.env.CF_API_KEY) throw new Error("CF_API_KEY is not set.");
 if (!process.env.CF_ACCOUNT_ID) throw new Error("CF_ACCOUNT_ID is not set.");
 
-const RenderSchema = z.object({ success: z.boolean(), result: z.string() });
+const RenderSchema = schema.object({
+	success: schema.boolean(),
+	result: schema.string(),
+});
 
 /**
  * @param url - Page to render

@@ -1,6 +1,6 @@
 import type { Dataset } from "@/lib/types";
 // import { Table } from "@/ui/table";
-import { escape } from "ovr";
+import * as ovr from "ovr";
 
 export const ExistingData = (props: { dataset: Dataset }) => {
 	if (props.dataset) {
@@ -9,7 +9,7 @@ export const ExistingData = (props: { dataset: Dataset }) => {
 				{/* <Table data={props.dataset} /> */}
 				<input
 					type="hidden"
-					value={escape(JSON.stringify(props.dataset), true)}
+					value={ovr.escape(JSON.stringify(props.dataset), true)}
 					name="existing-dataset"
 				></input>
 			</div>

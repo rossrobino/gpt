@@ -1,6 +1,6 @@
 import * as svg from "@/ui/svg";
 import type * as echarts from "echarts";
-import { escape } from "ovr";
+import * as ovr from "ovr";
 
 export const Chart = (props: { options: echarts.EChartsOption }) => {
 	// props.options.color = [
@@ -14,7 +14,7 @@ export const Chart = (props: { options: echarts.EChartsOption }) => {
 		<p>
 			<e-chart
 				class="flex h-96 w-full flex-col items-center justify-center gap-2"
-				options={escape(JSON.stringify(props.options), true)}
+				options={ovr.escape(JSON.stringify(props.options), true)}
 			>
 				<svg.Chart class="text-foreground animate-pulse" />
 				<noscript class="text-muted-foreground">

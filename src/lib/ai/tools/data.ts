@@ -1,13 +1,15 @@
 import * as tools from "@/lib/ai/tools";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/to-code-block";
+import * as schema from "@/lib/schema";
 import type { Dataset } from "@/lib/types";
 import type { ResponseInput } from "openai/resources/responses/responses.mjs";
 import * as stats from "simple-statistics";
-import * as z from "zod/v4";
 
 const toArray = (dataset: Record<string, unknown>[], feature: string) => {
-	return z.array(z.number()).parse(dataset.map((record) => record[feature]));
+	return schema
+		.array(schema.number())
+		.parse(dataset.map((record) => record[feature]));
 };
 
 export const data = (dataset: NonNullable<Dataset>) => {
@@ -16,38 +18,38 @@ export const data = (dataset: NonNullable<Dataset>) => {
 	const allFeatures: string[] = [];
 	if (firstRecord) allFeatures.push(...Object.keys(firstRecord));
 
-	const AnyFeatureSchema = z.enum(allFeatures);
+	const AnyFeatureSchema = schema.enum(allFeatures);
 
 	const helpers = [
 		// tools.helper({
 		// 	name: "sum",
 		// 	description: "Add numbers with precision.",
-		// 	ArgsSchema: z.object({ numbers: z.array(z.number()) }),
+		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	run: ({ numbers }) => ({ result: stats.sum(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "difference",
 		// 	description: "Subtract numbers with precision.",
-		// 	ArgsSchema: z.object({ numbers: z.array(z.number()) }),
+		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	run: ({ numbers }) => ({ result: math.difference(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "product",
 		// 	description: "Multiply numbers with precision.",
-		// 	ArgsSchema: z.object({ numbers: z.array(z.number()) }),
+		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	run: ({ numbers }) => ({ result: stats.product(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "quotient",
 		// 	description: "Divide numbers with precision.",
-		// 	ArgsSchema: z.object({ numbers: z.array(z.number()) }),
+		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	run: ({ numbers }) => ({ result: math.quotient(numbers) }),
 		// }),
 		tools.helper({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
-			ArgsSchema: z.object({
-				features: z.object({
+			ArgsSchema: schema.object({
+				features: schema.object({
 					dependent: AnyFeatureSchema,
 					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
 				}),
@@ -91,7 +93,7 @@ export const data = (dataset: NonNullable<Dataset>) => {
 		}),
 		tools.helper({
 			name: "count",
-			ArgsSchema: z.object(),
+			ArgsSchema: schema.object(),
 			description: "Find the total count of records in the dataset.",
 			run: () => ({ result: { length: dataset.length } }),
 		}),
@@ -99,7 +101,7 @@ export const data = (dataset: NonNullable<Dataset>) => {
 			name: "describe",
 			description:
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
-			ArgsSchema: z.object({ feature: AnyFeatureSchema }),
+			ArgsSchema: schema.object({ feature: AnyFeatureSchema }),
 			run: ({ feature }) => {
 				const count = dataset.length;
 				const values = toArray(dataset, feature);
@@ -184,7 +186,10 @@ export const data = (dataset: NonNullable<Dataset>) => {
 		tools.helper({
 			name: "percentile",
 			description: "Find a percentile for a given feature.",
-			ArgsSchema: z.object({ feature: AnyFeatureSchema, percentile: z.int() }),
+			ArgsSchema: schema.object({
+				feature: AnyFeatureSchema,
+				percentile: schema.int(),
+			}),
 			run: ({ feature, percentile }) => {
 				const values = toArray(dataset, feature);
 				return {
@@ -195,8 +200,8 @@ export const data = (dataset: NonNullable<Dataset>) => {
 		tools.helper({
 			name: "correlation",
 			description: "Calculate sample correlation between two features.",
-			ArgsSchema: z.object({
-				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
+			ArgsSchema: schema.object({
+				features: schema.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
 			run: ({ features }) => {
 				const x = toArray(dataset, features.x);
