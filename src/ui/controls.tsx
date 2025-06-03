@@ -1,13 +1,28 @@
+import { BackButton } from "./back-button";
 import { html } from "@/content/info.md";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 
-export const Controls = (props: { store: boolean }) => {
+export const Controls = (props: {
+	store: boolean;
+	undo?: boolean;
+	clear?: boolean;
+}) => {
 	return (
-		<div class="my-3 flex justify-end" style="view-transition-name: controls">
+		<div
+			class="my-3 flex flex-wrap-reverse justify-between gap-3"
+			style="view-transition-name: controls"
+		>
+			<div class="flex gap-3">
+				{props.clear && <Clear />}
+				{props.undo && (
+					<BackButton aria-label="Undo last message" class="icon secondary">
+						<svg.Undo />
+					</BackButton>
+				)}
+			</div>
 			<div class="flex gap-3">
 				<Info />
-				<Clear />
 				<Attachments />
 				<Temporary store={props.store} />
 				<Submit />

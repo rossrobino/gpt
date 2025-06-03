@@ -38,3 +38,5 @@ export const MessageDashed = (props: ovr.JSX.IntrinsicElements["span"]) => {
 
 export const CopyComplete = () =>
 	`<span class="icon-[lucide--clipboard-check]"></span>`;
+
+export const Undo = () => `<span class="icon-[lucide--undo]"></span>`;

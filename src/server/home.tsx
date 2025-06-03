@@ -8,7 +8,6 @@ import { generateTitle } from "@/lib/generate-title";
 import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
 import * as schema from "@/lib/schema";
-import { Controls } from "@/ui/controls";
 import { ExistingData } from "@/ui/existing-data";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
@@ -18,16 +17,10 @@ import { Action, Page } from "ovr";
 export const page = new Page("/", (c) => {
 	c.head(<title>New Message</title>);
 
-	return (
-		<>
-			<Input index={0} />
-			<Controls store={true} />
-		</>
-	);
+	return <Input />;
 });
 
 export const action = new Action("/chat", async (c) => {
-	const formData = await c.req.formData();
 	const data = schema
 		.formData({
 			id: schema.string().nullable(),
@@ -42,7 +35,7 @@ export const action = new Action("/chat", async (c) => {
 			existing: schema.string().nullable(),
 			temporary: schema.checkbox(),
 		})
-		.parse(formData);
+		.parse(await c.req.formData());
 
 	const newId = new Deferred<string>();
 
@@ -151,8 +144,12 @@ export const action = new Action("/chat", async (c) => {
 							}}
 						</div>
 
-						<Input index={data.index + 1} />
-						<Controls store={!data.temporary} />
+						<Input
+							index={data.index + 1}
+							store={!data.temporary}
+							undo={true}
+							clear={true}
+						/>
 
 						<ExistingData dataset={dataset} />
 					</>

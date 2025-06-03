@@ -1,14 +1,44 @@
+import * as schema from "@/lib/schema";
 import * as home from "@/server/home";
 import { Layout } from "@/server/layout";
+import { BackButton } from "@/ui/back-button";
 import { html } from "client:page";
 import { App } from "ovr";
 
 const app = new App();
 
 app.base = html;
+
 app.error = (c, error) => {
 	console.error(error);
-	c.html("Internal server error", 500);
+
+	if (error instanceof schema.ZodError) {
+		const validationError = "Validation Error";
+
+		c.head(<title>{validationError}</title>);
+
+		return c.page(
+			<>
+				<h1>{validationError}</h1>
+
+				{error.issues.map((issue) => {
+					return (
+						<>
+							<h2>{issue.path.join(", ")}</h2>
+							<p>{issue.message}</p>
+						</>
+					);
+				})}
+
+				<BackButton>Go Back</BackButton>
+			</>,
+			500,
+		);
+	}
+
+	const defaultMessage = "Internal server error";
+	c.head(<title>{defaultMessage}</title>);
+	c.html(defaultMessage, 500);
 };
 
 app.add(home);

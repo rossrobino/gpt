@@ -1,4 +1,16 @@
-export const Input = (props: { index: number }) => (
+import { Controls } from "@/ui/controls";
+
+export const Input = ({
+	index = 0,
+	store = true,
+	undo,
+	clear,
+}: {
+	index?: number;
+	store?: boolean;
+	undo?: boolean;
+	clear?: boolean;
+}) => (
 	<>
 		<drab-editor class="contents">
 			<textarea
@@ -8,9 +20,11 @@ export const Input = (props: { index: number }) => (
 				required
 				placeholder="Ask anything"
 				class="bg-muted border-base-200 dark:border-base-800 mt-12 h-48 border shadow-sm outline-none dark:shadow-black/75"
-				style={`view-transition-name: m-${props.index}`}
+				style={`view-transition-name: m-${index}`}
 			></textarea>
 		</drab-editor>
-		<input type="hidden" name="index" value={props.index.toString()} />
+		<input type="hidden" name="index" value={index.toString()} />
+
+		<Controls store={store} undo={undo} clear={clear} />
 	</>
 );
