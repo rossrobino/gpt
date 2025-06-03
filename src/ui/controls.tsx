@@ -9,7 +9,7 @@ export const Controls = (props: { store: boolean }) => {
 				<Info />
 				<Clear />
 				<Attachments />
-				<Store store={props.store} />
+				<Temporary store={props.store} />
 				<Submit />
 			</div>
 		</div>
@@ -116,13 +116,13 @@ const Clear = () => {
 	);
 };
 
-const Store = (props: { store: boolean }) => (
+const Temporary = (props: { store: boolean }) => (
 	<label class="button secondary icon has-checked:bg-primary has-checked:text-primary-foreground m-0 has-focus-within:ring has-focus-within:ring-offset-1">
 		<svg.MessageDashed />
 		<input
 			type="checkbox"
 			class="sr-only"
-			name="no-store"
+			name="temporary"
 			aria-label="Do not store messages (temporary)"
 			checked={!props.store}
 		/>

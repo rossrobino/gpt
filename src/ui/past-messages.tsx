@@ -20,7 +20,9 @@ export const PastMessages = async (props: { id: string | null }) => {
 					...latestResponse.output,
 				];
 
-				return fetchedMessages.map((entry) => <Message message={entry} />);
+				return fetchedMessages.map((message, i) => (
+					<Message message={message} index={i} />
+				));
 			}}
 		</Details>
 	);

@@ -3,11 +3,8 @@ import { toCodeBlock } from "@/lib/md/util";
 import type { ChatMessage } from "@/lib/types";
 import { clsx } from "clsx";
 
-export const Message = (props: {
-	message: ChatMessage;
-	transitionName?: string;
-}) => {
-	const { transitionName, message } = props;
+export const Message = (props: { message: ChatMessage; index: number }) => {
+	const { index, message } = props;
 
 	if (message.type === "message") {
 		const { content, role } = message;
@@ -21,7 +18,7 @@ export const Message = (props: {
 						user &&
 							"bg-muted border-base-200 dark:border-base-800 w-fit rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75",
 					)}
-					style={transitionName && `view-transition-name: ${transitionName}`}
+					style={`view-transition-name: m-${index}`}
 				>
 					{processor.render(
 						typeof content === "string"

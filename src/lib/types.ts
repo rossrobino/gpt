@@ -5,4 +5,4 @@ export type ChatMessage =
 	| ai.OpenAI.Responses.ResponseOutputItem
 	| ai.OpenAI.Responses.ResponseInputItem;
 
-export type Dataset = schema.infer<typeof schema.DataSchema> | null;
+export type Dataset = schema.infer<ReturnType<typeof schema.data>> | null;

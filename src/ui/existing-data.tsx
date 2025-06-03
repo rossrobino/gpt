@@ -10,7 +10,7 @@ export const ExistingData = (props: { dataset: Dataset }) => {
 				<input
 					type="hidden"
 					value={ovr.escape(JSON.stringify(props.dataset), true)}
-					name="existing-dataset"
+					name="existing"
 				></input>
 			</div>
 		);

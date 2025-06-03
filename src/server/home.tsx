@@ -27,54 +27,52 @@ export const page = new Page("/", (c) => {
 });
 
 export const action = new Action("/chat", async (c) => {
-	const data = await c.req.formData();
-
-	let id = schema.string().nullable().parse(data.get("id"));
-	const title = schema.string().nullable().parse(data.get("title"));
-	const text = schema.string().parse(data.get("text"));
-	const image = schema.url().safeParse(data.get("image")).data ?? null;
-	const website = schema.url().safeParse(data.get("website")).data ?? null;
-	const files = schema.FilesSchema.parse([
-		...data.getAll("files"),
-		...data.getAll("directory"),
-	]);
-	const messageIndex = parseInt(schema.string().parse(data.get("index")));
-	const dataFile = schema.file().nullable().parse(data.get("dataset"));
-	const existing = schema
-		.string()
-		.nullable()
-		.parse(data.get("existing-dataset"));
-	const store = data.get("no-store") !== "on";
+	const formData = await c.req.formData();
+	const data = schema
+		.formData({
+			id: schema.string().nullable(),
+			title: schema.string().nullable(),
+			text: schema.string(),
+			image: schema.httpUrl(),
+			website: schema.httpUrl(),
+			files: schema.files(),
+			directory: schema.files(),
+			index: schema.coerce.number(),
+			dataset: schema.fileOrNull(),
+			existing: schema.string().nullable(),
+			temporary: schema.checkbox(),
+		})
+		.parse(formData);
 
 	const newId = new Deferred<string>();
 
-	c.head(<title>{generateTitle(title, text)}</title>);
+	c.head(<title>{generateTitle(data.title, data.text)}</title>);
 
 	return (
 		<>
-			<PastMessages id={id} />
+			<PastMessages id={data.id} />
 
 			{async function* () {
-				let [fileInputs, dataset, renderResult] = await Promise.all([
-					fileInput(files),
-					parseDataset(dataFile, existing),
-					render(website),
+				const [fileInputs, dataset, renderResult] = await Promise.all([
+					fileInput(data.files),
+					parseDataset(data.dataset, data.existing),
+					render(data.website),
 				]);
 
 				// current message input
 				const content: ai.OpenAI.Responses.ResponseInputContent[] = [
 					...fileInputs,
-					{ type: "input_text", text },
+					{ type: "input_text", text: data.text },
 				];
 
 				if (renderResult.success) {
 					content.unshift({ type: "input_text", text: renderResult.md });
 				}
 
-				if (image) {
+				if (data.image) {
 					content.unshift({
 						type: "input_image",
-						image_url: image,
+						image_url: data.image,
 						detail: "auto",
 					});
 				}
@@ -87,7 +85,7 @@ export const action = new Action("/chat", async (c) => {
 
 				yield (
 					<>
-						<Message transitionName={`m-${messageIndex}`} message={message} />
+						<Message index={data.index} message={message} />
 
 						<div class="my-trim my-6">
 							{async function* () {
@@ -104,10 +102,10 @@ export const action = new Action("/chat", async (c) => {
 												const dataGen = ai.generate({
 													model: "gpt-4.1",
 													input: [
-														{ role: "user", content: text },
+														{ role: "user", content: data.text },
 														...dataTools.input,
 													],
-													previous_response_id: id,
+													previous_response_id: data.id,
 													toolHelpers: dataTools.helpers,
 												});
 
@@ -126,8 +124,8 @@ export const action = new Action("/chat", async (c) => {
 												input,
 												instructions,
 												model: "gpt-4.1-mini",
-												store,
-												previous_response_id: id,
+												store: !data.temporary,
+												previous_response_id: data.id,
 											});
 
 											while (true) {
@@ -153,8 +151,8 @@ export const action = new Action("/chat", async (c) => {
 							}}
 						</div>
 
-						<Input index={messageIndex + 1} />
-						<Controls store={store} />
+						<Input index={data.index + 1} />
+						<Controls store={!data.temporary} />
 
 						<ExistingData dataset={dataset} />
 					</>
@@ -165,12 +163,12 @@ export const action = new Action("/chat", async (c) => {
 				<input
 					type="hidden"
 					name="title"
-					value={await generateTitle(title, text)}
+					value={await generateTitle(data.title, data.text)}
 				></input>
 			)}
 
 			{async () => {
-				if (store)
+				if (!data.temporary)
 					return <input type="hidden" name="id" value={await newId.promise} />;
 			}}
 		</>
