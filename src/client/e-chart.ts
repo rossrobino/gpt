@@ -1,5 +1,29 @@
 import { Lifecycle } from "drab/base";
-import * as echarts from "echarts";
+import type * as types from "echarts";
+import { BoxplotChart, LineChart, ScatterChart } from "echarts/charts";
+import {
+	TitleComponent,
+	TooltipComponent,
+	GridComponent,
+	DatasetComponent,
+	TransformComponent,
+	LegendComponent,
+} from "echarts/components";
+import * as echarts from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+
+echarts.use([
+	BoxplotChart,
+	LineChart,
+	ScatterChart,
+	TitleComponent,
+	TooltipComponent,
+	GridComponent,
+	DatasetComponent,
+	TransformComponent,
+	LegendComponent,
+	CanvasRenderer,
+]);
 
 class EChart extends Lifecycle() {
 	get options() {
@@ -7,7 +31,7 @@ class EChart extends Lifecycle() {
 
 		if (!attr) throw new Error("Options not set.");
 
-		return JSON.parse(attr) as echarts.EChartsOption;
+		return JSON.parse(attr) as types.EChartsOption;
 	}
 
 	override mount() {

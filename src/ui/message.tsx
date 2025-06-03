@@ -1,5 +1,5 @@
 import { processor } from "@/lib/md";
-import { toCodeBlock } from "@/lib/md/to-code-block";
+import { toCodeBlock } from "@/lib/md/util";
 import type { ChatMessage } from "@/lib/types";
 import { clsx } from "clsx";
 
@@ -17,7 +17,7 @@ export const Message = (props: {
 			<div class={clsx(user && "flex justify-end pl-8")}>
 				<div
 					class={clsx(
-						"chat-bubble my-6",
+						"my-trim my-6",
 						user &&
 							"bg-muted border-base-200 dark:border-base-800 w-fit rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75",
 					)}

@@ -13,11 +13,6 @@ import { ExistingData } from "@/ui/existing-data";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import type {
-	ResponseInput,
-	ResponseInputContent,
-	ResponseInputItem,
-} from "openai/resources/responses/responses.mjs";
 import { Action, Page } from "ovr";
 
 export const page = new Page("/", (c) => {
@@ -67,7 +62,7 @@ export const action = new Action("/chat", async (c) => {
 				]);
 
 				// current message input
-				const content: ResponseInputContent[] = [
+				const content: ai.OpenAI.Responses.ResponseInputContent[] = [
 					...fileInputs,
 					{ type: "input_text", text },
 				];
@@ -84,7 +79,7 @@ export const action = new Action("/chat", async (c) => {
 					});
 				}
 
-				const message: ResponseInputItem = {
+				const message: ai.OpenAI.Responses.ResponseInputItem = {
 					role: "user",
 					type: "message",
 					content,
@@ -94,12 +89,14 @@ export const action = new Action("/chat", async (c) => {
 					<>
 						<Message transitionName={`m-${messageIndex}`} message={message} />
 
-						<div class="chat-bubble py-6">
+						<div class="my-trim my-6">
 							{async function* () {
 								const htmlStream = processor.renderStream(
 									new ReadableStream<string>({
 										async start(c) {
-											const input: ResponseInput = [message];
+											const input: ai.OpenAI.Responses.ResponseInput = [
+												message,
+											];
 
 											if (dataset) {
 												const dataTools = tools.data(dataset);

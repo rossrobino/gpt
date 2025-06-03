@@ -1,6 +1,6 @@
 import * as schema from "@/lib/schema";
 import type { EChartsOption } from "echarts";
-import type { FunctionTool } from "openai/resources/responses/responses.mjs";
+import type * as ai from "openai";
 
 export { data } from "@/lib/ai/tools/data";
 
@@ -15,7 +15,7 @@ export const helper = <
 		chartOptions?: EChartsOption;
 	};
 }) => {
-	const tool: FunctionTool = {
+	const tool: ai.OpenAI.Responses.FunctionTool = {
 		type: "function",
 		name: options.name,
 		description: options.description,

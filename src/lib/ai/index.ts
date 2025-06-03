@@ -1,15 +1,13 @@
-import { toCodeBlock } from "../md/to-code-block";
+import { toCodeBlock } from "@/lib/md/util";
 import type * as schema from "@/lib/schema";
+import type { ChatMessage } from "@/lib/types";
 import { Chart } from "@/ui/chart";
 import "dotenv/config";
 import type { EChartsOption } from "echarts";
 import { OpenAI } from "openai";
-import type {
-	FunctionTool,
-	ResponseInputItem,
-	ResponseOutputItem,
-} from "openai/resources/responses/responses.mjs";
 import * as ovr from "ovr";
+
+export type { OpenAI } from "openai";
 
 if (!process.env.OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not set.");
 
@@ -34,7 +32,7 @@ export async function* generate(
 	> & {
 		toolHelpers?: {
 			ArgsSchema: schema.ZodObject;
-			tool: FunctionTool;
+			tool: OpenAI.Responses.FunctionTool;
 			run: (...args: any[]) => {
 				result?: Record<string, unknown>;
 				chartOptions?: EChartsOption;
@@ -58,8 +56,7 @@ export async function* generate(
 		...rest,
 	});
 
-	const outputs: (ResponseInputItem.FunctionCallOutput | ResponseOutputItem)[] =
-		[];
+	const outputs: ChatMessage[] = [];
 
 	for await (const event of response) {
 		if (event.type === "response.output_item.added") {

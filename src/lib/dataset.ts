@@ -10,10 +10,8 @@ export const parseDataset = async (
 
 	try {
 		if (!file?.size) {
-			if (existing) {
-				data = schema.DataSchema.parse(JSON.parse(existing));
-			}
-		} else if (file.type === mime.types.csv) {
+			if (existing) data = schema.DataSchema.parse(JSON.parse(existing));
+		} else if (mime.types.csv.includes(file.type)) {
 			const [{ default: csv }, fileText] = await Promise.all([
 				import("papaparse"),
 				file.text(),
@@ -25,13 +23,14 @@ export const parseDataset = async (
 				header: true,
 			});
 
-			data = schema.DataSchema.safeParse(csvResult.data).data ?? null;
+			data = schema.DataSchema.parse(csvResult.data);
 		} else if (file.type === mime.types.json) {
 			const fileText = await file.text();
-			data = schema.DataSchema.safeParse(JSON.parse(fileText)).data ?? null;
+			data = schema.DataSchema.parse(JSON.parse(fileText));
 		}
 	} catch (error) {
 		console.error("Unable to parse data.", error);
 	}
+
 	return data;
 };

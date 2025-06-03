@@ -1,4 +1,4 @@
-import { toCodeBlock } from "./md/to-code-block";
+import { toCodeBlock } from "@/lib/md/util";
 import * as schema from "@/lib/schema";
 import "dotenv/config";
 

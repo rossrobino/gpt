@@ -1,10 +1,9 @@
-import { toCodeBlock } from "./md/to-code-block";
 import * as ai from "@/lib/ai";
+import { toCodeBlock } from "@/lib/md/util";
 import * as mime from "@/lib/mime";
-import type { ResponseInputContent } from "openai/resources/responses/responses.mjs";
 
 export const fileInput = async (files: File[]) => {
-	const inputs: ResponseInputContent[] = [];
+	const inputs: ai.OpenAI.Responses.ResponseInputContent[] = [];
 
 	const handleFile = async (file: File) => {
 		if (file.type === "application/pdf") {

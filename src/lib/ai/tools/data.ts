@@ -1,9 +1,8 @@
 import * as tools from "@/lib/ai/tools";
 import * as math from "@/lib/math";
-import { toCodeBlock } from "@/lib/md/to-code-block";
+import { toCodeBlock } from "@/lib/md/util";
 import * as schema from "@/lib/schema";
-import type { Dataset } from "@/lib/types";
-import type { ResponseInput } from "openai/resources/responses/responses.mjs";
+import type { ChatMessage, Dataset } from "@/lib/types";
 import * as stats from "simple-statistics";
 
 const toArray = (dataset: Record<string, unknown>[], feature: string) => {
@@ -212,7 +211,7 @@ export const data = (dataset: NonNullable<Dataset>) => {
 		}),
 	];
 
-	const input: ResponseInput = [
+	const input: ChatMessage[] = [
 		{
 			role: "user",
 			content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
