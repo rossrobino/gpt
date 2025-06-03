@@ -72,14 +72,14 @@ export async function* generate(
 			} else if (event.item.type === "function_call" && toolHelpers) {
 				const output = event.item;
 
-				const tool = toolHelpers.find((t) => output.name === t.tool.name);
+				const helper = toolHelpers.find((h) => output.name === h.tool.name);
 
-				if (tool) {
+				if (helper) {
 					outputs.push(output);
 
-					const args = tool.ArgsSchema.parse(JSON.parse(output.arguments));
+					const args = helper.ArgsSchema.parse(JSON.parse(output.arguments));
 
-					const { result, chartOptions } = tool.run(args);
+					const { result, chartOptions } = helper.run(args);
 
 					outputs.push({
 						type: "function_call_output",
