@@ -85,7 +85,11 @@ export const action = new Action("/chat", async (c) => {
 					});
 				}
 
-				const message: ResponseInputItem = { role: "user", content };
+				const message: ResponseInputItem = {
+					role: "user",
+					type: "message",
+					content,
+				};
 
 				// yield current message
 				yield (
