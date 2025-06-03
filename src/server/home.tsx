@@ -26,7 +26,7 @@ export const page = new Page("/", (c) => {
 	return (
 		<>
 			<Input index={0} />
-			<Controls />
+			<Controls store={true} />
 		</>
 	);
 });
@@ -48,7 +48,7 @@ export const action = new Action("/chat", async (c) => {
 	const existing = schema.NullableStringSchema.parse(
 		data.get("existing-dataset"),
 	);
-	const store = data.get("store") === "on";
+	const store = data.get("no-store") !== "on";
 
 	const newId = new Deferred<string>();
 
@@ -162,7 +162,7 @@ export const action = new Action("/chat", async (c) => {
 			}}
 
 			<Input index={messageIndex + 1} />
-			<Controls />
+			<Controls store={store} />
 
 			{async () => (
 				<input

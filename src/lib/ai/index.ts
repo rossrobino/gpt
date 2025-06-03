@@ -92,13 +92,13 @@ export async function* generate(
 					if (chartOptions) {
 						const chart = `${await ovr.toString(Chart({ options: chartOptions }))}\n\n`;
 
-						outputs.push({
-							id: undefined as unknown as string, // hack to save chart -- id is created
-							status: "completed",
-							type: "message",
-							role: "assistant",
-							content: [{ type: "output_text", annotations: [], text: chart }],
-						});
+						// outputs.push({
+						// 	id: undefined as unknown as string, // hack to save chart -- id is created
+						// 	status: "completed",
+						// 	type: "message",
+						// 	role: "assistant",
+						// 	content: [{ type: "output_text", annotations: [], text: chart }],
+						// });
 
 						yield chart; // stream in current message
 					}

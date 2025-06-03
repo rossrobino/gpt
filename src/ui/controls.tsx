@@ -2,14 +2,14 @@ import { html } from "@/content/info.md";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 
-export const Controls = () => {
+export const Controls = (props: { store: boolean }) => {
 	return (
 		<div class="my-3 flex justify-end" style="view-transition-name: controls">
 			<div class="flex gap-3">
 				<Info />
 				<Clear />
 				<Attachments />
-				<Store />
+				<Store store={props.store} />
 				<Submit />
 			</div>
 		</div>
@@ -116,15 +116,15 @@ const Clear = () => {
 	);
 };
 
-const Store = (props: { store?: boolean }) => (
+const Store = (props: { store: boolean }) => (
 	<label class="button secondary icon has-checked:bg-primary has-checked:text-primary-foreground m-0 has-focus-within:ring has-focus-within:ring-offset-1">
 		<svg.MessageDashed />
 		<input
 			type="checkbox"
 			class="sr-only"
-			name="web"
-			aria-label="Store chat"
-			checked={props.store}
+			name="no-store"
+			aria-label="Do not store messages (temporary)"
+			checked={!props.store}
 		/>
 	</label>
 );
