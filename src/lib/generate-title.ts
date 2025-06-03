@@ -1,18 +1,13 @@
 import * as ai from "@/lib/ai";
-import * as schema from "@/lib/schema";
 import { Context, escape } from "ovr";
 
-export const generateTitle = (data: FormData) => {
+export const generateTitle = (title: string | null, text: string | null) => {
 	const c = Context.get();
-	return c.memo(gen)(data);
+	return c.memo(gen)(title, text);
 };
 
-const gen = async (data: FormData) => {
-	const title = schema.NullableStringSchema.parse(data.get("title"));
-
+const gen = async (title: string | null, text: string | null) => {
 	if (title) return title;
-
-	const text = schema.StringSchema.parse(data.get("text"));
 
 	const res = await ai.openai.responses.create({
 		model: ai.fastestModel.name,

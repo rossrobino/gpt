@@ -35,6 +35,7 @@ export const action = new Action("/chat", async (c) => {
 	const data = await c.req.formData();
 
 	const id = schema.NullableStringSchema.parse(data.get("id"));
+	const title = schema.NullableStringSchema.parse(data.get("title"));
 	const text = schema.StringSchema.parse(data.get("text"));
 	const image = schema.URLSchema.safeParse(data.get("image")).data ?? null;
 	const website = schema.URLSchema.safeParse(data.get("website")).data ?? null;
@@ -51,7 +52,7 @@ export const action = new Action("/chat", async (c) => {
 
 	const newId = new Deferred<string>();
 
-	c.head(<title>{generateTitle(data)}</title>);
+	c.head(<title>{generateTitle(title, text)}</title>);
 
 	return (
 		<>
@@ -167,7 +168,7 @@ export const action = new Action("/chat", async (c) => {
 				<input
 					type="hidden"
 					name="title"
-					value={await generateTitle(data)}
+					value={await generateTitle(title, text)}
 				></input>
 			)}
 
