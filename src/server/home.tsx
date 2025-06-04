@@ -142,16 +142,16 @@ export const action = new Action("/chat", async (c) => {
 									if (done) break;
 								}
 							}}
+
+							<Input
+								index={data.index + 1}
+								store={!data.temporary}
+								undo={true}
+								clear={true}
+							/>
+
+							<ExistingData dataset={dataset} />
 						</div>
-
-						<Input
-							index={data.index + 1}
-							store={!data.temporary}
-							undo={true}
-							clear={true}
-						/>
-
-						<ExistingData dataset={dataset} />
 					</>
 				);
 			}}

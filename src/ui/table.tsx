@@ -41,38 +41,40 @@ export const Table = <R extends Row>(props: {
 			);
 
 	return (
-		<drab-tablesort trigger="th" content="tbody">
-			<table>
-				<thead class="cursor-default">
-					<tr>
-						{columns.map((column) => (
-							<th>
-								{column.head
-									? typeof column.head === "function"
-										? column.head(column.key)
-										: column.head
-									: column.key}
-							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{props.data.map((row) => (
-						<tr>
-							{columns.map((column) => (
-								<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
-							))}
-						</tr>
+		<table>
+			<thead class="cursor-default">
+				<tr>
+					{columns.map((column) => (
+						<th>
+							{column.head
+								? typeof column.head === "function"
+									? column.head(column.key)
+									: column.head
+								: column.key}
+						</th>
 					))}
-				</tbody>
-				<tfoot>
-					<tr>
-						{columns.map((column) => (
-							<td>{column.foot ? column.foot(props.data!) : null}</td>
-						))}
-					</tr>
-				</tfoot>
-			</table>
-		</drab-tablesort>
+				</tr>
+			</thead>
+			<tbody>
+				{function* () {
+					for (const row of props.data!) {
+						yield (
+							<tr>
+								{columns.map((column) => (
+									<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
+								))}
+							</tr>
+						);
+					}
+				}}
+			</tbody>
+			<tfoot>
+				<tr>
+					{columns.map((column) => (
+						<td>{column.foot ? column.foot(props.data!) : null}</td>
+					))}
+				</tr>
+			</tfoot>
+		</table>
 	);
 };
