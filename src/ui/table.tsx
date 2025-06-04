@@ -41,40 +41,43 @@ export const Table = <R extends Row>(props: {
 			);
 
 	return (
-		<table>
-			<thead class="cursor-default">
-				<tr>
-					{columns.map((column) => (
-						<th>
-							{column.head
-								? typeof column.head === "function"
-									? column.head(column.key)
-									: column.head
-								: column.key}
-						</th>
-					))}
-				</tr>
-			</thead>
-			<tbody>
-				{function* () {
-					for (const row of props.data!) {
-						yield (
-							<tr>
-								{columns.map((column) => (
-									<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
-								))}
-							</tr>
-						);
-					}
-				}}
-			</tbody>
-			<tfoot>
-				<tr>
-					{columns.map((column) => (
-						<td>{column.foot ? column.foot(props.data!) : null}</td>
-					))}
-				</tr>
-			</tfoot>
-		</table>
+		<div class="rotate-180 overflow-x-auto">
+			{/* rotating both puts the horizontal scrollbar on the top */}
+			<table class="rotate-180">
+				<thead class="cursor-default">
+					<tr>
+						{columns.map((column) => (
+							<th>
+								{column.head
+									? typeof column.head === "function"
+										? column.head(column.key)
+										: column.head
+									: column.key}
+							</th>
+						))}
+					</tr>
+				</thead>
+				<tbody>
+					{function* () {
+						for (const row of props.data!) {
+							yield (
+								<tr>
+									{columns.map((column) => (
+										<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
+									))}
+								</tr>
+							);
+						}
+					}}
+				</tbody>
+				<tfoot>
+					<tr>
+						{columns.map((column) => (
+							<td>{column.foot ? column.foot(props.data!) : null}</td>
+						))}
+					</tr>
+				</tfoot>
+			</table>
+		</div>
 	);
 };
