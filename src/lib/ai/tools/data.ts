@@ -25,36 +25,36 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 		// 	name: "sum",
 		// 	description: "Add numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	run: ({ numbers }) => ({ result: stats.sum(numbers) }),
+		// 	execute: async ({ numbers }) => ({ result: stats.sum(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "difference",
 		// 	description: "Subtract numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	run: ({ numbers }) => ({ result: math.difference(numbers) }),
+		// 	execute: async ({ numbers }) => ({ result: math.difference(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "product",
 		// 	description: "Multiply numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	run: ({ numbers }) => ({ result: stats.product(numbers) }),
+		// 	execute: async ({ numbers }) => ({ result: stats.product(numbers) }),
 		// }),
 		// tools.helper({
 		// 	name: "quotient",
 		// 	description: "Divide numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	run: ({ numbers }) => ({ result: math.quotient(numbers) }),
+		// 	execute: async ({ numbers }) => ({ result: math.quotient(numbers) }),
 		// }),
-		tools.helper({
+		tools.tool({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
-			ArgsSchema: schema.object({
+			parameters: schema.object({
 				features: schema.object({
 					dependent: AnyFeatureSchema,
 					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
 				}),
 			}),
-			run: ({ features }) => {
+			execute: async ({ features }) => {
 				const independent = toArray(dataset, features.independent);
 				const dependent = toArray(dataset, features.dependent);
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
@@ -91,18 +91,18 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 				};
 			},
 		}),
-		tools.helper({
+		tools.tool({
 			name: "count",
-			ArgsSchema: schema.object(),
+			parameters: schema.object(),
 			description: "Find the total count of records in the dataset.",
-			run: () => ({ result: { length: dataset.length } }),
+			execute: async () => ({ result: { length: dataset.length } }),
 		}),
-		tools.helper({
+		tools.tool({
 			name: "describe",
 			description:
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
-			ArgsSchema: schema.object({ feature: AnyFeatureSchema }),
-			run: ({ feature }) => {
+			parameters: schema.object({ feature: AnyFeatureSchema }),
+			execute: async ({ feature }) => {
 				const count = dataset.length;
 				const values = toArray(dataset, feature);
 
@@ -183,27 +183,27 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 				};
 			},
 		}),
-		tools.helper({
+		tools.tool({
 			name: "percentile",
 			description: "Find a percentile for a given feature.",
-			ArgsSchema: schema.object({
+			parameters: schema.object({
 				feature: AnyFeatureSchema,
 				percentile: schema.int(),
 			}),
-			run: ({ feature, percentile }) => {
+			execute: async ({ feature, percentile }) => {
 				const values = toArray(dataset, feature);
 				return {
 					result: { percentile: stats.quantile(values, percentile / 100) },
 				};
 			},
 		}),
-		tools.helper({
+		tools.tool({
 			name: "correlation",
 			description: "Calculate sample correlation between two features.",
-			ArgsSchema: schema.object({
+			parameters: schema.object({
 				features: schema.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
-			run: ({ features }) => {
+			execute: async ({ features }) => {
 				const x = toArray(dataset, features.x);
 				const y = toArray(dataset, features.y);
 
@@ -220,7 +220,8 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 				content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
 			},
 		],
-		instructions: "You are an expert data analyst.",
+		instructions:
+			"You are an expert data analyst, you determine which tool is best for task at hand. You don't need to explain, just quickly select the tool.",
 		model: "gpt-4.1",
 	};
 };

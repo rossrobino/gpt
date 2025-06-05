@@ -31,12 +31,14 @@ export type GenerateOptions = Omit<
 > & {
 	input: OpenAI.Responses.ResponseInputItem[];
 	toolHelpers?: {
-		ArgsSchema: schema.ZodObject;
+		parameters: schema.ZodObject;
 		tool: OpenAI.Responses.FunctionTool;
-		run: (args: any) => {
+		execute: (
+			args: any,
+		) => Promise<{
 			result?: Record<string, unknown>;
 			chartOptions?: EChartsOption;
-		};
+		}>;
 	}[];
 };
 
@@ -75,9 +77,9 @@ export async function* generate(options: GenerateOptions) {
 				if (helper) {
 					outputs.push(output);
 
-					const args = helper.ArgsSchema.parse(JSON.parse(output.arguments));
+					const args = helper.parameters.parse(JSON.parse(output.arguments));
 
-					const { result, chartOptions } = helper.run(args);
+					const { result, chartOptions } = await helper.execute(args);
 
 					outputs.push({
 						type: "function_call_output",

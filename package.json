@@ -24,6 +24,7 @@
 	},
 	"dependencies": {
 		"@mdit/plugin-katex": "^0.21.0",
+		"@openai/agents": "^0.0.2",
 		"@robino/md": "^3.2.6",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.3",

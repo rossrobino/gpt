@@ -4,24 +4,26 @@ import type * as ai from "openai";
 
 export { data } from "@/lib/ai/tools/data";
 
-export const helper = <
+export const tool = <
 	S extends schema.ZodObject = schema.ZodObject<any, any>,
 >(options: {
-	ArgsSchema: S;
 	name: string;
 	description: string;
-	run: (args: schema.infer<S>) => {
+	parameters: S;
+	execute: (
+		args: schema.infer<S>,
+	) => Promise<{
 		result?: Record<string, unknown>;
 		chartOptions?: EChartsOption;
-	};
+	}>;
 }) => {
 	const tool: ai.OpenAI.Responses.FunctionTool = {
 		type: "function",
 		name: options.name,
 		description: options.description,
 		strict: true,
-		parameters: schema.toJSONSchema(options.ArgsSchema),
+		parameters: schema.toJSONSchema(options.parameters),
 	};
 
-	return { ArgsSchema: options.ArgsSchema, tool, run: options.run };
+	return { parameters: options.parameters, tool, execute: options.execute };
 };
