@@ -25,21 +25,22 @@ export const models: Model[] = [
 export const defaultModel = models[0]!;
 export const fastestModel = models[0]!;
 
-export async function* generate(
-	options: Omit<
-		OpenAI.Responses.ResponseCreateParamsStreaming,
-		"tools" | "stream" | "reasoning" | "truncation"
-	> & {
-		toolHelpers?: {
-			ArgsSchema: schema.ZodObject;
-			tool: OpenAI.Responses.FunctionTool;
-			run: (...args: any[]) => {
-				result?: Record<string, unknown>;
-				chartOptions?: EChartsOption;
-			};
-		}[];
-	},
-) {
+export type GenerateOptions = Omit<
+	OpenAI.Responses.ResponseCreateParamsStreaming,
+	"tools" | "stream" | "reasoning" | "truncation" | "input"
+> & {
+	input: OpenAI.Responses.ResponseInputItem[];
+	toolHelpers?: {
+		ArgsSchema: schema.ZodObject;
+		tool: OpenAI.Responses.FunctionTool;
+		run: (args: any) => {
+			result?: Record<string, unknown>;
+			chartOptions?: EChartsOption;
+		};
+	}[];
+};
+
+export async function* generate(options: GenerateOptions) {
 	const { toolHelpers, model, ...rest } = options;
 
 	const tools: OpenAI.Responses.Tool[] = toolHelpers?.map((t) => t.tool) ?? [];

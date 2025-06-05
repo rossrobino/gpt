@@ -1,8 +1,9 @@
+import type { GenerateOptions } from "..";
 import * as tools from "@/lib/ai/tools";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/util";
 import * as schema from "@/lib/schema";
-import type { ChatMessage, Dataset } from "@/lib/types";
+import type { Dataset } from "@/lib/types";
 import * as stats from "simple-statistics";
 
 const toArray = (dataset: Record<string, unknown>[], feature: string) => {
@@ -11,7 +12,7 @@ const toArray = (dataset: Record<string, unknown>[], feature: string) => {
 		.parse(dataset.map((record) => record[feature]));
 };
 
-export const data = (dataset: NonNullable<Dataset>) => {
+export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 	const firstRecord = dataset.at(0);
 
 	const allFeatures: string[] = [];
@@ -19,7 +20,7 @@ export const data = (dataset: NonNullable<Dataset>) => {
 
 	const AnyFeatureSchema = schema.enum(allFeatures);
 
-	const helpers = [
+	const toolHelpers = [
 		// tools.helper({
 		// 	name: "sum",
 		// 	description: "Add numbers with precision.",
@@ -211,12 +212,15 @@ export const data = (dataset: NonNullable<Dataset>) => {
 		}),
 	];
 
-	const input: ChatMessage[] = [
-		{
-			role: "user",
-			content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
-		},
-	];
-
-	return { helpers, input };
+	return {
+		toolHelpers,
+		input: [
+			{
+				role: "user",
+				content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
+			},
+		],
+		instructions: "You are an expert data analyst.",
+		model: "gpt-4.1",
+	};
 };

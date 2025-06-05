@@ -93,13 +93,12 @@ export const action = new Action("/chat", async (c) => {
 												const dataTools = tools.data(dataset);
 
 												const dataGen = ai.generate({
-													model: "gpt-4.1",
+													...dataTools,
 													input: [
 														{ role: "user", content: data.text },
 														...dataTools.input,
 													],
 													previous_response_id: data.id,
-													toolHelpers: dataTools.helpers,
 												});
 
 												while (true) {
