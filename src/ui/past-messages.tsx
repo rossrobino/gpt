@@ -2,7 +2,7 @@ import * as ai from "@/lib/ai";
 import { Details } from "@/ui/details";
 import { Message } from "@/ui/message";
 
-export const PastMessages = async (props: { id: string | null }) => {
+export const PastMessages = async (props: { id?: string }) => {
 	if (!props.id) return null;
 
 	return (
@@ -15,13 +15,13 @@ export const PastMessages = async (props: { id: string | null }) => {
 					ai.openai.responses.retrieve(props.id),
 				]);
 
-				const fetchedMessages = [
+				const fetchedInput = [
 					...previousInput.data.reverse(),
 					...latestResponse.output,
 				];
 
-				return fetchedMessages.map((message, i) => (
-					<Message message={message} index={i} />
+				return fetchedInput.map((message, i) => (
+					<Message input={message} index={i} />
 				));
 			}}
 		</Details>

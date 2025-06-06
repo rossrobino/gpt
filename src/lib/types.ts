@@ -1,8 +1,3 @@
-import type * as schema from "@/lib/schema";
-import type * as ai from "openai";
+import type * as z from "@/lib/schema";
 
-export type ChatMessage =
-	| ai.OpenAI.Responses.ResponseOutputItem
-	| ai.OpenAI.Responses.ResponseInputItem;
-
-export type Dataset = schema.infer<ReturnType<typeof schema.data>> | null;
+export type Dataset = z.infer<ReturnType<typeof z.data>> | null;

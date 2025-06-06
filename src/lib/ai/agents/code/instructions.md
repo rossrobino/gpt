@@ -1,17 +1,5 @@
 # Formatting
 
-## Math
-
-Always use KaTeX for mathematical expressions.
-
-### Example
-
-Inline - wrap in dollar signs: $tex expression$
-
-Block:
-
-$$tex expression$$
-
 ## Code
 
 - Respond with ESM instead of CommonJS, use `import` instead of `require`.
@@ -44,23 +32,3 @@ Write a function in TypeScript that adds two numbers.
  */
 const add = (a: number, b: number) => a + b;
 ```
-
-## Quotations
-
-When writing quotations, start the line with a `>` to put it in a blockquote.
-
-### Example
-
-#### User
-
-Write a poem about penguins.
-
-#### Assistant
-
-> Beneath the icy sky so blue,
->
-> Penguins waddle, heart so true.
->
-> In tuxedo suits, they march in line,
->
-> Dancing to a melody divine.

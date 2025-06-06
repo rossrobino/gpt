@@ -1,4 +1,5 @@
-import * as ai from "@/lib/ai";
+import { agent } from "@/lib/ai/agents/title";
+import { run } from "@openai/agents";
 import { Context, escape } from "ovr";
 
 export const generateTitle = (title: string | null, text: string | null) => {
@@ -8,11 +9,9 @@ export const generateTitle = (title: string | null, text: string | null) => {
 
 const gen = async (title: string | null, text: string | null) => {
 	if (title) return title;
+	if (!text) return "Message";
 
-	const res = await ai.openai.responses.create({
-		model: ai.fastestModel.name,
-		input: `Create a title (<5 words) for this message:\n\n${text}`,
-	});
+	const result = await run(agent, text);
 
-	return escape(res.output_text);
+	return escape(result.finalOutput);
 };

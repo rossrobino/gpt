@@ -1,28 +1,21 @@
 import { Lifecycle } from "drab/base";
 import type * as types from "echarts";
-import { BoxplotChart, LineChart, ScatterChart } from "echarts/charts";
-import {
-	TitleComponent,
-	TooltipComponent,
-	GridComponent,
-	DatasetComponent,
-	TransformComponent,
-	LegendComponent,
-} from "echarts/components";
-import * as echarts from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+import * as charts from "echarts/charts";
+import * as components from "echarts/components";
+import * as core from "echarts/core";
+import * as renderers from "echarts/renderers";
 
-echarts.use([
-	BoxplotChart,
-	LineChart,
-	ScatterChart,
-	TitleComponent,
-	TooltipComponent,
-	GridComponent,
-	DatasetComponent,
-	TransformComponent,
-	LegendComponent,
-	CanvasRenderer,
+core.use([
+	charts.BoxplotChart,
+	charts.LineChart,
+	charts.ScatterChart,
+	components.TitleComponent,
+	components.TooltipComponent,
+	components.GridComponent,
+	components.DatasetComponent,
+	components.TransformComponent,
+	components.LegendComponent,
+	renderers.CanvasRenderer,
 ]);
 
 class EChart extends Lifecycle() {
@@ -35,7 +28,7 @@ class EChart extends Lifecycle() {
 	}
 
 	override mount() {
-		const chart = echarts.init(this);
+		const chart = core.init(this);
 
 		chart.setOption(this.options);
 

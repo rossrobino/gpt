@@ -1,60 +1,60 @@
-import type { GenerateOptions } from "..";
-import * as tools from "@/lib/ai/tools";
+import instructions from "@/lib/ai/agents/data/instructions.md?raw";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/util";
-import * as schema from "@/lib/schema";
 import type { Dataset } from "@/lib/types";
+import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
+import * as z from "zod";
 
 const toArray = (dataset: Record<string, unknown>[], feature: string) => {
-	return schema
-		.array(schema.number())
-		.parse(dataset.map((record) => record[feature]));
+	return z.array(z.number()).parse(dataset.map((record) => record[feature]));
 };
 
-export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
-	const firstRecord = dataset.at(0);
+export const createDataAgent = (dataset: Dataset) => {
+	if (!dataset) return null;
 
-	const allFeatures: string[] = [];
-	if (firstRecord) allFeatures.push(...Object.keys(firstRecord));
+	const allFeatures = Object.keys(dataset.at(0) ?? {}).map((feat) =>
+		z.literal(feat),
+	);
 
-	const AnyFeatureSchema = schema.enum(allFeatures);
+	// @ts-expect-error - zod 4 enum works, can just pass the keys
+	const AnyFeatureSchema = z.union(allFeatures);
 
-	const toolHelpers = [
-		// tools.helper({
+	const tools = [
+		// helper({
 		// 	name: "sum",
 		// 	description: "Add numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	execute: async ({ numbers }) => ({ result: stats.sum(numbers) }),
 		// }),
-		// tools.helper({
+		// helper({
 		// 	name: "difference",
 		// 	description: "Subtract numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	execute: async ({ numbers }) => ({ result: math.difference(numbers) }),
 		// }),
-		// tools.helper({
+		// helper({
 		// 	name: "product",
 		// 	description: "Multiply numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	execute: async ({ numbers }) => ({ result: stats.product(numbers) }),
 		// }),
-		// tools.helper({
+		// helper({
 		// 	name: "quotient",
 		// 	description: "Divide numbers with precision.",
 		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
 		// 	execute: async ({ numbers }) => ({ result: math.quotient(numbers) }),
 		// }),
-		tools.tool({
+		tool({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
-			parameters: schema.object({
-				features: schema.object({
+			parameters: z.object({
+				features: z.object({
 					dependent: AnyFeatureSchema,
 					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
 				}),
 			}),
-			execute: async ({ features }) => {
+			execute: ({ features }) => {
 				const independent = toArray(dataset, features.independent);
 				const dependent = toArray(dataset, features.dependent);
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
@@ -91,18 +91,18 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 				};
 			},
 		}),
-		tools.tool({
+		tool({
 			name: "count",
-			parameters: schema.object(),
+			parameters: z.object({}),
 			description: "Find the total count of records in the dataset.",
-			execute: async () => ({ result: { length: dataset.length } }),
+			execute: () => ({ result: { length: dataset.length } }),
 		}),
-		tools.tool({
+		tool({
 			name: "describe",
 			description:
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
-			parameters: schema.object({ feature: AnyFeatureSchema }),
-			execute: async ({ feature }) => {
+			parameters: z.object({ feature: AnyFeatureSchema }),
+			execute: ({ feature }) => {
 				const count = dataset.length;
 				const values = toArray(dataset, feature);
 
@@ -183,27 +183,27 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 				};
 			},
 		}),
-		tools.tool({
+		tool({
 			name: "percentile",
 			description: "Find a percentile for a given feature.",
-			parameters: schema.object({
+			parameters: z.object({
 				feature: AnyFeatureSchema,
-				percentile: schema.int(),
+				percentile: z.number(),
 			}),
-			execute: async ({ feature, percentile }) => {
+			execute: ({ feature, percentile }) => {
 				const values = toArray(dataset, feature);
 				return {
 					result: { percentile: stats.quantile(values, percentile / 100) },
 				};
 			},
 		}),
-		tools.tool({
+		tool({
 			name: "correlation",
 			description: "Calculate sample correlation between two features.",
-			parameters: schema.object({
-				features: schema.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
+			parameters: z.object({
+				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
-			execute: async ({ features }) => {
+			execute: ({ features }) => {
 				const x = toArray(dataset, features.x);
 				const y = toArray(dataset, features.y);
 
@@ -212,16 +212,15 @@ export const data = (dataset: NonNullable<Dataset>): GenerateOptions => {
 		}),
 	];
 
-	return {
-		toolHelpers,
-		input: [
-			{
-				role: "user",
-				content: `data sample:\n\n${toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)))}`,
-			},
-		],
+	const agent = new Agent({
+		name: "Data Analyst",
 		instructions:
-			"You are an expert data analyst, you determine which tool is best for task at hand. You don't need to explain, just quickly select the tool.",
+			instructions + toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))),
+		tools,
 		model: "gpt-4.1",
-	};
+		handoffDescription:
+			"This agent has access to data and can run a variety of statistical analyses.",
+	});
+
+	return agent;
 };

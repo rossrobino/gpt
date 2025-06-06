@@ -1,9 +1,12 @@
-import * as schema from "@/lib/schema";
+import * as z from "@/lib/schema";
+import * as chat from "@/server/chat";
 import * as home from "@/server/home";
 import { Layout } from "@/server/layout";
 import { BackButton } from "@/ui/back-button";
 import { html } from "client:page";
 import { App } from "ovr";
+
+process.removeAllListeners();
 
 const app = new App();
 
@@ -12,7 +15,7 @@ app.base = html;
 app.error = (c, error) => {
 	console.error(error);
 
-	if (error instanceof schema.ZodError) {
+	if (error instanceof z.ZodError) {
 		const validationError = "Validation Error";
 
 		c.head(<title>{validationError}</title>);
@@ -41,7 +44,7 @@ app.error = (c, error) => {
 	c.html(defaultMessage, 500);
 };
 
-app.add(home);
+app.add(home, chat);
 
 app.use((c, next) => {
 	c.layout(Layout);

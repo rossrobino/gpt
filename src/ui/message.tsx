@@ -1,13 +1,21 @@
 import { processor } from "@/lib/md";
-import { toCodeBlock } from "@/lib/md/util";
-import type { ChatMessage } from "@/lib/types";
+import type { AgentInputItem } from "@openai/agents-core";
 import { clsx } from "clsx";
+import type * as ai from "openai";
 
-export const Message = (props: { message: ChatMessage; index: number }) => {
-	const { index, message } = props;
+export const Message = (props: {
+	input:
+		| AgentInputItem
+		| ai.OpenAI.Responses.ResponseOutputItem
+		| ai.OpenAI.Responses.ResponseInputItem;
+	index: number;
+}) => {
+	const { index, input } = props;
 
-	if (message.type === "message") {
-		const { content, role } = message;
+	if (!input.type) input.type = "message";
+
+	if (input.type === "message") {
+		const { content, role } = input;
 		const user = role === "user";
 
 		return (
@@ -28,9 +36,17 @@ export const Message = (props: { message: ChatMessage; index: number }) => {
 										if (c.type === "input_text" || c.type === "output_text") {
 											return c.text;
 										} else if (c.type === "input_image") {
-											return c.image_url ?? "Image";
+											if ("image" in c) {
+												return c.image;
+											} else {
+												return c.image_url ?? "Image";
+											}
 										} else if (c.type === "input_file") {
-											return c.filename ?? "File";
+											if ("file" in c) {
+												return c.file;
+											} else {
+												return c.filename ?? "File";
+											}
 										}
 
 										return "";
@@ -39,13 +55,6 @@ export const Message = (props: { message: ChatMessage; index: number }) => {
 					)}
 				</div>
 			</div>
-		);
-	} else if (message.type === "function_call_output") {
-		return processor.render(
-			toCodeBlock(
-				"function",
-				JSON.stringify(JSON.parse(message.output), null, 4),
-			),
 		);
 	}
 };

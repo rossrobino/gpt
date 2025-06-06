@@ -1,17 +1,18 @@
 import * as mime from "@/lib/mime";
-import * as schema from "@/lib/schema";
+import * as z from "@/lib/schema";
 import type { Dataset } from "@/lib/types";
 
 export const parseDataset = async (
 	file: File | null,
 	existing: string | null,
 ) => {
-	let data: Dataset = null;
+	let dataset: Dataset = null;
 
-	try {
-		if (!file) {
-			if (existing) data = schema.data().parse(JSON.parse(existing));
-		} else if (mime.types.csv.includes(file.type)) {
+	if (existing) dataset = z.data().parse(JSON.parse(existing));
+
+	// file takes precedence to existing data
+	if (file) {
+		if (mime.types.csv.includes(file.type)) {
 			const [{ default: csv }, fileText] = await Promise.all([
 				import("papaparse"),
 				file.text(),
@@ -23,14 +24,12 @@ export const parseDataset = async (
 				header: true,
 			});
 
-			data = schema.data().parse(csvResult.data);
+			dataset = z.data().parse(csvResult.data);
 		} else if (file.type === mime.types.json) {
 			const fileText = await file.text();
-			data = schema.data().parse(JSON.parse(fileText));
+			dataset = z.data().parse(JSON.parse(fileText));
 		}
-	} catch (error) {
-		console.error("Unable to parse data.", error);
 	}
 
-	return data;
+	return dataset;
 };
