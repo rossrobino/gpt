@@ -1,3 +1,4 @@
+import * as echarts from "echarts";
 import * as z from "zod/v4";
 
 export * from "zod/v4";
@@ -48,3 +49,14 @@ export const formData = <S extends Record<string, z.ZodType>>(shape: S) =>
 
 		return z.object(shape).parse(data);
 	});
+
+export const functionOutput = () =>
+	z
+		.object({
+			result: z.unknown(),
+			chartOptions: z.record(z.string(), z.any()).optional(),
+		})
+		.transform(
+			(output) =>
+				output as { result: unknown; chartOptions?: echarts.EChartsOption },
+		);

@@ -1,7 +1,7 @@
-import instructions from "@/lib/ai/agents/data/instructions.md?raw";
+import katex from "@/lib/ai/agents/math/katex.md?raw";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/util";
-import type { Dataset } from "@/lib/types";
+import type { Dataset, FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
@@ -21,30 +21,6 @@ export const createDataAgent = (dataset: Dataset) => {
 	const AnyFeatureSchema = z.union(allFeatures);
 
 	const tools = [
-		// helper({
-		// 	name: "sum",
-		// 	description: "Add numbers with precision.",
-		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	execute: async ({ numbers }) => ({ result: stats.sum(numbers) }),
-		// }),
-		// helper({
-		// 	name: "difference",
-		// 	description: "Subtract numbers with precision.",
-		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	execute: async ({ numbers }) => ({ result: math.difference(numbers) }),
-		// }),
-		// helper({
-		// 	name: "product",
-		// 	description: "Multiply numbers with precision.",
-		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	execute: async ({ numbers }) => ({ result: stats.product(numbers) }),
-		// }),
-		// helper({
-		// 	name: "quotient",
-		// 	description: "Divide numbers with precision.",
-		// 	ArgsSchema: schema.object({ numbers: schema.array(schema.number()) }),
-		// 	execute: async ({ numbers }) => ({ result: math.quotient(numbers) }),
-		// }),
 		tool({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
@@ -54,7 +30,7 @@ export const createDataAgent = (dataset: Dataset) => {
 					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
 				}),
 			}),
-			execute: ({ features }) => {
+			execute: ({ features }): FunctionOutput => {
 				const independent = toArray(dataset, features.independent);
 				const dependent = toArray(dataset, features.dependent);
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
@@ -95,14 +71,14 @@ export const createDataAgent = (dataset: Dataset) => {
 			name: "count",
 			parameters: z.object({}),
 			description: "Find the total count of records in the dataset.",
-			execute: () => ({ result: { length: dataset.length } }),
+			execute: (): FunctionOutput => ({ result: { length: dataset.length } }),
 		}),
 		tool({
 			name: "describe",
 			description:
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
 			parameters: z.object({ feature: AnyFeatureSchema }),
-			execute: ({ feature }) => {
+			execute: ({ feature }): FunctionOutput => {
 				const count = dataset.length;
 				const values = toArray(dataset, feature);
 
@@ -190,7 +166,7 @@ export const createDataAgent = (dataset: Dataset) => {
 				feature: AnyFeatureSchema,
 				percentile: z.number(),
 			}),
-			execute: ({ feature, percentile }) => {
+			execute: ({ feature, percentile }): FunctionOutput => {
 				const values = toArray(dataset, feature);
 				return {
 					result: { percentile: stats.quantile(values, percentile / 100) },
@@ -203,7 +179,7 @@ export const createDataAgent = (dataset: Dataset) => {
 			parameters: z.object({
 				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
-			execute: ({ features }) => {
+			execute: ({ features }): FunctionOutput => {
 				const x = toArray(dataset, features.x);
 				const y = toArray(dataset, features.y);
 
@@ -215,7 +191,11 @@ export const createDataAgent = (dataset: Dataset) => {
 	const agent = new Agent({
 		name: "Data Analyst",
 		instructions:
-			instructions + toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))),
+			"You are an expert data analyst.\n\n" +
+			"# Data Sample\n\n" +
+			toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))) +
+			"\n\n" +
+			katex,
 		tools,
 		model: "gpt-4.1-mini",
 		handoffDescription:

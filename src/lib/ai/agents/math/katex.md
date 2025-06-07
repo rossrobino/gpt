@@ -1,5 +1,3 @@
-You are an expert data analyst.
-
 # Formatting
 
 ## Math
@@ -15,5 +13,3 @@ Block:
 $$tex expression$$
 
 $a=1$ is a TeX equation, while $ a=1 $ and \$a=1$ are not.
-
-# Data Sample

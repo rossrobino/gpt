@@ -1,4 +1,6 @@
+import { Chart } from "./chart";
 import { processor } from "@/lib/md";
+import * as z from "@/lib/schema";
 import type { AgentInputItem } from "@openai/agents-core";
 import { clsx } from "clsx";
 import type * as ai from "openai";
@@ -56,5 +58,16 @@ export const Message = (props: {
 				</div>
 			</div>
 		);
+	} else if (input.type === "function_call_output") {
+		try {
+			const parsed = JSON.parse(input.output);
+			const { data } = z.functionOutput().safeParse(parsed);
+
+			if (data?.chartOptions) {
+				return <Chart options={data.chartOptions} />;
+			}
+		} catch {
+			// JSON parse error
+		}
 	}
 };

@@ -75,7 +75,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 								const handoffs: Agent[] = [];
 
 								const dataAgent = createDataAgent(dataset);
-
 								if (dataAgent) handoffs.push(dataAgent);
 
 								triage.agent.handoffs.push(...handoffs);
@@ -104,7 +103,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 								for await (const event of result) {
 									if (event.type === "raw_model_stream_event") {
-										// these are the raw events from the model
+										// raw events from the model
 										if (event.data.type === "output_text_delta") {
 											yield event.data.delta;
 										}
@@ -113,18 +112,17 @@ export const action = new ovr.Action("/chat", async (c) => {
 									} else if (event.type === "run_item_stream_event") {
 										// Agent SDK specific events
 										if (event.item.type === "tool_call_output_item") {
-											if (event.item.agent === dataAgent) {
-												const chartOptionsSchema = z.object({
-													chartOptions: z.record(z.string(), z.any()),
-												});
+											if (event.item.rawItem.type === "function_call_result") {
+												if (import.meta.env.DEV) {
+													console.log("[function]", event.item.rawItem.name);
+												}
 
-												const { data } = chartOptionsSchema.safeParse(
-													event.item.output,
-												);
+												const { data } = z
+													.functionOutput()
+													.safeParse(event.item.output);
 
 												if (data?.chartOptions) {
-													const chart = `${await ovr.toString(Chart({ options: data.chartOptions }))}\n\n`;
-													yield chart;
+													yield `${await ovr.toString(Chart({ options: data.chartOptions }))}\n\n`;
 												}
 											}
 										}
@@ -134,13 +132,14 @@ export const action = new ovr.Action("/chat", async (c) => {
 								await result.completed;
 
 								if (!data.temporary) {
-									yield await ovr.toString(
-										<input
-											type="hidden"
-											name="id"
-											value={result.lastResponseId}
-										/>,
-									);
+									yield "\n\n" +
+										(await ovr.toString(
+											<input
+												type="hidden"
+												name="id"
+												value={result.lastResponseId}
+											/>,
+										));
 								}
 							})(),
 						)}
