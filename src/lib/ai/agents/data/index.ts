@@ -33,12 +33,15 @@ export const createDataAgent = (dataset: Dataset) => {
 			execute: ({ features }): FunctionOutput => {
 				const independent = toArray(dataset, features.independent);
 				const dependent = toArray(dataset, features.dependent);
+
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
 				const regression = stats.linearRegression(pairs);
 				const regressionLine = stats.linearRegressionLine(regression);
-				const iMin = stats.min(independent);
-				const iMax = stats.max(independent);
-				const xValues = math.linspace(iMin, iMax, 50);
+				const xValues = math.linspace(
+					stats.min(independent),
+					stats.max(independent),
+					50,
+				);
 				const regressionData = xValues.map((x) => [x, regressionLine(x)]);
 
 				return {
@@ -66,12 +69,6 @@ export const createDataAgent = (dataset: Dataset) => {
 					},
 				};
 			},
-		}),
-		tool({
-			name: "count",
-			parameters: z.object({}),
-			description: "Find the total count of records in the dataset.",
-			execute: (): FunctionOutput => ({ result: { length: dataset.length } }),
 		}),
 		tool({
 			name: "describe",
@@ -130,6 +127,7 @@ export const createDataAgent = (dataset: Dataset) => {
 								type: "boxplot",
 								data: [[min, q1, median, q3, max]],
 								boxWidth: ["20%", "30%"],
+								itemStyle: { color: "transparent" },
 							},
 							{
 								name: "68% Range (±1σ)",
@@ -168,8 +166,55 @@ export const createDataAgent = (dataset: Dataset) => {
 			}),
 			execute: ({ feature, percentile }): FunctionOutput => {
 				const values = toArray(dataset, feature);
+				const sorted = values.slice().sort((a, b) => a - b);
+
+				const p = stats.quantileSorted(sorted, percentile / 100);
+
+				const binCount = 20;
+				const breaks = stats.equalIntervalBreaks(sorted, binCount);
+				const bins = Array(binCount).fill(0);
+				sorted.forEach((v) => {
+					for (let i = 0; i < binCount; i++) {
+						const lo = breaks[i]!,
+							hi = breaks[i + 1]!;
+						if (
+							(i === binCount - 1 && v >= lo && v <= hi) ||
+							(v >= lo && v < hi)
+						) {
+							bins[i]++;
+							break;
+						}
+					}
+				});
+
+				const histogramData = breaks.slice(0, -1).map((b, i) => [b, bins[i]]);
+				const yMax = Math.max(...bins);
+
 				return {
-					result: { percentile: stats.quantile(values, percentile / 100) },
+					result: { p },
+					chartOptions: {
+						xAxis: {
+							type: "value",
+							name: feature,
+							min: "dataMin",
+							max: "dataMax",
+						},
+						yAxis: { type: "value", name: "Frequency" },
+						tooltip: { trigger: "axis" },
+						series: [
+							{ name: "Histogram", type: "bar", data: histogramData },
+							{
+								name: `${percentile}th %ile`,
+								type: "line",
+								data: [
+									[p, 0],
+									[p, yMax],
+								],
+								lineStyle: { type: "dashed", width: 3 },
+								showSymbol: false,
+							},
+						],
+					},
 				};
 			},
 		}),

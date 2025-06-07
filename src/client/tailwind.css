@@ -6,7 +6,7 @@
 @import "tailwindcss/utilities.css" layer(utilities);
 
 @plugin "@iconify/tailwind4" {
-	scale: 1.3;
+	scale: 1.25;
 }
 
 @theme {
@@ -37,8 +37,6 @@
 
 	--font-sans: var(--font-family-sans);
 	--font-mono: var(--font-family-mono);
-	--font-old-style:
-		"Iowan Old Style", "Palatino Linotype", "URW Palladio L", P052, serif;
 
 	--text-xs: var(--font-size-1);
 	--text-xs--line-height: var(--line-height-1);
@@ -75,6 +73,9 @@
 	:root {
 		--light-end: 0.01;
 		--accent: light-dark(var(--base-800), var(--base-500));
+
+		--font-family-sans: "Geist Variable", sans-serif;
+		--font-family-mono: "Geist Mono Variable", monospace;
 
 		--shiki-foreground: var(--base-100);
 		--shiki-background: var(--base-900);
@@ -113,6 +114,10 @@
 		}
 	}
 
+	a {
+		@apply font-normal;
+	}
+
 	p,
 	li {
 		text-wrap: pretty;
@@ -126,7 +131,7 @@
 @layer components {
 	.button,
 	button {
-		@apply shadow-sm transition-transform active:scale-97 active:shadow-none dark:shadow-black/75;
+		@apply shadow-xs transition-transform active:scale-97 active:shadow-none dark:shadow-black/75;
 	}
 
 	.ghost {

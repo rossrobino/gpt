@@ -4,6 +4,9 @@ import * as ovr from "ovr";
 export const Arrow = () =>
 	`<span class="icon-[lucide--send-horizontal] rotate-270"></span>`;
 
+export const ArrowBigRight = () =>
+	`<span class="icon-[lucide--arrow-big-right]"></span>`;
+
 export const X = () => `<span class="icon-[lucide--x]"></span>`;
 
 export const Web = () => `<span class="icon-[lucide--globe]"></span>`;
@@ -40,3 +43,8 @@ export const CopyComplete = () =>
 	`<span class="icon-[lucide--clipboard-check]"></span>`;
 
 export const Undo = () => `<span class="icon-[lucide--undo]"></span>`;
+
+export const HandHelping = () =>
+	`<span class="icon-[lucide--hand-helping]"></span>`;
+
+export const User = () => `<span class="icon-[lucide--user]"></span>`;

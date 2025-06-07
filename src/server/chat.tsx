@@ -8,6 +8,8 @@ import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
 import { Chart } from "@/ui/chart";
 import { ExistingData } from "@/ui/existing-data";
+import { FunctionCall } from "@/ui/function-call";
+import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
@@ -88,12 +90,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 									runner.on("agent_start", (_c, agent) =>
 										console.log("[agent_start]", agent.name),
 									);
-									runner.on("agent_end", (_c, agent) =>
-										console.log("[agent_end]", agent.name),
-									);
-									runner.on("agent_handoff", (_c, agent) =>
-										console.log("[agent_handoff]", agent.name),
-									);
 								}
 
 								const result = await runner.run(triage.agent, input, {
@@ -111,8 +107,15 @@ export const action = new ovr.Action("/chat", async (c) => {
 										// agent updated events
 									} else if (event.type === "run_item_stream_event") {
 										// Agent SDK specific events
-										if (event.item.type === "tool_call_output_item") {
+										if (event.item.type === "handoff_output_item") {
+											yield* ovr.toGenerator(
+												<Handoff agentName={event.item.targetAgent.name} />,
+											);
+										} else if (event.item.type === "tool_call_output_item") {
 											if (event.item.rawItem.type === "function_call_result") {
+												yield* ovr.toGenerator(
+													<FunctionCall name={event.item.rawItem.name} />,
+												);
 												if (import.meta.env.DEV) {
 													console.log("[function]", event.item.rawItem.name);
 												}
@@ -122,7 +125,10 @@ export const action = new ovr.Action("/chat", async (c) => {
 													.safeParse(event.item.output);
 
 												if (data?.chartOptions) {
-													yield `${await ovr.toString(Chart({ options: data.chartOptions }))}\n\n`;
+													yield* ovr.toGenerator(
+														Chart({ options: data.chartOptions }),
+													);
+													yield "\n\n";
 												}
 											}
 										}
@@ -132,14 +138,14 @@ export const action = new ovr.Action("/chat", async (c) => {
 								await result.completed;
 
 								if (!data.temporary) {
-									yield "\n\n" +
-										(await ovr.toString(
-											<input
-												type="hidden"
-												name="id"
-												value={result.lastResponseId}
-											/>,
-										));
+									yield "\n\n";
+									yield* ovr.toGenerator(
+										<input
+											type="hidden"
+											name="id"
+											value={result.lastResponseId}
+										/>,
+									);
 								}
 							})(),
 						)}

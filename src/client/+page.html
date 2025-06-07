@@ -7,7 +7,7 @@
 		<link rel="stylesheet" href="/client/tailwind.css" />
 		<script type="module" src="/client/main.ts"></script>
 	</head>
-	<body class="prose font-old-style mx-auto max-w-[80ch]">
+	<body class="prose mx-auto max-w-2xl font-sans font-light">
 		<script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js"></script>
 		<script>
 			customElements.define(
@@ -19,10 +19,12 @@
 						return JSON.parse(attr);
 					}
 					connectedCallback() {
-						echarts.init(this).setOption(this.options);
-						new ResizeObserver(() => {
+						const chart = echarts.init(this);
+						chart.setOption(this.options);
+						const observer = new ResizeObserver(() => {
 							chart.resize();
-						}).observe(this);
+						});
+						observer.observe(this);
 					}
 				},
 			);

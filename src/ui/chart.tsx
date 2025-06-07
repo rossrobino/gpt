@@ -1,19 +1,32 @@
+import * as colors from "@/lib/colors";
+import { defu } from "defu";
 import type * as echarts from "echarts";
 import * as ovr from "ovr";
 
 export const Chart = (props: { options: echarts.EChartsOption }) => {
-	// props.options.color = [
-	// 	"#2a7392",
-	// 	"#cb304a",
-	// 	"rgb(68 78 96)",
-	// 	"rgb(157 166 181)",
-	// ];
+	const options = defu(props.options, {
+		legend: { textStyle: { color: colors.base["500"] } },
+		textStyle: {
+			fontFamily: "'Geist Mono', monospace",
+			color: colors.base["500"],
+		},
+		yAxis: {
+			splitLine: { lineStyle: { color: colors.base["500"] } },
+			axisLine: { lineStyle: { color: colors.base["500"] } },
+			axisTick: { lineStyle: { color: colors.base["500"] } },
+		},
+		xAxis: {
+			splitLine: { lineStyle: { color: colors.base["500"] } },
+			axisLine: { lineStyle: { color: colors.base["500"] } },
+			axisTick: { lineStyle: { color: colors.base["500"] } },
+		},
+	} as echarts.EChartsOption);
 
 	return (
 		<p>
 			<e-chart
-				class="flex h-96 w-full flex-col items-center justify-center gap-2"
-				options={ovr.escape(JSON.stringify(props.options), true)}
+				class="block h-96 w-full"
+				options={ovr.escape(JSON.stringify(options), true)}
 			>
 				<noscript class="text-muted-foreground">
 					JavaScript is required to view charts.
