@@ -19,7 +19,7 @@ export const codeControls = async (md: MarkdownIt) => {
 		const encoded = encodeURIComponent(token.content);
 
 		return /* html */ `
-<div class="bg-base-800 rounded-none sm:rounded-md -mx-4 sm:mx-0 my-6">
+<div class="bg-base-800 rounded-none sm:rounded-md -mx-4 sm:mx-0 my-8">
 	<div class="flex justify-between items-center pt-px px-4 sm:px-2 border-b border-base-700">
 		<div class="font-mono px-2 text-base-200 text-sm">${lang}</div>
 		<div class="flex">
@@ -27,11 +27,6 @@ export const codeControls = async (md: MarkdownIt) => {
 			${Download({ fileName, encoded })}
 		</div>
 	</div>
-	${
-		lang === "html"
-			? /* html */ `<iframe class="bg-base-50 w-full my-0 border-x-2 border-base-800 border-b h-48 resize-y" srcdoc="${escaped}"></iframe>`
-			: ""
-	}
 	${code}
 </div>
 `.trim();

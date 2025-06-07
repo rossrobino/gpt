@@ -7,5 +7,25 @@
 		<link rel="stylesheet" href="/client/tailwind.css" />
 		<script type="module" src="/client/main.ts"></script>
 	</head>
-	<body class="prose font-old-style mx-auto max-w-[80ch]"></body>
+	<body class="prose font-old-style mx-auto max-w-[80ch]">
+		<script src="https://unpkg.com/echarts@5.6.0/dist/echarts.min.js"></script>
+		<script>
+			customElements.define(
+				"e-chart",
+				class extends HTMLElement {
+					get options() {
+						const attr = this.getAttribute("options");
+						if (!attr) throw new Error("Options not set.");
+						return JSON.parse(attr);
+					}
+					connectedCallback() {
+						echarts.init(this).setOption(this.options);
+						new ResizeObserver(() => {
+							chart.resize();
+						}).observe(this);
+					}
+				},
+			);
+		</script>
+	</body>
 </html>

@@ -217,9 +217,9 @@ export const createDataAgent = (dataset: Dataset) => {
 		instructions:
 			instructions + toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))),
 		tools,
-		model: "gpt-4.1",
+		model: "gpt-4.1-mini",
 		handoffDescription:
-			"This agent has access to data and can run a variety of statistical analyses.",
+			"This agent has access to the user's data and can run a variety of statistical analyses on it.",
 	});
 
 	return agent;

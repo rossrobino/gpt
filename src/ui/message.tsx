@@ -19,10 +19,10 @@ export const Message = (props: {
 		const user = role === "user";
 
 		return (
-			<div class={clsx(user && "flex justify-end pl-8")}>
+			<div class={clsx("pb-12", user && "flex justify-end pl-8")}>
 				<div
 					class={clsx(
-						"my-trim my-6",
+						"my-trim",
 						user &&
 							"bg-muted border-base-200 dark:border-base-800 w-fit rounded-md border p-3 px-4 wrap-break-word shadow-sm dark:shadow-black/75",
 					)}
