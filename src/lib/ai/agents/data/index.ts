@@ -24,8 +24,6 @@ export const agent = new Agent<{ dataset: Dataset }>({
 				toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)));
 		}
 
-		console.log("Created Instructions for data scientist");
-
 		return ins;
 	},
 	model: "gpt-4.1-mini",
