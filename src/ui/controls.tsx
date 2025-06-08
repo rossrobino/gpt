@@ -1,4 +1,5 @@
 import { BackButton } from "./back-button";
+import { Agents } from "@/ui/agents";
 import { Overview } from "@/ui/overview";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
@@ -23,6 +24,7 @@ export const Controls = (props: {
 			</div>
 			<div class="flex gap-3">
 				<Overview />
+				<Agents />
 				<Attachments />
 				<Temporary store={props.store} />
 				<Submit />

@@ -44,6 +44,8 @@ export const CopyComplete = () =>
 
 export const Undo = () => `<span class="icon-[lucide--undo]"></span>`;
 
+export const BookUser = () => `<span class="icon-[lucide--book-user]"></span>`;
+
 export const HandHelping = () =>
 	`<span class="icon-[lucide--hand-helping]"></span>`;
 

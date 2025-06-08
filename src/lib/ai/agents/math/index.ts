@@ -44,6 +44,5 @@ export const agent = new Agent({
 	instructions: instructions + katex,
 	tools,
 	model: "gpt-4.1-mini",
-	handoffDescription:
-		"This agent has access to the tools to do math more precisely.",
+	handoffDescription: "Has access to the tools to do math precisely.",
 });

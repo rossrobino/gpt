@@ -6,8 +6,6 @@ import { BackButton } from "@/ui/back-button";
 import { html } from "client:page";
 import { App } from "ovr";
 
-process.removeAllListeners();
-
 const app = new App();
 
 app.base = html;

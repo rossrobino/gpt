@@ -5,6 +5,5 @@ export const agent = new Agent({
 	name: "Software Developer",
 	model: "gpt-4.1-mini",
 	instructions,
-	handoffDescription:
-		"This agent is good at software development / programming / coding.",
+	handoffDescription: "Excellent at programming and coding.",
 });

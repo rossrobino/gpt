@@ -30,7 +30,7 @@ export const agent = new Agent<{ dataset: Dataset }>({
 	},
 	model: "gpt-4.1-mini",
 	handoffDescription:
-		"This agent has access to the user's data and can run a variety of statistical analyses on it.",
+		"Ability access to the user's dataset and run a variety of statistical analyses using it.",
 });
 
 /** Adds tools to the data agent. */
