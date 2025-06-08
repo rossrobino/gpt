@@ -16,11 +16,12 @@ export const agent = new Agent<{ dataset: Dataset }>({
 	instructions({ context: { dataset } }) {
 		let ins =
 			katex + // seems to format better when this comes first
+			+"\n" +
 			instructions;
 
 		if (dataset) {
 			ins +=
-				"# Data Sample\n\n" +
+				"\n# Data Sample" +
 				toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)));
 		}
 
