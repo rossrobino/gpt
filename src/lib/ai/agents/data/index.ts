@@ -1,3 +1,4 @@
+import instructions from "@/lib/ai/agents/data/instructions.md?raw";
 import katex from "@/lib/ai/agents/math/katex.md?raw";
 import * as math from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/util";
@@ -234,13 +235,12 @@ export const createDataAgent = (dataset: Dataset) => {
 	];
 
 	const agent = new Agent({
-		name: "Data Analyst",
+		name: "Data Scientist",
 		instructions:
-			"You are an expert data analyst.\n\n" +
+			katex + // seems to format better when this comes first
+			instructions +
 			"# Data Sample\n\n" +
-			toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))) +
-			"\n\n" +
-			katex,
+			toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))),
 		tools,
 		model: "gpt-4.1-mini",
 		handoffDescription:

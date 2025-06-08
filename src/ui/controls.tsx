@@ -1,5 +1,5 @@
 import { BackButton } from "./back-button";
-import { html } from "@/content/info.md";
+import { Overview } from "@/ui/overview";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 
@@ -22,7 +22,7 @@ export const Controls = (props: {
 				)}
 			</div>
 			<div class="flex gap-3">
-				<Info />
+				<Overview />
 				<Attachments />
 				<Temporary store={props.store} />
 				<Submit />
@@ -102,12 +102,6 @@ const Website = () => {
 		</div>
 	);
 };
-
-const Info = () => (
-	<Popover title="Overview" trigger={{ children: svg.Info }}>
-		{html}
-	</Popover>
-);
 
 const Submit = () => (
 	<button class="icon" aria-label="submit" tabindex={2}>

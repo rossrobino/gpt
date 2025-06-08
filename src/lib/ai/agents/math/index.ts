@@ -1,4 +1,5 @@
-import instructions from "@/lib/ai/agents/math/katex.md?raw";
+import instructions from "@/lib/ai/agents/math/instructions.md?raw";
+import katex from "@/lib/ai/agents/math/katex.md?raw";
 import * as math from "@/lib/math";
 import type { FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
@@ -40,7 +41,7 @@ const tools = [
 
 export const agent = new Agent({
 	name: "Mathematician",
-	instructions: "You are an expert mathematician.\n\n" + instructions,
+	instructions: instructions + katex,
 	tools,
 	model: "gpt-4.1-mini",
 	handoffDescription:

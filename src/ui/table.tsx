@@ -41,9 +41,8 @@ export const Table = <R extends Row>(props: {
 			);
 
 	return (
-		<div class="rotate-180 overflow-x-auto">
-			{/* rotating both puts the horizontal scrollbar on the top */}
-			<table class="rotate-180">
+		<div class="overflow-x-auto">
+			<table>
 				<thead class="cursor-default">
 					<tr>
 						{columns.map((column) => (
