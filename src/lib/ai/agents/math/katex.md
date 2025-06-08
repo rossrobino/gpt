@@ -6,7 +6,7 @@ Always use KaTeX for mathematical expressions.
 
 ### Example
 
-Inline - wrap in dollar signs: $E=mc^2$
+Inline - wrap in dollar signs: \$E=mc^2\$
 
 Block:
 

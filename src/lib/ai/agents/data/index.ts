@@ -1,15 +1,11 @@
 import instructions from "@/lib/ai/agents/data/instructions.md?raw";
 import katex from "@/lib/ai/agents/math/katex.md?raw";
-import * as math from "@/lib/math";
+import { linspace } from "@/lib/math";
 import { toCodeBlock } from "@/lib/md/util";
 import type { Dataset, FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
-
-const toArray = (dataset: Dataset, feature: string) => {
-	return z.array(z.number()).parse(dataset?.map((record) => record[feature]));
-};
 
 export const agent = new Agent<{ dataset: Dataset }>({
 	name: "Data Scientist",
@@ -20,9 +16,7 @@ export const agent = new Agent<{ dataset: Dataset }>({
 			instructions;
 
 		if (dataset) {
-			ins +=
-				"\n# Data Sample" +
-				toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)));
+			ins += "\n# Data Sample" + toCodeBlock("json", dataset.slice(0, 10));
 		}
 
 		return ins;
@@ -32,16 +26,25 @@ export const agent = new Agent<{ dataset: Dataset }>({
 		"Ability access to the user's dataset and run a variety of statistical analyses using it.",
 });
 
+const toArray = (dataset: Dataset, feature: string) => {
+	const { data } = z
+		.array(z.number())
+		.safeParse(dataset?.map((record) => record[feature]));
+
+	if (!data) return [];
+
+	return data;
+};
+
 /** Adds tools to the data agent. */
-export const addDataTools = (dataset: Dataset) => {
+export const setup = (dataset: Dataset) => {
 	if (!dataset) return; // don't add the tools
 
-	const allFeatures = Object.keys(dataset.at(0) ?? {}).map((feat) =>
-		z.literal(feat),
-	);
+	const [first, ...rest] = Object.keys(dataset.at(0) ?? {});
 
-	// @ts-expect-error - zod 4 enum works, can just pass the keys
-	const AnyFeatureSchema = z.union(allFeatures);
+	if (!first) return;
+
+	const AnyFeatureSchema = z.enum([first, ...rest]);
 
 	agent.tools.push(
 		tool({
@@ -60,7 +63,7 @@ export const addDataTools = (dataset: Dataset) => {
 				const pairs = independent.map((x, i) => [x, dependent[i]!]);
 				const regression = stats.linearRegression(pairs);
 				const regressionLine = stats.linearRegressionLine(regression);
-				const xValues = math.linspace(
+				const xValues = linspace(
 					stats.min(independent),
 					stats.max(independent),
 					50,
@@ -189,6 +192,7 @@ export const addDataTools = (dataset: Dataset) => {
 			}),
 			execute: ({ feature, percentile }): FunctionOutput => {
 				const values = toArray(dataset, feature);
+
 				const sorted = values.slice().sort((a, b) => a - b);
 
 				const p = stats.quantileSorted(sorted, percentile / 100);
@@ -255,4 +259,8 @@ export const addDataTools = (dataset: Dataset) => {
 			},
 		}),
 	);
+};
+
+export const cleanup = () => {
+	agent.tools = [];
 };

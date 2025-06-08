@@ -20,6 +20,8 @@ export const Message = (props: {
 		const { content, role } = input;
 		const user = role === "user";
 
+		if (!content) return;
+
 		return (
 			<div class={clsx("pb-12", user && "flex justify-end pl-8")}>
 				<div

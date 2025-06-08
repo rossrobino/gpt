@@ -1,4 +1,4 @@
-import * as dataAgent from "@/lib/ai/agents/data";
+import * as data from "@/lib/ai/agents/data";
 import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
@@ -13,11 +13,11 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { Runner, type AgentInputItem } from "@openai/agents";
+import { Runner } from "@openai/agents";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
-	const data = z
+	const form = z
 		.formData({
 			id: z
 				.string()
@@ -36,49 +36,46 @@ export const action = new ovr.Action("/chat", async (c) => {
 		})
 		.parse(await c.req.formData());
 
-	c.head(<title>{generateTitle(data.title, data.text)}</title>);
+	c.head(<title>{generateTitle(form.title, form.text)}</title>);
 
 	return (
 		<>
-			<PastMessages id={data.id} />
+			<PastMessages id={form.id} />
 
 			{async function* () {
-				const [fileInputs, dataset, renderResult] = await Promise.all([
-					fileInput(data.files),
-					parseDataset(data.dataset, data.existing),
-					render(data.website),
+				const [input, dataset, renderResult] = await Promise.all([
+					fileInput(form.files),
+					parseDataset(form.dataset, form.existing),
+					render(form.website),
 				]);
 
-				// current message input
-				const input: AgentInputItem[] = [
-					...fileInputs,
-					{ role: "user", content: data.text ?? "" },
-				];
-
 				if (renderResult.success) {
-					input.unshift({ role: "user", content: renderResult.md });
+					input.push({ role: "user", content: renderResult.md });
 				}
 
-				if (data.image) {
-					input.unshift({
+				if (form.image) {
+					input.push({
 						role: "user",
-						content: [{ type: "input_image", image: data.image }],
+						content: [{ type: "input_image", image: form.image }],
 					});
 				}
+
+				// current message input
+				input.push({ role: "user", content: form.text });
 
 				yield (
 					<>
 						{input.map((inp, i) => (
-							<Message input={inp} index={data.index + i} />
+							<Message input={inp} index={form.index + i} />
 						))}
 
 						{processor.generate(
 							(async function* () {
-								dataAgent.addDataTools(dataset);
+								data.setup(dataset);
 
 								const runner = new Runner({
 									model: "gpt-4.1-nano",
-									modelSettings: { truncation: "auto", store: !data.temporary },
+									modelSettings: { truncation: "auto", store: !form.temporary },
 								});
 
 								if (import.meta.env.DEV) {
@@ -89,7 +86,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 								const result = await runner.run(triage.agent, input, {
 									stream: true,
-									previousResponseId: data.id,
+									previousResponseId: form.id,
 									context: { dataset },
 								});
 
@@ -133,7 +130,9 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 								await result.completed;
 
-								if (!data.temporary) {
+								data.cleanup();
+
+								if (!form.temporary) {
 									yield "\n\n";
 									yield* ovr.toGenerator(
 										<input
@@ -147,8 +146,8 @@ export const action = new ovr.Action("/chat", async (c) => {
 						)}
 
 						<Input
-							index={data.index + 1}
-							store={!data.temporary}
+							index={form.index + 1}
+							store={!form.temporary}
 							undo={true}
 							clear={true}
 						/>
@@ -162,7 +161,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 				<input
 					type="hidden"
 					name="title"
-					value={await generateTitle(data.title, data.text)}
+					value={await generateTitle(form.title, form.text)}
 				></input>
 			)}
 		</>
