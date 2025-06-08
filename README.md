@@ -1,17 +1,18 @@
-# gpt
+# AI6
 
-[gpt.robino.dev](https://gpt.robino.dev)
+Artificial Intelligence, Section 6
 
-In contrast to most GPT wrappers, this project does not require any client-side JavaScript. I think it's an interesting example of how far you can get using modern browser HTML and CSS features.
+[aisix.app](https://aisix.app)
+
+## Agents
+
+AI6 uses the [OpenAI Agents SDK](https://github.com/openai/openai-agents-js) to create agents to handle a variety of tasks. The Triage agent receives each message and hands off the task to the most suitable agent available.
+
+## Accessibility
+
+AI6 strives to be accessible to any user. In contrast to most AI chat applications, this project does not require any client-side JavaScript to run and stream chat messages.
 
 - Form submissions to submit messages
 - Streams HTML in order with the chat response
 - CSS cross document view transitions for animations
 - Server-side markdown rendering with syntax highlighting
-
-## Run locally
-
-- Clone repo to local machine
-- Create a `.env` file and add your `OPENAI_API_KEY`, for browser rendering add both `CF_API_KEY` and `CF_ACCOUNT_ID`
-- `npm i`
-- `npm run dev`
