@@ -1,4 +1,4 @@
-import { createDataAgent } from "@/lib/ai/agents/data";
+import * as dataAgent from "@/lib/ai/agents/data";
 import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
@@ -13,7 +13,7 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { Agent, Runner, type AgentInputItem } from "@openai/agents";
+import { Runner, type AgentInputItem } from "@openai/agents";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
@@ -74,12 +74,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 						{processor.generate(
 							(async function* () {
-								const handoffs: Agent[] = [];
-
-								const dataAgent = createDataAgent(dataset);
-								if (dataAgent) handoffs.push(dataAgent);
-
-								triage.agent.handoffs.push(...handoffs);
+								dataAgent.addDataTools(dataset);
 
 								const runner = new Runner({
 									model: "gpt-4.1-nano",
@@ -95,6 +90,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 								const result = await runner.run(triage.agent, input, {
 									stream: true,
 									previousResponseId: data.id,
+									context: { dataset },
 								});
 
 								for await (const event of result) {

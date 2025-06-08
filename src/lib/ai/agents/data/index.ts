@@ -7,12 +7,35 @@ import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
 
-const toArray = (dataset: Record<string, unknown>[], feature: string) => {
-	return z.array(z.number()).parse(dataset.map((record) => record[feature]));
+const toArray = (dataset: Dataset, feature: string) => {
+	return z.array(z.number()).parse(dataset?.map((record) => record[feature]));
 };
 
-export const createDataAgent = (dataset: Dataset) => {
-	if (!dataset) return null;
+export const agent = new Agent<{ dataset: Dataset }>({
+	name: "Data Scientist",
+	instructions({ context: { dataset } }) {
+		let ins =
+			katex + // seems to format better when this comes first
+			instructions;
+
+		if (dataset) {
+			ins +=
+				"# Data Sample\n\n" +
+				toCodeBlock("json", JSON.stringify(dataset.slice(0, 10)));
+		}
+
+		console.log("Created Instructions for data scientist");
+
+		return ins;
+	},
+	model: "gpt-4.1-mini",
+	handoffDescription:
+		"This agent has access to the user's data and can run a variety of statistical analyses on it.",
+});
+
+/** Adds tools to the data agent. */
+export const addDataTools = (dataset: Dataset) => {
+	if (!dataset) return; // don't add the tools
 
 	const allFeatures = Object.keys(dataset.at(0) ?? {}).map((feat) =>
 		z.literal(feat),
@@ -21,7 +44,7 @@ export const createDataAgent = (dataset: Dataset) => {
 	// @ts-expect-error - zod 4 enum works, can just pass the keys
 	const AnyFeatureSchema = z.union(allFeatures);
 
-	const tools = [
+	agent.tools.push(
 		tool({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
@@ -232,20 +255,5 @@ export const createDataAgent = (dataset: Dataset) => {
 				return { result: { correlation: stats.sampleCorrelation(x, y) } };
 			},
 		}),
-	];
-
-	const agent = new Agent({
-		name: "Data Scientist",
-		instructions:
-			katex + // seems to format better when this comes first
-			instructions +
-			"# Data Sample\n\n" +
-			toCodeBlock("json", JSON.stringify(dataset.slice(0, 10))),
-		tools,
-		model: "gpt-4.1-mini",
-		handoffDescription:
-			"This agent has access to the user's data and can run a variety of statistical analyses on it.",
-	});
-
-	return agent;
+	);
 };
