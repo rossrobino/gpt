@@ -9,7 +9,7 @@ export const Controls = (props: {
 	store: boolean;
 	undo?: boolean;
 	clear?: boolean;
-	agents: Agent[];
+	agent?: Agent;
 }) => {
 	return (
 		<div
@@ -26,7 +26,7 @@ export const Controls = (props: {
 			</div>
 			<div class="flex gap-3">
 				<Overview />
-				<Agents agents={props.agents} />
+				<Agents agent={props.agent} />
 				<Attachments />
 				<Temporary store={props.store} />
 				<Submit />

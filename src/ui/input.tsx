@@ -6,13 +6,13 @@ export const Input = ({
 	store = true,
 	undo,
 	clear,
-	agents,
+	agent,
 }: {
 	index?: number;
 	store?: boolean;
 	undo?: boolean;
 	clear?: boolean;
-	agents: Agent[];
+	agent?: Agent;
 }) => (
 	<>
 		<drab-editor class="contents">
@@ -27,6 +27,6 @@ export const Input = ({
 		</drab-editor>
 		<input type="hidden" name="index" value={index.toString()} />
 
-		<Controls store={store} undo={undo} clear={clear} agents={agents} />
+		<Controls store={store} undo={undo} clear={clear} agent={agent} />
 	</>
 );

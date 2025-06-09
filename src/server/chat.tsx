@@ -12,7 +12,7 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { Agent, Runner } from "@openai/agents";
+import { Runner } from "@openai/agents";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
@@ -62,8 +62,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 				// current message input
 				input.push({ role: "user", content: form.text });
 
-				const agent = triage.create(dataset);
-
 				yield (
 					<>
 						{input.map((inp, i) => (
@@ -83,7 +81,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 									);
 								}
 
-								const result = await runner.run(agent, input, {
+								const result = await runner.run(triage.create(dataset), input, {
 									stream: true,
 									previousResponseId: form.id,
 									context: { dataset },
@@ -147,7 +145,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 							store={!form.temporary}
 							undo={true}
 							clear={true}
-							agents={agent.handoffs.filter((a) => a instanceof Agent)}
 						/>
 
 						<ExistingData dataset={dataset} />

@@ -1,18 +1,23 @@
+import * as triage from "@/lib/ai/agents/triage";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 import { Agent } from "@openai/agents";
 
-export const Agents = (props: { agents: Agent[] }) => (
-	<Popover title="Agents" trigger={{ children: svg.BookUser }}>
-		<div class="grid gap-3">
-			{props.agents?.map((agent, i) => {
-				if (agent instanceof Agent) {
-					return <AgentInfo agent={agent} index={i} />;
-				}
-			})}
-		</div>
-	</Popover>
-);
+export const Agents = (props: { agent?: Agent }) => {
+	if (!props.agent) props.agent = triage.create([{ home: 0 }]); // to populate agent info
+
+	return (
+		<Popover title="Agents" trigger={{ children: svg.BookUser }}>
+			<div class="grid gap-3">
+				{props.agent.handoffs.map((agent, i) => {
+					if (agent instanceof Agent) {
+						return <AgentInfo agent={agent} index={i} />;
+					}
+				})}
+			</div>
+		</Popover>
+	);
+};
 
 const AgentInfo = ({ agent, index }: { agent: Agent; index: number }) => {
 	return (
