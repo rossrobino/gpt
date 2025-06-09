@@ -71,5 +71,6 @@ export const Message = (props: {
 		} catch {
 			// JSON parse error
 		}
+	} else if (input.type === "web_search_call") {
 	}
 };

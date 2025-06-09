@@ -12,7 +12,9 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
+import { WebSearchCall } from "@/ui/web-search-call";
 import { Runner } from "@openai/agents";
+import type OpenAI from "openai";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
@@ -86,16 +88,28 @@ export const action = new ovr.Action("/chat", async (c) => {
 										// raw events from the model
 										if (event.data.type === "output_text_delta") {
 											yield event.data.delta;
+										} else if (event.data.type === "model") {
+											const modelEvent: OpenAI.Responses.ResponseStreamEvent =
+												event.data.event;
+
+											if (
+												modelEvent.type ===
+												"response.web_search_call.in_progress"
+											) {
+												yield* ovr.toGenerator(<WebSearchCall />);
+											}
 										}
 									} else if (event.type == "agent_updated_stream_event") {
 										// agent updated events
-									} else if (event.type === "run_item_stream_event") {
+									} else {
+										// event.type === "run_item_stream_event"
 										// Agent SDK specific events
 										if (event.item.type === "handoff_output_item") {
 											yield* ovr.toGenerator(
 												<Handoff agentName={event.item.targetAgent.name} />,
 											);
 										} else if (event.item.type === "tool_call_output_item") {
+											console.log(event.item.rawItem);
 											if (event.item.rawItem.type === "function_call_result") {
 												yield* ovr.toGenerator(
 													<FunctionCall name={event.item.rawItem.name} />,
