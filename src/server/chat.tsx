@@ -75,12 +75,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 									modelSettings: { truncation: "auto", store: !form.temporary },
 								});
 
-								if (import.meta.env.DEV) {
-									runner.on("agent_start", (_c, agent) =>
-										console.log("[agent_start]", agent.name),
-									);
-								}
-
 								const result = await runner.run(triage.create(dataset), input, {
 									stream: true,
 									previousResponseId: form.id,
@@ -106,9 +100,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 												yield* ovr.toGenerator(
 													<FunctionCall name={event.item.rawItem.name} />,
 												);
-												if (import.meta.env.DEV) {
-													console.log("[function]", event.item.rawItem.name);
-												}
 
 												const { data } = z
 													.functionOutput()
