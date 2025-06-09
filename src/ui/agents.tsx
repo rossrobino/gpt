@@ -22,12 +22,7 @@ export const Agents = (props: { agent?: Agent }) => {
 const AgentInfo = ({ agent, index }: { agent: Agent; index: number }) => {
 	return (
 		<div class="border-muted rounded-md border p-3">
-			<div class="flex items-center gap-3 font-mono">
-				<div class="text-xl">00{index}</div>
-				<h2 class="text-base-500 my-0 text-xl font-normal lowercase">
-					{agent.name}
-				</h2>
-			</div>
+			<AgentNumberAndName agent={agent} index={index} />
 			<p class="text-muted-foreground mt-1 mb-0">{agent.handoffDescription}</p>
 			{Boolean(agent.tools.length) && (
 				<div class="mt-3 flex flex-wrap gap-2">
@@ -36,6 +31,23 @@ const AgentInfo = ({ agent, index }: { agent: Agent; index: number }) => {
 					})}
 				</div>
 			)}
+		</div>
+	);
+};
+
+export const AgentNumberAndName = ({
+	agent,
+	index,
+}: {
+	agent: Agent;
+	index: number;
+}) => {
+	return (
+		<div class="flex cursor-default items-center gap-3 font-mono">
+			<div class="text-xl">00{index}</div>
+			<h2 class="text-base-500 my-0 text-xl font-normal lowercase">
+				{agent.name}
+			</h2>
 		</div>
 	);
 };

@@ -7,9 +7,9 @@ import { processor } from "@/lib/md";
 import { toCodeBlock } from "@/lib/md/util";
 import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
+import { AgentNumberAndName } from "@/ui/agents";
 import { Chart } from "@/ui/chart";
 import { ExistingData } from "@/ui/existing-data";
-import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
@@ -78,7 +78,9 @@ export const action = new ovr.Action("/chat", async (c) => {
 									modelSettings: { truncation: "auto", store: !form.temporary },
 								});
 
-								const result = await runner.run(triage.create(dataset), input, {
+								const triageAgent = triage.create(dataset);
+
+								const result = await runner.run(triageAgent, input, {
 									stream: true,
 									previousResponseId: form.id,
 									context: { dataset },
@@ -107,8 +109,14 @@ export const action = new ovr.Action("/chat", async (c) => {
 										// event.type === "run_item_stream_event"
 										// Agent SDK specific events
 										if (event.item.type === "handoff_output_item") {
+											const target = event.item.targetAgent;
+											const index = triageAgent.handoffs.findIndex(
+												(agent) => agent === target,
+											);
 											yield* ovr.toGenerator(
-												<Handoff agentName={event.item.targetAgent.name} />,
+												<div class="my-6">
+													<AgentNumberAndName agent={target} index={index} />
+												</div>,
 											);
 										} else if (event.item.type === "tool_call_item") {
 											if (event.item.rawItem.type === "function_call") {
