@@ -2,7 +2,9 @@ import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
 import { generateTitle } from "@/lib/generate-title";
+import { jsFormat } from "@/lib/js-format";
 import { processor } from "@/lib/md";
+import { toCodeBlock } from "@/lib/md/util";
 import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
 import { Chart } from "@/ui/chart";
@@ -11,7 +13,6 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { ToolCall } from "@/ui/tool-call";
 import { WebSearchCall } from "@/ui/web-search-call";
 import { Runner } from "@openai/agents";
 import type OpenAI from "openai";
@@ -110,20 +111,40 @@ export const action = new ovr.Action("/chat", async (c) => {
 												<Handoff agentName={event.item.targetAgent.name} />,
 											);
 										} else if (event.item.type === "tool_call_item") {
-											yield* ovr.toGenerator(
-												<ToolCall item={event.item.rawItem} />,
-											);
+											if (event.item.rawItem.type === "function_call") {
+												try {
+													const args = JSON.parse(event.item.rawItem.arguments);
+
+													yield toCodeBlock(
+														"fn-input",
+														`${event.item.rawItem.name}(${jsFormat(args)})`,
+													);
+												} catch (error) {
+													console.error(error);
+												}
+											}
 										} else if (event.item.type === "tool_call_output_item") {
 											if (event.item.rawItem.type === "function_call_result") {
 												const { data } = z
 													.functionOutput()
 													.safeParse(event.item.output);
 
-												if (data?.chartOptions) {
-													yield* ovr.toGenerator(
-														Chart({ options: data.chartOptions }),
-													);
-													yield "\n\n";
+												if (data) {
+													if (data.result) {
+														yield toCodeBlock(
+															"fn-output",
+															event.item.rawItem.name +
+																" = " +
+																JSON.stringify(data.result),
+														);
+													}
+
+													if (data.chartOptions) {
+														yield* ovr.toGenerator(
+															Chart({ options: data.chartOptions }),
+														);
+														yield "\n\n";
+													}
 												}
 											}
 										}

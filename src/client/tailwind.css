@@ -73,6 +73,7 @@
 	:root {
 		--light-end: 0.01;
 		--accent: light-dark(var(--base-800), var(--base-500));
+		--border-radius: 1px;
 
 		--font-family-sans: "Geist Variable", sans-serif;
 		--font-family-mono: "Geist Mono Variable", monospace;

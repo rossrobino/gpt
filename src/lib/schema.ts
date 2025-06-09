@@ -56,6 +56,7 @@ export const functionOutput = () =>
 			result: z.unknown(),
 			chartOptions: z.record(z.string(), z.any()).optional(),
 		})
+		.loose()
 		.transform(
 			(output) =>
 				output as { result: unknown; chartOptions?: echarts.EChartsOption },

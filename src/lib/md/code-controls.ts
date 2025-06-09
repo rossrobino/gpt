@@ -15,8 +15,8 @@ export const codeControls = async (md: MarkdownIt) => {
 		const code = defaultFence(tokens, i, opts, env, self);
 		const lang = token.info?.trim().split(/\s+/)[0] ?? "";
 
-		if (lang === "fn") {
-			return /* html */ `<div class="my-8">${code}</div>`;
+		if (lang.startsWith("fn")) {
+			return /* html */ `<div class="my-4 *:border *:border-base-700">${code}</div>`;
 		}
 
 		const fileName = `code.${lang ? lang : "txt"}`;
