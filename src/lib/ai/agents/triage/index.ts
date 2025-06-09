@@ -11,7 +11,7 @@ export const create = (dataset: Dataset) =>
 	Agent.create({
 		name: "Triage",
 		instructions: promptWithHandoffInstructions(instructions),
-		model: "gpt-4.1-mini",
+		model: "gpt-4.1-nano",
 		handoffs: [
 			assistant.create(),
 			data.create(dataset),
