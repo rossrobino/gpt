@@ -4,12 +4,24 @@
 
 Always use KaTeX for mathematical expressions.
 
-### Example
+Wrap expression on dollar signs, not brackets.
 
-Inline - wrap in dollar signs: \$E=mc^2\$
+### Inline
 
-Block:
+Wrap in SINGLE dollar signs.
 
-$$tex expression$$
+#### Example 1
 
-$a=1$ is a TeX equation, while $ a=1 $ and \$a=1$ are not.
+Energy is calculated by $E=mc^2$
+
+#### Example 2
+
+Circumference: $( A = \pi r^2 )$
+
+### Block
+
+Wrap in DOUBLE dollar signs with NEW LINES.
+
+#### Example 1
+
+$$E=mc^2$$

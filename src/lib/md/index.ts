@@ -41,13 +41,7 @@ export const processor = new Processor({
 			langCsharp,
 			langPhp,
 		],
-		langAlias: {
-			js: "tsx",
-			ts: "tsx",
-			jsx: "tsx",
-			mdx: "md",
-			function: "json",
-		},
+		langAlias: { js: "tsx", ts: "tsx", jsx: "tsx", mdx: "md", fn: "tsx" },
 	},
 })
 	.use(katex)

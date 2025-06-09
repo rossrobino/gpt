@@ -7,11 +7,11 @@ import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
 import { Chart } from "@/ui/chart";
 import { ExistingData } from "@/ui/existing-data";
-import { FunctionCall } from "@/ui/function-call";
 import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
+import { ToolCall } from "@/ui/tool-call";
 import { WebSearchCall } from "@/ui/web-search-call";
 import { Runner } from "@openai/agents";
 import type OpenAI from "openai";
@@ -81,6 +81,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 									stream: true,
 									previousResponseId: form.id,
 									context: { dataset },
+									maxTurns: 10,
 								});
 
 								for await (const event of result) {
@@ -108,13 +109,12 @@ export const action = new ovr.Action("/chat", async (c) => {
 											yield* ovr.toGenerator(
 												<Handoff agentName={event.item.targetAgent.name} />,
 											);
+										} else if (event.item.type === "tool_call_item") {
+											yield* ovr.toGenerator(
+												<ToolCall item={event.item.rawItem} />,
+											);
 										} else if (event.item.type === "tool_call_output_item") {
-											console.log(event.item.rawItem);
 											if (event.item.rawItem.type === "function_call_result") {
-												yield* ovr.toGenerator(
-													<FunctionCall name={event.item.rawItem.name} />,
-												);
-
 												const { data } = z
 													.functionOutput()
 													.safeParse(event.item.output);
