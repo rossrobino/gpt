@@ -130,15 +130,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 													.safeParse(event.item.output);
 
 												if (data) {
-													if (data.result) {
-														yield toCodeBlock(
-															"fn-output",
-															event.item.rawItem.name +
-																" = " +
-																JSON.stringify(data.result),
-														);
-													}
-
 													if (data.chartOptions) {
 														yield* ovr.toGenerator(
 															Chart({ options: data.chartOptions }),
@@ -154,7 +145,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 								await result.completed;
 
 								if (!form.temporary) {
-									yield "\n\n";
+									yield "\n\n\n\n";
 									yield* ovr.toGenerator(
 										<input
 											type="hidden"

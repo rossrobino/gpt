@@ -16,10 +16,4 @@ product({ numbers: [2, 3.1416, 1.784]})
 
 $$C = 11.21$$
 
-FINAL RESULT
-
-The circumference $(C)$ of a circle with an area of 10 is:
-
-$$C = 11.21$$
-
-You MUST iterate and keep going until the problem is solved entirely, the result of a function is NOT the final result.
+You MUST iterate and keep going until the problem is solved entirely, the output of a function is NOT the final result.

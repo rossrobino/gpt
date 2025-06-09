@@ -6,6 +6,8 @@ import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
 
+const toKatexBlock = (str: string) => `\n\n$$${str}$$\n\n`;
+
 export const create = () =>
 	new Agent({
 		name: "Mathematician",
@@ -17,24 +19,36 @@ export const create = () =>
 				name: "sum",
 				description: "Add numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
-				execute: ({ numbers }): FunctionOutput => ({
-					result: stats.sum(numbers),
-				}),
+				execute: ({ numbers }): FunctionOutput => {
+					const result = stats.sum(numbers);
+					return {
+						result,
+						summary: toKatexBlock(`${numbers.join(" + ")} = ${result}`),
+					};
+				},
 			}),
 			tool({
 				name: "difference",
 				description: "Subtract numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
-				execute: ({ numbers }): FunctionOutput => ({
-					result: math.difference(numbers),
-				}),
+				execute: ({ numbers }): FunctionOutput => {
+					const result = math.difference(numbers);
+					return {
+						result,
+						summary: toKatexBlock(`${numbers.join(" - ")} = ${result}`),
+					};
+				},
 			}),
 			tool({
 				name: "product",
 				description: "Multiply numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
-					return { result: stats.product(numbers) };
+					const result = stats.product(numbers);
+					return {
+						result,
+						summary: toKatexBlock(`${numbers.join(" x ")} = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -42,7 +56,11 @@ export const create = () =>
 				description: "Divide numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
-					return { result: math.quotient(numbers) };
+					const result = math.quotient(numbers);
+					return {
+						result,
+						summary: toKatexBlock(`${numbers.join(" / ")} = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -50,8 +68,11 @@ export const create = () =>
 				description: "Find the square root of a number.",
 				parameters: z.object({ number: z.number() }),
 				execute: ({ number }): FunctionOutput => {
-					Math.pow;
-					return { result: Math.sqrt(number) };
+					const result = Math.sqrt(number);
+					return {
+						result,
+						summary: toKatexBlock(`\\sqrt{${number}} = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -59,7 +80,11 @@ export const create = () =>
 				description: "Find the cube root of a number.",
 				parameters: z.object({ number: z.number() }),
 				execute: ({ number }): FunctionOutput => {
-					return { result: Math.cbrt(number) };
+					const result = Math.cbrt(number);
+					return {
+						result,
+						summary: toKatexBlock(`\\sqrt[3]{${number}} = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -68,7 +93,11 @@ export const create = () =>
 					"Returns the number taken to a specified power. For example, to square a number, pass in a `power` of 2.",
 				parameters: z.object({ number: z.number(), power: z.number() }),
 				execute: ({ number, power }): FunctionOutput => {
-					return { result: Math.pow(number, power) };
+					const result = Math.pow(number, power);
+					return {
+						result,
+						summary: toKatexBlock(`${number}^${power} = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -76,7 +105,11 @@ export const create = () =>
 				description: "Find the sine of a number.",
 				parameters: z.object({ number: z.number() }),
 				execute: ({ number }): FunctionOutput => {
-					return { result: Math.sin(number) };
+					const result = Math.sin(number);
+					return {
+						result,
+						summary: toKatexBlock(`\\sin(${number}) = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -84,7 +117,11 @@ export const create = () =>
 				description: "Find the cosine of a number.",
 				parameters: z.object({ number: z.number() }),
 				execute: ({ number }): FunctionOutput => {
-					return { result: Math.cos(number) };
+					const result = Math.cos(number);
+					return {
+						result,
+						summary: toKatexBlock(`\\cos(${number}) = ${result}`),
+					};
 				},
 			}),
 			tool({
@@ -92,7 +129,11 @@ export const create = () =>
 				description: "Find the tangent of a number.",
 				parameters: z.object({ number: z.number() }),
 				execute: ({ number }): FunctionOutput => {
-					return { result: Math.tan(number) };
+					const result = Math.tan(number);
+					return {
+						result,
+						summary: toKatexBlock(`\\tan(${number}) = ${result}`),
+					};
 				},
 			}),
 		],
