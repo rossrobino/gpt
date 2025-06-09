@@ -3,11 +3,13 @@ import { Agents } from "@/ui/agents";
 import { Overview } from "@/ui/overview";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
+import type { Agent } from "@openai/agents";
 
 export const Controls = (props: {
 	store: boolean;
 	undo?: boolean;
 	clear?: boolean;
+	agents: Agent[];
 }) => {
 	return (
 		<div
@@ -24,7 +26,7 @@ export const Controls = (props: {
 			</div>
 			<div class="flex gap-3">
 				<Overview />
-				<Agents />
+				<Agents agents={props.agents} />
 				<Attachments />
 				<Temporary store={props.store} />
 				<Submit />
@@ -39,7 +41,7 @@ const Attachments = () => {
 			title="Attachments"
 			trigger={{ children: svg.Paperclip, class: "icon secondary" }}
 		>
-			<div className="flex flex-col gap-3 pt-4">
+			<div className="flex flex-col gap-3">
 				<Dataset />
 				<Files />
 				<Directory />

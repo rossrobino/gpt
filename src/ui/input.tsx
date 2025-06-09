@@ -1,15 +1,18 @@
 import { Controls } from "@/ui/controls";
+import type { Agent } from "@openai/agents";
 
 export const Input = ({
 	index = 0,
 	store = true,
 	undo,
 	clear,
+	agents,
 }: {
 	index?: number;
 	store?: boolean;
 	undo?: boolean;
 	clear?: boolean;
+	agents: Agent[];
 }) => (
 	<>
 		<drab-editor class="contents">
@@ -24,6 +27,6 @@ export const Input = ({
 		</drab-editor>
 		<input type="hidden" name="index" value={index.toString()} />
 
-		<Controls store={store} undo={undo} clear={clear} />
+		<Controls store={store} undo={undo} clear={clear} agents={agents} />
 	</>
 );

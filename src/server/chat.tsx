@@ -1,4 +1,3 @@
-import * as data from "@/lib/ai/agents/data";
 import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
@@ -13,7 +12,7 @@ import { Handoff } from "@/ui/handoff";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
 import { PastMessages } from "@/ui/past-messages";
-import { Runner } from "@openai/agents";
+import { Agent, Runner } from "@openai/agents";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
@@ -63,6 +62,8 @@ export const action = new ovr.Action("/chat", async (c) => {
 				// current message input
 				input.push({ role: "user", content: form.text });
 
+				const agent = triage.create(dataset);
+
 				yield (
 					<>
 						{input.map((inp, i) => (
@@ -71,8 +72,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 						{processor.generate(
 							(async function* () {
-								data.setup(dataset);
-
 								const runner = new Runner({
 									model: "gpt-4.1-nano",
 									modelSettings: { truncation: "auto", store: !form.temporary },
@@ -84,7 +83,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 									);
 								}
 
-								const result = await runner.run(triage.agent, input, {
+								const result = await runner.run(agent, input, {
 									stream: true,
 									previousResponseId: form.id,
 									context: { dataset },
@@ -130,8 +129,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 								await result.completed;
 
-								data.cleanup();
-
 								if (!form.temporary) {
 									yield "\n\n";
 									yield* ovr.toGenerator(
@@ -150,6 +147,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 							store={!form.temporary}
 							undo={true}
 							clear={true}
+							agents={agent.handoffs.filter((a) => a instanceof Agent)}
 						/>
 
 						<ExistingData dataset={dataset} />

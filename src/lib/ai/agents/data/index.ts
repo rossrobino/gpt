@@ -7,25 +7,6 @@ import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
 
-export const agent = new Agent<{ dataset: Dataset }>({
-	name: "Data Scientist",
-	instructions({ context: { dataset } }) {
-		let ins =
-			katex + // seems to format better when this comes first
-			+"\n" +
-			instructions;
-
-		if (dataset) {
-			ins += "\n# Data Sample" + toCodeBlock("json", dataset.slice(0, 10));
-		}
-
-		return ins;
-	},
-	model: "gpt-4.1-mini",
-	handoffDescription:
-		"Ability access to the user's dataset and run a variety of statistical analyses using it.",
-});
-
 const toArray = (dataset: Dataset, feature: string) => {
 	const { data } = z
 		.array(z.number())
@@ -37,230 +18,250 @@ const toArray = (dataset: Dataset, feature: string) => {
 };
 
 /** Adds tools to the data agent. */
-export const setup = (dataset: Dataset) => {
-	if (!dataset) return; // don't add the tools
+export const create = (dataset: Dataset) => {
+	const agent = new Agent({
+		name: "Data Scientist",
+		instructions() {
+			let ins =
+				katex + // seems to format better when this comes first
+				+"\n" +
+				instructions;
 
-	const [first, ...rest] = Object.keys(dataset.at(0) ?? {});
+			if (dataset) {
+				ins += "\n# Data Sample" + toCodeBlock("json", dataset.slice(0, 10));
+			}
 
-	if (!first) return;
+			return ins;
+		},
+		model: "gpt-4.1-mini",
+		handoffDescription:
+			"Ability access to the user's dataset and run a variety of statistical analyses using it.",
+	});
 
-	const AnyFeatureSchema = z.enum([first, ...rest]);
+	if (dataset) {
+		const [first, ...rest] = Object.keys(dataset.at(0) ?? {});
 
-	agent.tools.push(
-		tool({
-			name: "linear_regression",
-			description: "Run a linear regression on data with relevant features.",
-			parameters: z.object({
-				features: z.object({
-					dependent: AnyFeatureSchema,
-					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
+		if (first) {
+			const AnyFeatureSchema = z.enum([first, ...rest]);
+
+			agent.tools.push(
+				tool({
+					name: "linear_regression",
+					description:
+						"Run a linear regression on data with relevant features.",
+					parameters: z.object({
+						features: z.object({
+							dependent: AnyFeatureSchema,
+							independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
+						}),
+					}),
+					execute: ({ features }): FunctionOutput => {
+						const independent = toArray(dataset, features.independent);
+						const dependent = toArray(dataset, features.dependent);
+
+						const pairs = independent.map((x, i) => [x, dependent[i]!]);
+						const regression = stats.linearRegression(pairs);
+						const regressionLine = stats.linearRegressionLine(regression);
+						const xValues = linspace(
+							stats.min(independent),
+							stats.max(independent),
+							50,
+						);
+						const regressionData = xValues.map((x) => [x, regressionLine(x)]);
+
+						return {
+							result: regression,
+							chartOptions: {
+								xAxis: {
+									type: "value",
+									name: features.independent,
+									axisTick: { show: false },
+									min: "dataMin",
+									max: "dataMax",
+								},
+								yAxis: {
+									type: "value",
+									name: features.dependent,
+									axisTick: { show: false },
+									min: "dataMin",
+									max: "dataMax",
+								},
+								tooltip: { trigger: "axis" },
+								series: [
+									{ symbolSize: 10, data: pairs, type: "scatter" },
+									{ type: "line", data: regressionData, showSymbol: false },
+								],
+							},
+						};
+					},
 				}),
-			}),
-			execute: ({ features }): FunctionOutput => {
-				const independent = toArray(dataset, features.independent);
-				const dependent = toArray(dataset, features.dependent);
+				tool({
+					name: "describe",
+					description:
+						"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
+					parameters: z.object({ feature: AnyFeatureSchema }),
+					execute: ({ feature }): FunctionOutput => {
+						const count = dataset.length;
+						const values = toArray(dataset, feature);
 
-				const pairs = independent.map((x, i) => [x, dependent[i]!]);
-				const regression = stats.linearRegression(pairs);
-				const regressionLine = stats.linearRegressionLine(regression);
-				const xValues = linspace(
-					stats.min(independent),
-					stats.max(independent),
-					50,
-				);
-				const regressionData = xValues.map((x) => [x, regressionLine(x)]);
+						const mean = stats.mean(values);
+						const median = stats.median(values);
+						const mode = stats.mode(values);
+						const standardDeviation = stats.standardDeviation(values);
+						const total = stats.sum(toArray(dataset, feature));
+						const uniqueCount = new Set(values).size;
 
-				return {
-					result: regression,
-					chartOptions: {
-						xAxis: {
-							type: "value",
-							name: features.independent,
-							axisTick: { show: false },
-							min: "dataMin",
-							max: "dataMax",
-						},
-						yAxis: {
-							type: "value",
-							name: features.dependent,
-							axisTick: { show: false },
-							min: "dataMin",
-							max: "dataMax",
-						},
-						tooltip: { trigger: "axis" },
-						series: [
-							{ symbolSize: 10, data: pairs, type: "scatter" },
-							{ type: "line", data: regressionData, showSymbol: false },
-						],
-					},
-				};
-			},
-		}),
-		tool({
-			name: "describe",
-			description:
-				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
-			parameters: z.object({ feature: AnyFeatureSchema }),
-			execute: ({ feature }): FunctionOutput => {
-				const count = dataset.length;
-				const values = toArray(dataset, feature);
+						const q1 = stats.quantile(values, 0.25);
+						const q3 = stats.quantile(values, 0.75);
+						const min = stats.min(values);
+						const max = stats.max(values);
 
-				const mean = stats.mean(values);
-				const median = stats.median(values);
-				const mode = stats.mode(values);
-				const standardDeviation = stats.standardDeviation(values);
-				const total = stats.sum(toArray(dataset, feature));
-				const uniqueCount = new Set(values).size;
-
-				const q1 = stats.quantile(values, 0.25);
-				const q3 = stats.quantile(values, 0.75);
-				const min = stats.min(values);
-				const max = stats.max(values);
-
-				return {
-					result: {
-						count,
-						mean,
-						median,
-						mode,
-						min,
-						max,
-						q1,
-						q3,
-						standardDeviation,
-						total,
-						uniqueCount,
-					},
-					chartOptions: {
-						xAxis: {
-							type: "value",
-							axisTick: { show: false },
-							splitLine: { show: true },
-							min: "dataMin",
-							max: "dataMax",
-						},
-						yAxis: {
-							type: "category",
-							data: [feature],
-							axisTick: { show: false },
-							axisLine: { show: false },
-						},
-						tooltip: {},
-						legend: {},
-						series: [
-							{
-								name: "Distribution",
-								type: "boxplot",
-								data: [[min, q1, median, q3, max]],
-								boxWidth: ["20%", "30%"],
-								itemStyle: { color: "transparent" },
+						return {
+							result: {
+								count,
+								mean,
+								median,
+								mode,
+								min,
+								max,
+								q1,
+								q3,
+								standardDeviation,
+								total,
+								uniqueCount,
 							},
-							{
-								name: "68% Range (±1σ)",
-								type: "line",
-								data: [
-									[mean - standardDeviation, -0.1],
-									[mean + standardDeviation, -0.1],
+							chartOptions: {
+								xAxis: {
+									type: "value",
+									axisTick: { show: false },
+									splitLine: { show: true },
+									min: "dataMin",
+									max: "dataMax",
+								},
+								yAxis: {
+									type: "category",
+									data: [feature],
+									axisTick: { show: false },
+									axisLine: { show: false },
+								},
+								tooltip: {},
+								legend: {},
+								series: [
+									{
+										name: "Distribution",
+										type: "boxplot",
+										data: [[min, q1, median, q3, max]],
+										boxWidth: ["20%", "30%"],
+										itemStyle: { color: "transparent" },
+									},
+									{
+										name: "68% Range (±1σ)",
+										type: "line",
+										data: [
+											[mean - standardDeviation, -0.1],
+											[mean + standardDeviation, -0.1],
+										],
+										lineStyle: { type: "dashed", opacity: 0.7 },
+									},
+									{
+										name: "Mode",
+										type: "scatter",
+										data: [[mode, 0]],
+										symbolSize: 12,
+										symbol: "diamond",
+									},
+									{
+										name: "Mean",
+										type: "scatter",
+										data: [[mean, 0]],
+										symbolSize: 14,
+										symbol: "circle",
+									},
 								],
-								lineStyle: { type: "dashed", opacity: 0.7 },
 							},
-							{
-								name: "Mode",
-								type: "scatter",
-								data: [[mode, 0]],
-								symbolSize: 12,
-								symbol: "diamond",
-							},
-							{
-								name: "Mean",
-								type: "scatter",
-								data: [[mean, 0]],
-								symbolSize: 14,
-								symbol: "circle",
-							},
-						],
+						};
 					},
-				};
-			},
-		}),
-		tool({
-			name: "percentile",
-			description: "Find a percentile for a given feature.",
-			parameters: z.object({
-				feature: AnyFeatureSchema,
-				percentile: z.number(),
-			}),
-			execute: ({ feature, percentile }): FunctionOutput => {
-				const values = toArray(dataset, feature);
+				}),
+				tool({
+					name: "percentile",
+					description: "Find a percentile for a given feature.",
+					parameters: z.object({
+						feature: AnyFeatureSchema,
+						percentile: z.number(),
+					}),
+					execute: ({ feature, percentile }): FunctionOutput => {
+						const values = toArray(dataset, feature);
 
-				const sorted = values.slice().sort((a, b) => a - b);
+						const sorted = values.slice().sort((a, b) => a - b);
 
-				const p = stats.quantileSorted(sorted, percentile / 100);
+						const p = stats.quantileSorted(sorted, percentile / 100);
 
-				const binCount = 20;
-				const breaks = stats.equalIntervalBreaks(sorted, binCount);
-				const bins = Array(binCount).fill(0);
-				sorted.forEach((v) => {
-					for (let i = 0; i < binCount; i++) {
-						const lo = breaks[i]!,
-							hi = breaks[i + 1]!;
-						if (
-							(i === binCount - 1 && v >= lo && v <= hi) ||
-							(v >= lo && v < hi)
-						) {
-							bins[i]++;
-							break;
-						}
-					}
-				});
+						const binCount = 20;
+						const breaks = stats.equalIntervalBreaks(sorted, binCount);
+						const bins = Array(binCount).fill(0);
+						sorted.forEach((v) => {
+							for (let i = 0; i < binCount; i++) {
+								const lo = breaks[i]!,
+									hi = breaks[i + 1]!;
+								if (
+									(i === binCount - 1 && v >= lo && v <= hi) ||
+									(v >= lo && v < hi)
+								) {
+									bins[i]++;
+									break;
+								}
+							}
+						});
 
-				const histogramData = breaks.slice(0, -1).map((b, i) => [b, bins[i]]);
-				const yMax = Math.max(...bins);
+						const histogramData = breaks
+							.slice(0, -1)
+							.map((b, i) => [b, bins[i]]);
+						const yMax = Math.max(...bins);
 
-				return {
-					result: { p },
-					chartOptions: {
-						xAxis: {
-							type: "value",
-							name: feature,
-							min: "dataMin",
-							max: "dataMax",
-						},
-						yAxis: { type: "value", name: "Frequency" },
-						tooltip: { trigger: "axis" },
-						series: [
-							{ name: "Histogram", type: "bar", data: histogramData },
-							{
-								name: `${percentile}th %ile`,
-								type: "line",
-								data: [
-									[p, 0],
-									[p, yMax],
+						return {
+							result: { p },
+							chartOptions: {
+								xAxis: {
+									type: "value",
+									name: feature,
+									min: "dataMin",
+									max: "dataMax",
+								},
+								yAxis: { type: "value", name: "Frequency" },
+								tooltip: { trigger: "axis" },
+								series: [
+									{ name: "Histogram", type: "bar", data: histogramData },
+									{
+										name: `${percentile}th %ile`,
+										type: "line",
+										data: [
+											[p, 0],
+											[p, yMax],
+										],
+										lineStyle: { type: "dashed", width: 3 },
+										showSymbol: false,
+									},
 								],
-								lineStyle: { type: "dashed", width: 3 },
-								showSymbol: false,
 							},
-						],
+						};
 					},
-				};
-			},
-		}),
-		tool({
-			name: "correlation",
-			description: "Calculate sample correlation between two features.",
-			parameters: z.object({
-				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
-			}),
-			execute: ({ features }): FunctionOutput => {
-				const x = toArray(dataset, features.x);
-				const y = toArray(dataset, features.y);
+				}),
+				tool({
+					name: "correlation",
+					description: "Calculate sample correlation between two features.",
+					parameters: z.object({
+						features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
+					}),
+					execute: ({ features }): FunctionOutput => {
+						const x = toArray(dataset, features.x);
+						const y = toArray(dataset, features.y);
 
-				return { result: { correlation: stats.sampleCorrelation(x, y) } };
-			},
-		}),
-	);
-};
+						return { result: { correlation: stats.sampleCorrelation(x, y) } };
+					},
+				}),
+			);
+		}
+	}
 
-export const cleanup = () => {
-	agent.tools = [];
+	return agent;
 };
