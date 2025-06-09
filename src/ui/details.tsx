@@ -1,9 +1,19 @@
+import { clsx } from "clsx";
 import type { JSX } from "ovr";
 
-export const Details = (props: { children: JSX.Element; summary: string }) => (
+export const Details = (props: {
+	children: JSX.Element;
+	summary: string;
+	hover?: boolean;
+}) => (
 	<details class="group mb-6 w-full">
 		<summary class="group summary flex cursor-default list-none items-center justify-between gap-8 rounded pb-2 transition-colors">
-			<div class="text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+			<div
+				class={clsx(
+					"text-muted-foreground",
+					props.hover && "opacity-0 transition-opacity group-hover:opacity-100",
+				)}
+			>
 				{props.summary}
 			</div>
 			<div class="group-hover:bg-muted rounded-sm p-2 transition group-hover:shadow group-active:scale-97 group-active:shadow-none dark:shadow-black/75">

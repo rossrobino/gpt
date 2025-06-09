@@ -38,11 +38,11 @@
 		"drab": "^7.0.1",
 		"echarts": "^5.6.0",
 		"mammoth": "^1.9.1",
-		"openai": "^5.1.1",
+		"openai": "^5.2.0",
 		"ovr": "^2.0.4",
 		"papaparse": "^5.5.3",
 		"simple-statistics": "^7.8.8",
-		"uico": "^0.10.1",
+		"uico": "^0.10.2",
 		"zod": "^3.25.56"
 	}
 }

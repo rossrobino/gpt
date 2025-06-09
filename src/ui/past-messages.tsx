@@ -6,7 +6,7 @@ export const PastMessages = async (props: { id?: string }) => {
 	if (!props.id) return null;
 
 	return (
-		<Details summary="Previous messages">
+		<Details summary="Previous messages" hover={true}>
 			{async () => {
 				if (!props.id) return null;
 
