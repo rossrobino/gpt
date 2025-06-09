@@ -50,3 +50,6 @@ export const HandHelping = () =>
 	`<span class="icon-[lucide--hand-helping]"></span>`;
 
 export const User = () => `<span class="icon-[lucide--user]"></span>`;
+
+export const Chevron = () =>
+	`<span class="icon-[lucide--chevron-down]"></span>`;

@@ -1,3 +1,4 @@
+import * as svg from "@/ui/svg";
 import { clsx } from "clsx";
 import type { JSX } from "ovr";
 
@@ -16,19 +17,10 @@ export const Details = (props: {
 			>
 				{props.summary}
 			</div>
-			<div class="group-hover:bg-muted rounded-sm p-2 transition group-hover:shadow group-active:scale-97 group-active:shadow-none dark:shadow-black/75">
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 20 20"
-					fill="currentColor"
-					class="size-5 transition-transform group-open:rotate-180"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
-						clip-rule="evenodd"
-					/>
-				</svg>
+			<div class="group-hover:bg-muted rounded-md p-2 transition group-hover:shadow-sm group-active:scale-97 group-active:shadow-none dark:shadow-black/75">
+				<div class="flex size-6 items-center justify-center transition-transform group-open:rotate-180">
+					<svg.Chevron />
+				</div>
 			</div>
 		</summary>
 		<div class="pt-4">{props.children}</div>
