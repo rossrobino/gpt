@@ -83,7 +83,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 								const result = await runner.run(triageAgent, input, {
 									stream: true,
 									previousResponseId: form.id,
-									context: { dataset },
 									maxTurns: 10,
 								});
 
@@ -113,11 +112,13 @@ export const action = new ovr.Action("/chat", async (c) => {
 											const index = triageAgent.handoffs.findIndex(
 												(agent) => agent === target,
 											);
+
 											yield* ovr.toGenerator(
 												<div class="my-6">
 													<AgentNumberAndName agent={target} index={index} />
 												</div>,
 											);
+											yield "\n\n";
 										} else if (event.item.type === "tool_call_item") {
 											if (event.item.rawItem.type === "function_call") {
 												try {
