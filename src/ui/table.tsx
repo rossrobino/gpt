@@ -27,12 +27,12 @@ const columnHelper = <R extends Row>() => {
 type Create<R extends Row> = ReturnType<typeof columnHelper<R>>["create"];
 
 export const Table = <R extends Row>(props: {
-	data?: R[];
+	data: R[];
 	columns?: (
 		h: Create<R>,
 	) => { [K in keyof R | string]: Column<R, K> }[keyof R][];
 }) => {
-	if (!props.data?.at(0)) return null;
+	if (!props.data.at(0)) return null;
 
 	const columns = props.columns
 		? props.columns(columnHelper<R>().create)
@@ -45,20 +45,24 @@ export const Table = <R extends Row>(props: {
 			<table>
 				<thead class="cursor-default">
 					<tr>
-						{columns.map((column) => (
-							<th>
-								{column.head
-									? typeof column.head === "function"
-										? column.head(column.key)
-										: column.head
-									: column.key}
-							</th>
-						))}
+						{function* () {
+							for (const column of columns) {
+								yield (
+									<th>
+										{column.head
+											? typeof column.head === "function"
+												? column.head(column.key)
+												: column.head
+											: column.key}
+									</th>
+								);
+							}
+						}}
 					</tr>
 				</thead>
 				<tbody>
 					{function* () {
-						for (const row of props.data!) {
+						for (const row of props.data) {
 							yield (
 								<tr>
 									{columns.map((column) => (
@@ -71,9 +75,11 @@ export const Table = <R extends Row>(props: {
 				</tbody>
 				<tfoot>
 					<tr>
-						{columns.map((column) => (
-							<td>{column.foot ? column.foot(props.data!) : null}</td>
-						))}
+						{function* () {
+							for (const column of columns) {
+								yield <td>{column.foot ? column.foot(props.data!) : null}</td>;
+							}
+						}}
 					</tr>
 				</tfoot>
 			</table>
