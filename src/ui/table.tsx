@@ -64,7 +64,7 @@ export const Table = <R extends Row>(props: {
 					{function* () {
 						for (const row of props.data) {
 							yield (
-								<tr>
+								<tr class="even:bg-muted">
 									{columns.map((column) => (
 										<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
 									))}
