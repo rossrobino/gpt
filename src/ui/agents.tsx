@@ -15,6 +15,10 @@ export const Agents = (props: { agent?: Agent }) => {
 					}
 				})}
 			</div>
+			<p class="text-muted-foreground mt-6 mb-0">
+				Submit an idea for another agent or tool on{" "}
+				<a href="https://github.com/rossrobino/ai6/issues/new">GitHub</a>.
+			</p>
 		</Popover>
 	);
 };
