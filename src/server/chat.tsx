@@ -66,117 +66,110 @@ export const action = new ovr.Action("/chat", async (c) => {
 				// current message input
 				input.push({ role: "user", content: form.text });
 
-				yield (
-					<>
-						{input.map((inp, i) => (
-							<Message input={inp} index={form.index + i} />
-						))}
+				yield input.map((inp, i) => (
+					<Message input={inp} index={form.index + i} />
+				));
 
-						{processor.generate(
-							(async function* () {
-								const runner = new Runner({
-									model: "gpt-4.1-nano",
-									modelSettings: { truncation: "auto", store: !form.temporary },
-								});
+				const runner = new Runner({
+					model: "gpt-4.1-nano",
+					modelSettings: { truncation: "auto", store: !form.temporary },
+				});
 
-								const triageAgent = triage.create(dataset);
+				const triageAgent = triage.create(dataset);
 
-								const result = await runner.run(triageAgent, input, {
-									stream: true,
-									previousResponseId: form.id,
-									maxTurns: 10,
-								});
+				const result = await runner.run(triageAgent, input, {
+					stream: true,
+					previousResponseId: form.id,
+					maxTurns: 10,
+				});
 
-								for await (const event of result) {
-									if (event.type === "raw_model_stream_event") {
-										// raw events from the model
-										if (event.data.type === "output_text_delta") {
-											yield event.data.delta;
-										} else if (event.data.type === "model") {
-											const modelEvent: OpenAI.Responses.ResponseStreamEvent =
-												event.data.event;
+				yield* processor.generate(
+					(async function* () {
+						for await (const event of result) {
+							if (event.type === "raw_model_stream_event") {
+								// raw events from the model
+								if (event.data.type === "output_text_delta") {
+									yield event.data.delta;
+								} else if (event.data.type === "model") {
+									const modelEvent: OpenAI.Responses.ResponseStreamEvent =
+										event.data.event;
 
-											if (
-												modelEvent.type ===
-												"response.web_search_call.in_progress"
-											) {
-												yield* ovr.toGenerator(<WebSearchCall />);
-											}
+									if (
+										modelEvent.type === "response.web_search_call.in_progress"
+									) {
+										yield* ovr.toGenerator(
+											<NewLines>
+												<WebSearchCall />
+											</NewLines>,
+										);
+									}
+								}
+							} else if (event.type == "agent_updated_stream_event") {
+								// agent updated events
+							} else {
+								// event.type === "run_item_stream_event"
+								// Agent SDK specific events
+								if (event.item.type === "handoff_output_item") {
+									const target = event.item.targetAgent;
+									const index = triageAgent.handoffs.findIndex(
+										(agent) => agent === target,
+									);
+
+									yield* ovr.toGenerator(
+										<NewLines>
+											<div class="my-6">
+												<AgentNumberAndName agent={target} index={index} />
+											</div>
+										</NewLines>,
+									);
+								} else if (event.item.type === "tool_call_item") {
+									if (event.item.rawItem.type === "function_call") {
+										try {
+											const args = JSON.parse(event.item.rawItem.arguments);
+
+											yield toCodeBlock(
+												"fn-input",
+												`${event.item.rawItem.name}(${format.jsFormat(args)})`,
+											);
+										} catch (error) {
+											console.error(error);
 										}
-									} else if (event.type == "agent_updated_stream_event") {
-										// agent updated events
-									} else {
-										// event.type === "run_item_stream_event"
-										// Agent SDK specific events
-										if (event.item.type === "handoff_output_item") {
-											const target = event.item.targetAgent;
-											const index = triageAgent.handoffs.findIndex(
-												(agent) => agent === target,
-											);
+									}
+								} else if (event.item.type === "tool_call_output_item") {
+									if (event.item.rawItem.type === "function_call_result") {
+										const { data } = z
+											.functionOutput()
+											.safeParse(event.item.output);
 
-											yield* ovr.toGenerator(
-												<NewLines>
-													<div class="my-6">
-														<AgentNumberAndName agent={target} index={index} />
-													</div>
-												</NewLines>,
-											);
-										} else if (event.item.type === "tool_call_item") {
-											if (event.item.rawItem.type === "function_call") {
-												try {
-													const args = JSON.parse(event.item.rawItem.arguments);
-
-													yield toCodeBlock(
-														"fn-input",
-														`${event.item.rawItem.name}(${format.jsFormat(args)})`,
-													);
-												} catch (error) {
-													console.error(error);
-												}
-											}
-										} else if (event.item.type === "tool_call_output_item") {
-											if (event.item.rawItem.type === "function_call_result") {
-												const { data } = z
-													.functionOutput()
-													.safeParse(event.item.output);
-
-												if (data) {
-													if (data.chartOptions) {
-														yield* ovr.toGenerator(
-															<NewLines>
-																<Chart options={data.chartOptions} />
-															</NewLines>,
-														);
-													}
-												}
+										if (data) {
+											if (data.chartOptions) {
+												yield* ovr.toGenerator(
+													<NewLines>
+														<Chart options={data.chartOptions} />
+													</NewLines>,
+												);
 											}
 										}
 									}
 								}
+							}
+						}
 
-								await result.completed;
+						await result.completed;
+					})(),
+				);
 
-								if (!form.temporary) {
-									yield* ovr.toGenerator(
-										<NewLines>
-											<input
-												type="hidden"
-												name="id"
-												value={result.lastResponseId}
-											/>
-										</NewLines>,
-									);
-								}
-							})(),
+				yield (
+					<>
+						{!form.temporary && (
+							<input type="hidden" name="id" value={result.lastResponseId} />
 						)}
-
 						<Input
 							index={form.index + 1}
 							store={!form.temporary}
 							undo={true}
 							clear={true}
 						/>
-
 						<ExistingData dataset={dataset} />
 					</>
 				);

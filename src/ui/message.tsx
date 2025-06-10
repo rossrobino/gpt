@@ -28,7 +28,7 @@ export const Message = (props: {
 					class={clsx(
 						"my-trim",
 						user &&
-							"bg-muted border-base-200 dark:border-base-800 flex w-fit min-w-10.5 justify-center rounded-md border p-2 px-3 wrap-break-word shadow-xs dark:shadow-black/75",
+							"bg-muted border-base-200 dark:border-base-800 w-fit min-w-10.5 rounded-md border p-2 px-3 wrap-break-word shadow-xs dark:shadow-black/75",
 					)}
 					style={`view-transition-name: m-${index}`}
 				>
