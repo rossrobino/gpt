@@ -6,5 +6,6 @@ export const create = () =>
 		name: "Software Developer",
 		model: "gpt-4.1-mini",
 		instructions,
-		handoffDescription: "Excellent at programming and coding.",
+		handoffDescription:
+			"Excellent at programming and coding, aware of language best practices and modern features.",
 	});

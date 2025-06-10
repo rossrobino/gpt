@@ -1,8 +1,8 @@
 import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
+import * as format from "@/lib/format";
 import { generateTitle } from "@/lib/generate-title";
-import { jsFormat } from "@/lib/js-format";
 import { processor } from "@/lib/md";
 import { toCodeBlock } from "@/lib/md/util";
 import { render } from "@/lib/render";
@@ -12,6 +12,7 @@ import { Chart } from "@/ui/chart";
 import { ExistingData } from "@/ui/existing-data";
 import { Input } from "@/ui/input";
 import { Message } from "@/ui/message";
+import { NewLines } from "@/ui/new-lines";
 import { PastMessages } from "@/ui/past-messages";
 import { WebSearchCall } from "@/ui/web-search-call";
 import { Runner } from "@openai/agents";
@@ -114,11 +115,12 @@ export const action = new ovr.Action("/chat", async (c) => {
 											);
 
 											yield* ovr.toGenerator(
-												<div class="my-6">
-													<AgentNumberAndName agent={target} index={index} />
-												</div>,
+												<NewLines>
+													<div class="my-6">
+														<AgentNumberAndName agent={target} index={index} />
+													</div>
+												</NewLines>,
 											);
-											yield "\n\n";
 										} else if (event.item.type === "tool_call_item") {
 											if (event.item.rawItem.type === "function_call") {
 												try {
@@ -126,7 +128,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 													yield toCodeBlock(
 														"fn-input",
-														`${event.item.rawItem.name}(${jsFormat(args)})`,
+														`${event.item.rawItem.name}(${format.jsFormat(args)})`,
 													);
 												} catch (error) {
 													console.error(error);
@@ -141,9 +143,10 @@ export const action = new ovr.Action("/chat", async (c) => {
 												if (data) {
 													if (data.chartOptions) {
 														yield* ovr.toGenerator(
-															Chart({ options: data.chartOptions }),
+															<NewLines>
+																<Chart options={data.chartOptions} />
+															</NewLines>,
 														);
-														yield "\n\n";
 													}
 												}
 											}
@@ -154,13 +157,14 @@ export const action = new ovr.Action("/chat", async (c) => {
 								await result.completed;
 
 								if (!form.temporary) {
-									yield "\n\n\n\n";
 									yield* ovr.toGenerator(
-										<input
-											type="hidden"
-											name="id"
-											value={result.lastResponseId}
-										/>,
+										<NewLines>
+											<input
+												type="hidden"
+												name="id"
+												value={result.lastResponseId}
+											/>
+										</NewLines>,
 									);
 								}
 							})(),
