@@ -131,6 +131,7 @@
 	p,
 	li {
 		text-wrap: pretty;
+		word-break: break-word;
 	}
 
 	tr:nth-child(n + 100) td {

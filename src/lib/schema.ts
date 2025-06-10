@@ -53,8 +53,9 @@ export const formData = <S extends Record<string, z.ZodType>>(shape: S) =>
 export const functionOutput = () =>
 	z
 		.object({
-			result: z.unknown(),
+			result: z.unknown().optional(),
 			summary: z.string().optional(),
+			error: z.object({ message: z.string(), error: z.unknown() }).optional(),
 			chartOptions: z.record(z.string(), z.any()).optional(),
 		})
 		.loose()
@@ -62,7 +63,8 @@ export const functionOutput = () =>
 			(output) =>
 				output as {
 					[key: string]: unknown;
-					result: unknown;
+					result?: unknown;
+					error?: { message: string; error: unknown };
 					summary?: string;
 					chartOptions?: echarts.EChartsOption;
 				},

@@ -149,6 +149,12 @@ export const action = new ovr.Action("/chat", async (c) => {
 													</NewLines>,
 												);
 											}
+
+											if (data.summary) {
+												yield* ovr.toGenerator(
+													<NewLines>{data.summary}</NewLines>,
+												);
+											}
 										}
 									}
 								}
