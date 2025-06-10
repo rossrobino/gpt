@@ -39,7 +39,9 @@ export const create = (dataset: Dataset) => {
 	});
 
 	if (dataset) {
-		const [first, ...rest] = Object.keys(dataset.at(0) ?? {});
+		const count = dataset.length;
+		const keys = Object.keys(dataset.at(0) ?? {});
+		const [first, ...rest] = keys;
 
 		if (first) {
 			const AnyFeatureSchema = z.enum([first, ...rest]);
@@ -101,7 +103,6 @@ export const create = (dataset: Dataset) => {
 						"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
 					parameters: z.object({ feature: AnyFeatureSchema }),
 					execute: ({ feature }): FunctionOutput => {
-						const count = dataset.length;
 						const values = toArray(dataset, feature);
 
 						const mean = stats.mean(values);
@@ -257,6 +258,40 @@ export const create = (dataset: Dataset) => {
 						const y = toArray(dataset, features.y);
 
 						return { result: { correlation: stats.sampleCorrelation(x, y) } };
+					},
+				}),
+				tool({
+					name: "remove_duplicates",
+					description:
+						"Remove duplicate records based on specified features. " +
+						"If no features are given, all fields will be used as the key.",
+					parameters: z.object({
+						features: z.array(AnyFeatureSchema).nullable(),
+					}),
+					execute: ({ features }): FunctionOutput => {
+						// decide which fields to use as the dedupe key
+						const fields = features?.length ? features : keys;
+
+						const seen = new Set<string>();
+						let write = 0;
+
+						// read-copy back into dataset[0…write-1]
+						for (let read = 0; read < dataset.length; read++) {
+							const record = dataset[read]!;
+							const composite = fields.map((f) => record[f]).join("||");
+							if (!seen.has(composite)) {
+								seen.add(composite);
+								dataset[write++] = record;
+							}
+						}
+
+						const removed = count - write;
+						// truncate in place
+						dataset.length = write;
+
+						return {
+							result: { originalCount: count, newCount: write, removed },
+						};
 					},
 				}),
 			);

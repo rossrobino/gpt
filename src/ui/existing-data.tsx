@@ -4,13 +4,13 @@ import { Table } from "@/ui/table";
 import * as ovr from "ovr";
 
 export const ExistingData = (props: { dataset: Dataset }) => {
-	if (props.dataset) {
-		return (
-			<div class="mt-12">
-				{function* () {
+	return (
+		<div class="mt-12">
+			{function* () {
+				if (props.dataset) {
 					yield (
-						<Details summary="Data">
-							<Table data={props.dataset!} />
+						<Details summary={`Dataset (${props.dataset.length})`}>
+							<Table data={props.dataset} />
 						</Details>
 					);
 					yield (
@@ -20,8 +20,8 @@ export const ExistingData = (props: { dataset: Dataset }) => {
 							name="existing"
 						></input>
 					);
-				}}
-			</div>
-		);
-	}
+				}
+			}}
+		</div>
+	);
 };

@@ -41,14 +41,14 @@ export const Table = <R extends Row>(props: {
 			);
 
 	return (
-		<div class="overflow-x-auto">
+		<div class="h-112 overflow-x-auto">
 			<table>
-				<thead class="cursor-default">
+				<thead class="sticky top-0 cursor-default">
 					<tr>
 						{function* () {
 							for (const column of columns) {
 								yield (
-									<th>
+									<th class="bg-background sticky top-0">
 										{column.head
 											? typeof column.head === "function"
 												? column.head(column.key)
@@ -77,7 +77,7 @@ export const Table = <R extends Row>(props: {
 					<tr>
 						{function* () {
 							for (const column of columns) {
-								yield <td>{column.foot ? column.foot(props.data!) : null}</td>;
+								yield <td>{column.foot ? column.foot(props.data) : null}</td>;
 							}
 						}}
 					</tr>
