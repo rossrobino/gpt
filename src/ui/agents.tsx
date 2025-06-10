@@ -8,7 +8,7 @@ export const Agents = (props: { agent?: Agent }) => {
 
 	return (
 		<Popover title="Agents" trigger={{ children: svg.BookUser }}>
-			<div class="grid gap-3">
+			<div class="grid gap-4">
 				{props.agent.handoffs.map((agent, i) => {
 					if (agent instanceof Agent) {
 						return <AgentInfo agent={agent} index={i} />;
@@ -21,10 +21,10 @@ export const Agents = (props: { agent?: Agent }) => {
 
 const AgentInfo = ({ agent, index }: { agent: Agent; index: number }) => {
 	return (
-		<div class="border-muted cursor-default rounded-md border p-3">
+		<div class="border-muted cursor-default rounded-md border p-4">
 			<AgentNumberAndName agent={agent} index={index} />
 
-			<p class="text-muted-foreground mt-1 mb-0">{agent.handoffDescription}</p>
+			<p class="text-muted-foreground mt-2 mb-0">{agent.handoffDescription}</p>
 
 			{Boolean(agent.tools.length) && (
 				<div class="mt-3 flex flex-wrap gap-2">
