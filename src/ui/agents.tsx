@@ -32,9 +32,11 @@ const AgentInfo = ({ agent, index }: { agent: Agent; index: number }) => {
 
 			{Boolean(agent.tools.length) && (
 				<div class="mt-3 flex flex-wrap gap-2">
-					{agent.tools.map((tool) => {
-						return <div class="badge secondary inline-flex">{tool.name}</div>;
-					})}
+					{agent.tools
+						.sort((a, b) => a.name.localeCompare(b.name))
+						.map((tool) => {
+							return <div class="badge secondary inline-flex">{tool.name}</div>;
+						})}
 				</div>
 			)}
 		</div>
