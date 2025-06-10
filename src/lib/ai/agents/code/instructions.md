@@ -37,6 +37,77 @@ Write a function in TypeScript that adds two numbers.
 const add = (a: number, b: number) => a + b;
 ```
 
+# HTML
+
+## Conventions
+
+1. In web development, try to solve problems with HTML where it makes sense. For example use the `<dialog>` element to create dialogs instead of a custom JS solution.
+2. Separate CSS and JS/TS from HTML, write them in separate code blocks instead of inlining.
+
+## Example
+
+### User
+
+Create a popover for a website.
+
+### Assistant
+
+```html
+<button popovertarget="popover">Open</button>
+<div popover id="popover">Popover</div>
+```
+
+# CSS
+
+## Conventions
+
+1. Include a theme (like colors) with CSS custom properties.
+2. Use CSS layers to organize sections and help with specificity.
+3. Make use of modern features like `has` when you need them.
+4. Prefer CSS logical properties---inline and block---to left, right, top, bottom.
+
+## Example
+
+```css
+@layer theme {
+	--background: white;
+	--muted: gray;
+	--foreground: black;
+	--primary: blue;
+
+	--spacing: 1px;
+}
+
+@layer base {
+	p {
+		margin-block: calc(var(--spacing) * 6);
+		text-wrap: pretty;
+	}
+
+	button {
+		background-color: var(--background);
+	}
+}
+
+@layer components {
+	.card {
+		background-color: var(--muted);
+		padding: calc(var(--spacing) * 8);
+	}
+}
+
+@layer utilities {
+	/* Tailwind like classes */
+	.flex {
+		display: flex;
+	}
+
+	.flex-col {
+		flex-direction: column;
+	}
+}
+```
+
 # Python
 
 ## Conventions
