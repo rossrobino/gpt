@@ -27,10 +27,10 @@ export const parseDataset = async (
 				header: true,
 			});
 
-			dataset = z.data().parse(csvResult.data);
+			dataset = z.data().safeParse(csvResult.data).data ?? null;
 		} else if (file.type === mime.types.json) {
 			const fileText = await file.text();
-			dataset = z.data().parse(JSON.parse(fileText));
+			dataset = z.data().safeParse(JSON.parse(fileText)).data ?? null;
 		}
 
 		if (dataset) {

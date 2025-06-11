@@ -15,8 +15,11 @@ export const fileOrNull = () =>
 			return file;
 		});
 
-export const data = () =>
-	z.array(z.record(z.string(), z.union([z.string(), z.number()])));
+export const dataValue = () => z.union([z.string(), z.number(), z.null()]);
+
+export const dataRecord = () => z.record(z.string(), dataValue());
+
+export const data = () => z.array(dataRecord());
 
 export const httpUrl = () =>
 	z.union([
