@@ -22,10 +22,7 @@ export const create = (dataset: Dataset) => {
 	const agent = new Agent({
 		name: "Data Scientist",
 		instructions() {
-			let ins =
-				katex + // seems to format better when this comes first
-				+"\n" +
-				instructions;
+			let ins = instructions;
 
 			if (dataset) {
 				ins += "\n# Data Sample" + toCodeBlock("json", dataset.slice(0, 10));

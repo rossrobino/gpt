@@ -41,7 +41,7 @@ export const Table = <R extends Row>(props: {
 			);
 
 	return (
-		<div class="h-112 overflow-x-auto">
+		<div class="h-[90dvh] overflow-x-auto">
 			<table>
 				<thead class="sticky top-0 cursor-default">
 					<tr>
@@ -64,7 +64,7 @@ export const Table = <R extends Row>(props: {
 					{function* () {
 						for (const row of props.data) {
 							yield (
-								<tr class="even:bg-muted">
+								<tr class="hover:bg-muted">
 									{columns.map((column) => (
 										<td>{column.cell ? column.cell(row) : row[column.key]!}</td>
 									))}

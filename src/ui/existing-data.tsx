@@ -1,4 +1,3 @@
-import { Details } from "./details";
 import type { Dataset } from "@/lib/types";
 import { Table } from "@/ui/table";
 import * as ovr from "ovr";
@@ -9,9 +8,10 @@ export const ExistingData = (props: { dataset: Dataset }) => {
 			{function* () {
 				if (props.dataset) {
 					yield (
-						<Details summary={`Dataset (${props.dataset.length})`}>
+						<div>
+							<p>{props.dataset.length} Records</p>
 							<Table data={props.dataset} />
-						</Details>
+						</div>
 					);
 					yield (
 						<input
