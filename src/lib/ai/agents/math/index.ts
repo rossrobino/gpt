@@ -19,6 +19,7 @@ export const create = () =>
 				name: "sum",
 				description: "Add numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
+				needsApproval: true,
 				execute: ({ numbers }): FunctionOutput => {
 					const result = stats.sum(numbers);
 					return {

@@ -15,7 +15,13 @@ import { Message } from "@/ui/message";
 import { NewLines } from "@/ui/new-lines";
 import { PastMessages } from "@/ui/past-messages";
 import { WebSearchCall } from "@/ui/web-search-call";
-import { Runner } from "@openai/agents";
+import {
+	type Agent,
+	Runner,
+	RunState,
+	RunToolApprovalItem,
+	type AgentInputItem,
+} from "@openai/agents";
 import type OpenAI from "openai";
 import * as ovr from "ovr";
 
@@ -36,6 +42,22 @@ export const action = new ovr.Action("/chat", async (c) => {
 			dataset: z.fileOrNull(),
 			existing: z.string().nullable(),
 			temporary: z.checkbox(),
+			state: z
+				.string()
+				.nullable()
+				.transform((str) => {
+					if (!str) return null;
+					return str.replaceAll("\\\\", "\\");
+				}),
+			approval: z.array(
+				z.string().transform((str) => {
+					const json = JSON.parse(str.replaceAll("\\\\", "\\"));
+					return z
+						.object({ rawItem: z.any(), agent: z.any() })
+						.loose()
+						.parse(json);
+				}),
+			),
 		})
 		.parse(await c.req.formData());
 
@@ -46,6 +68,8 @@ export const action = new ovr.Action("/chat", async (c) => {
 			<PastMessages id={form.id} />
 
 			{async function* () {
+				let stateOrInput: RunState<{}, Agent<any, any>> | AgentInputItem[] = [];
+
 				const [input, { dataset, dataInput }, renderResult] = await Promise.all(
 					[
 						fileInput(form.files),
@@ -54,38 +78,55 @@ export const action = new ovr.Action("/chat", async (c) => {
 					],
 				);
 
-				if (renderResult.success) {
-					input.push({ role: "user", content: renderResult.md });
+				const triageAgent = triage.create(dataset);
+
+				if (form.state) {
+					form.id = undefined;
+					stateOrInput = await RunState.fromString(triageAgent, form.state);
+
+					for (const interruption of form.approval) {
+						const item = new RunToolApprovalItem(
+							interruption.rawItem,
+							interruption.agent,
+						);
+
+						stateOrInput.approve(item);
+					}
+				} else {
+					if (renderResult.success) {
+						input.push({ role: "user", content: renderResult.md });
+					}
+
+					if (form.image) {
+						input.push({
+							role: "user",
+							content: [{ type: "input_image", image: form.image }],
+						});
+					}
+
+					input.push(
+						// current message input
+						{ role: "user", content: form.text },
+						...dataInput,
+					);
+
+					yield input.map((inp, i) => (
+						<Message input={inp} index={form.index + i} />
+					));
+
+					stateOrInput = input;
 				}
-
-				if (form.image) {
-					input.push({
-						role: "user",
-						content: [{ type: "input_image", image: form.image }],
-					});
-				}
-
-				input.push(
-					// current message input
-					{ role: "user", content: form.text },
-					...dataInput,
-				);
-
-				yield input.map((inp, i) => (
-					<Message input={inp} index={form.index + i} />
-				));
 
 				const runner = new Runner({
 					model: "gpt-4.1-nano",
 					modelSettings: { truncation: "auto", store: !form.temporary },
 				});
 
-				const triageAgent = triage.create(dataset);
+				console.log(stateOrInput);
 
-				const result = await runner.run(triageAgent, input, {
+				const result = await runner.run(triageAgent, stateOrInput, {
 					stream: true,
 					previousResponseId: form.id,
-					maxTurns: 10,
 				});
 
 				yield* processor.generate(
@@ -112,7 +153,6 @@ export const action = new ovr.Action("/chat", async (c) => {
 							} else if (event.type == "agent_updated_stream_event") {
 								// agent updated events
 							} else {
-								// event.type === "run_item_stream_event"
 								// Agent SDK specific events
 								if (event.item.type === "handoff_output_item") {
 									const target = event.item.targetAgent;
@@ -161,6 +201,33 @@ export const action = new ovr.Action("/chat", async (c) => {
 												);
 											}
 										}
+									}
+								} else if (event.type === "run_item_stream_event") {
+									if (event.item.type === "tool_approval_item") {
+										yield* ovr.toGenerator(
+											<NewLines>
+												<div>
+													{result.interruptions.map((int) => {
+														return (
+															<div>
+																<p>{int.rawItem.name} requires approval.</p>
+																<input
+																	type="checkbox"
+																	name="approval"
+																	value={ovr.escape(JSON.stringify(int), true)}
+																/>
+															</div>
+														);
+													})}
+													<button>Send</button>
+												</div>
+												<input
+													type="hidden"
+													name="state"
+													value={ovr.escape(JSON.stringify(result.state), true)}
+												/>
+											</NewLines>,
+										);
 									}
 								}
 							}
