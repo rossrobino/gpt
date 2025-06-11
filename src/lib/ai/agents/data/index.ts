@@ -1,5 +1,4 @@
 import instructions from "@/lib/ai/agents/data/instructions.md?raw";
-import * as prompts from "@/lib/ai/prompts";
 import { linspace } from "@/lib/math";
 import type { Dataset, FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
