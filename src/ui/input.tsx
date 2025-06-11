@@ -21,7 +21,7 @@ export const Input = ({
 				tabindex={1}
 				name="text"
 				placeholder="Ask anything"
-				class="bg-muted border-secondary mt-12 h-42 border px-4 py-3 font-light shadow-xs outline-none"
+				class="bg-muted border-secondary mt-12 h-42 border font-light shadow-xs outline-none"
 				style={`view-transition-name: m-${index}`}
 			></textarea>
 		</drab-editor>

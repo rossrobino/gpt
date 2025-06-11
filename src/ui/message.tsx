@@ -30,7 +30,7 @@ export const Message = (props: {
 					class={clsx(
 						"my-trim",
 						user &&
-							"bg-muted border-secondary w-fit min-w-10.5 rounded-md border px-4 py-3 shadow-xs",
+							"bg-muted border-secondary w-fit min-w-10.5 rounded-md border px-3 py-2 shadow-xs",
 						system && "text-muted-foreground italic",
 					)}
 					style={`view-transition-name: m-${index}`}
