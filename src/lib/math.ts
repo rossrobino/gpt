@@ -7,11 +7,11 @@ export const linspace = (start: number, end: number, n: number) => {
 };
 
 export const difference = (numbers: number[]) =>
-	numbers.length === 0
-		? 0
-		: numbers.slice(1).reduce((acc, curr) => acc - curr, numbers[0]!);
+	numbers[0]
+		? numbers.slice(1).reduce((acc, curr) => acc - curr, numbers[0])
+		: 0;
 
 export const quotient = (numbers: number[]) =>
-	numbers.length === 0
-		? 0
-		: numbers.slice(1).reduce((acc, curr) => acc / curr, numbers[0]!);
+	numbers[0]
+		? numbers.slice(1).reduce((acc, curr) => acc / curr, numbers[0])
+		: 0;
