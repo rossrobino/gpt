@@ -25,7 +25,7 @@ export const Agents = (props: { agent?: AgentClass }) => {
 
 const Agent = ({ agent, index }: { agent: AgentClass; index: number }) => {
 	return (
-		<div class="border-muted cursor-default rounded-md border p-4">
+		<div class="bg-background/95 border-secondary/80 cursor-default rounded-md border p-4">
 			<AgentNumberAndName agent={agent} index={index} />
 
 			<p class="text-muted-foreground mt-2 mb-0">{agent.handoffDescription}</p>
