@@ -1,7 +1,8 @@
 import * as ai from "@/lib/ai";
-import { toCodeBlock } from "@/lib/md/util";
+import { toMdCodeBlock } from "@/lib/format";
 import * as mime from "@/lib/mime";
 import type { AgentInputItem } from "@openai/agents-core";
+import * as ovr from "ovr";
 
 export const fileInput = async (files: File[]) => {
 	const input: AgentInputItem[] = [];
@@ -32,12 +33,17 @@ export const fileInput = async (files: File[]) => {
 
 			const { value } = await mammoth.extractRawText({ arrayBuffer });
 
-			input.push({ role: "user", content: `**${file.name}**\n\n${value}` });
+			input.push({
+				role: "system",
+				content: ovr.escape(`**${file.name}**\n\n${value}`),
+			});
 		} else {
 			// fallback to text
 			input.push({
-				role: "user",
-				content: `**${file.name}**\n\n${toCodeBlock(file.name.split(".").at(-1), await file.text())}`,
+				role: "system",
+				content: ovr.escape(
+					`**${file.name}**\n\n${toMdCodeBlock(file.name.split(".").at(-1), await file.text())}`,
+				),
 			});
 		}
 	};

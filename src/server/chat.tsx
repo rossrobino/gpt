@@ -2,9 +2,9 @@ import * as triage from "@/lib/ai/agents/triage";
 import { parseDataset } from "@/lib/dataset";
 import { fileInput } from "@/lib/file-input";
 import * as format from "@/lib/format";
+import { toMdCodeBlock } from "@/lib/format";
 import { generateTitle } from "@/lib/generate-title";
 import { processor } from "@/lib/md";
-import { toCodeBlock } from "@/lib/md/util";
 import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
 import { AgentNumberAndName } from "@/ui/agents";
@@ -27,7 +27,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 				.nullable()
 				.transform((id) => (!id ? undefined : id)),
 			title: z.string().nullable(),
-			text: z.string(),
+			text: z.string().transform((text) => ovr.escape(text)),
 			image: z.httpUrl(),
 			website: z.httpUrl(),
 			files: z.files(),
@@ -132,7 +132,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 										try {
 											const args = JSON.parse(event.item.rawItem.arguments);
 
-											yield toCodeBlock(
+											yield toMdCodeBlock(
 												"fn-input",
 												`${event.item.rawItem.name}(${format.jsFormat(args)})`,
 											);

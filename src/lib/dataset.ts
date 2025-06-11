@@ -1,3 +1,4 @@
+import * as format from "@/lib/format";
 import * as mime from "@/lib/mime";
 import * as z from "@/lib/schema";
 import type { Dataset } from "@/lib/types";
@@ -34,7 +35,10 @@ export const parseDataset = async (
 
 		if (dataset) {
 			// New dataset added
-			dataInput.push({ role: "system", content: "Dataset added." });
+			dataInput.push({
+				role: "system",
+				content: `_Dataset added, sample:_\n\n${format.toMdTable(dataset.slice(0, 6))}`,
+			});
 		}
 	}
 

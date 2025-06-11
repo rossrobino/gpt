@@ -30,35 +30,46 @@ export const Message = (props: {
 					class={clsx(
 						"my-trim",
 						user &&
-							"bg-muted border-secondary w-fit min-w-10.5 rounded-md border px-3 py-2 shadow-xs",
-						system && "text-muted-foreground italic",
+							"bg-muted border-secondary chat-bubble w-fit min-w-10.5 rounded-md border px-3 py-2 shadow-xs",
+						system && "text-muted-foreground w-full",
 					)}
 					style={`view-transition-name: m-${index}`}
 				>
-					{processor.render(
-						typeof content === "string"
-							? content
-							: content
-									.map((c) => {
-										if (c.type === "input_text" || c.type === "output_text") {
-											return c.text;
-										} else if (c.type === "input_image") {
-											if ("image" in c) {
-												return c.image;
+					{processor.generate(
+						(function* () {
+							if (typeof content === "string") yield content;
+							else {
+								for (const c of content) {
+									if (c.type === "input_text" || c.type === "output_text") {
+										yield c.text;
+									} else if (c.type === "input_image") {
+										if ("image" in c) {
+											const { image } = c;
+											if (typeof image === "string") {
+												yield image;
 											} else {
-												return c.image_url ?? "Image";
+												yield image.id;
 											}
-										} else if (c.type === "input_file") {
-											if ("file" in c) {
-												return c.file;
-											} else {
-												return c.filename ?? "File";
-											}
+										} else {
+											yield c.image_url ?? "Image";
 										}
+									} else if (c.type === "input_file") {
+										if ("file" in c) {
+											const { file } = c;
+											if (typeof file === "string") {
+												yield file;
+											} else {
+												yield file.id;
+											}
+										} else {
+											yield c.filename ?? "File";
+										}
+									}
 
-										return "";
-									})
-									.join("\n\n"),
+									yield "\n\n";
+								}
+							}
+						})(),
 					)}
 				</div>
 			</div>

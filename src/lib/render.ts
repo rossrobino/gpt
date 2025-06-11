@@ -1,4 +1,4 @@
-import { toCodeBlock } from "@/lib/md/util";
+import { toMdCodeBlock } from "@/lib/format";
 import * as z from "@/lib/schema";
 import "dotenv/config";
 
@@ -33,7 +33,7 @@ export const render = async (
 		const code = await res.text();
 		const lang = url.split(".").at(-1);
 
-		return { success: true, md: toCodeBlock(lang, code) };
+		return { success: true, md: toMdCodeBlock(lang, code) };
 	}
 
 	const res = await fetch(

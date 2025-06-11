@@ -20,13 +20,7 @@ const toArray = (dataset: Dataset, feature: string) => {
 export const create = (dataset: Dataset) => {
 	const agent = new Agent({
 		name: "Data Scientist",
-		instructions() {
-			let ins = instructions;
-
-			if (dataset) ins += prompts.dataSample(dataset);
-
-			return ins;
-		},
+		instructions,
 		model: "gpt-4.1-mini",
 		handoffDescription:
 			"Ability access to the user's dataset and run a variety of statistical analyses using it.",
