@@ -26,8 +26,8 @@
 		"@fontsource-variable/geist": "^5.2.6",
 		"@fontsource-variable/geist-mono": "^5.2.6",
 		"@mdit/plugin-katex": "^0.22.0",
-		"@openai/agents": "^0.0.4",
-		"@openai/agents-core": "^0.0.4",
+		"@openai/agents": "^0.0.6",
+		"@openai/agents-core": "^0.0.6",
 		"@robino/md": "^4.0.0",
 		"@robino/prettier": "^2.0.0",
 		"@robino/tsconfig": "^1.0.4",
@@ -38,11 +38,11 @@
 		"drab": "^7.0.1",
 		"echarts": "^5.6.0",
 		"mammoth": "^1.9.1",
-		"openai": "^5.2.0",
+		"openai": "^5.3.0",
 		"ovr": "^2.0.4",
 		"papaparse": "^5.5.3",
 		"simple-statistics": "^7.8.8",
 		"uico": "^0.10.2",
-		"zod": "^3.25.56"
+		"zod": "^3.25.58"
 	}
 }

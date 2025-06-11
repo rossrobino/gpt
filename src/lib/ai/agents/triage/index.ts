@@ -2,6 +2,7 @@ import * as assistant from "@/lib/ai/agents/assistant";
 import * as code from "@/lib/ai/agents/code";
 import * as data from "@/lib/ai/agents/data";
 import * as math from "@/lib/ai/agents/math";
+import * as researcher from "@/lib/ai/agents/researcher";
 import instructions from "@/lib/ai/agents/triage/instructions.md?raw";
 import type { Dataset } from "@/lib/types";
 import { Agent } from "@openai/agents";
@@ -17,5 +18,6 @@ export const create = (dataset: Dataset) =>
 			data.create(dataset),
 			code.create(),
 			math.create(),
+			researcher.create(),
 		],
 	});
