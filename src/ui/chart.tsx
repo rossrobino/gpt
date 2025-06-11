@@ -23,15 +23,13 @@ export const Chart = (props: { options: echarts.EChartsOption }) => {
 	} as echarts.EChartsOption);
 
 	return (
-		<p>
-			<e-chart
-				class="block h-96 w-full"
-				options={ovr.escape(JSON.stringify(options), true)}
-			>
-				<noscript class="text-muted-foreground">
-					JavaScript is required to view charts.
-				</noscript>
-			</e-chart>
-		</p>
+		<e-chart
+			class="mt-12 mb-8 block h-96 w-full"
+			options={ovr.escape(JSON.stringify(options), true)}
+		>
+			<noscript class="text-muted-foreground">
+				JavaScript is required to view charts.
+			</noscript>
+		</e-chart>
 	);
 };

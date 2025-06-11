@@ -1,7 +1,6 @@
 import instructions from "@/lib/ai/agents/data/instructions.md?raw";
-import katex from "@/lib/ai/agents/math/katex.md?raw";
+import * as prompts from "@/lib/ai/prompts";
 import { linspace } from "@/lib/math";
-import { toCodeBlock } from "@/lib/md/util";
 import type { Dataset, FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
@@ -24,9 +23,7 @@ export const create = (dataset: Dataset) => {
 		instructions() {
 			let ins = instructions;
 
-			if (dataset) {
-				ins += "\n# Data Sample" + toCodeBlock("json", dataset.slice(0, 10));
-			}
+			if (dataset) ins += prompts.dataSample(dataset);
 
 			return ins;
 		},
@@ -272,7 +269,7 @@ export const create = (dataset: Dataset) => {
 						const seen = new Set<string>();
 						let write = 0;
 
-						// read-copy back into dataset[0…write-1]
+						// read-copy back into dataset
 						for (let read = 0; read < dataset.length; read++) {
 							const record = dataset[read]!;
 							const composite = fields.map((f) => record[f]).join("||");

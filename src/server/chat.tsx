@@ -46,11 +46,13 @@ export const action = new ovr.Action("/chat", async (c) => {
 			<PastMessages id={form.id} />
 
 			{async function* () {
-				const [input, dataset, renderResult] = await Promise.all([
-					fileInput(form.files),
-					parseDataset(form.dataset, form.existing),
-					render(form.website),
-				]);
+				const [input, { dataset, dataInput }, renderResult] = await Promise.all(
+					[
+						fileInput(form.files),
+						parseDataset(form.dataset, form.existing),
+						render(form.website),
+					],
+				);
 
 				if (renderResult.success) {
 					input.push({ role: "user", content: renderResult.md });
@@ -63,8 +65,11 @@ export const action = new ovr.Action("/chat", async (c) => {
 					});
 				}
 
-				// current message input
-				input.push({ role: "user", content: form.text });
+				input.push(
+					// current message input
+					{ role: "user", content: form.text },
+					...dataInput,
+				);
 
 				yield input.map((inp, i) => (
 					<Message input={inp} index={form.index + i} />

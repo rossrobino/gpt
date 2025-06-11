@@ -17,3 +17,5 @@ product({ numbers: [2, 3.1416, 1.784]})
 $$C = 11.21$$
 
 You MUST iterate and keep going until the problem is solved entirely, the output of a function is NOT the final result.
+
+The `summary` of a function call is automatically displayed to the user.

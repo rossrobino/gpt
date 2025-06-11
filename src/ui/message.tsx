@@ -19,16 +19,18 @@ export const Message = (props: {
 	if (input.type === "message") {
 		const { content, role } = input;
 		const user = role === "user";
+		const system = role === "system";
 
 		if (!content) return;
 
 		return (
-			<div class={clsx("pb-12", user && "flex justify-end pl-8")}>
+			<div class="pb-12">
 				<div
 					class={clsx(
 						"my-trim",
 						user &&
-							"bg-muted border-base-200 dark:border-base-800 w-fit min-w-10.5 rounded-md border p-2 px-3 wrap-break-word shadow-xs dark:shadow-black/75",
+							"bg-muted border-base-200 dark:border-base-800 w-fit min-w-10.5 justify-self-end rounded-md border p-2 px-3 wrap-break-word shadow-xs dark:shadow-black/75",
+						system && "text-muted-foreground justify-self-end italic",
 					)}
 					style={`view-transition-name: m-${index}`}
 				>
