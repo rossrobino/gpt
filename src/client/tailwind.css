@@ -149,7 +149,7 @@
 @layer components {
 	.button,
 	button {
-		@apply shadow-xs transition-transform active:scale-97 active:shadow-none dark:shadow-black/75;
+		@apply shadow-xs transition-transform active:scale-97 active:shadow-none;
 	}
 
 	.ghost {
