@@ -1,9 +1,10 @@
 import instructions from "@/lib/ai/agents/data/instructions.md?raw";
 import { linspace } from "@/lib/math";
+import * as z from "@/lib/schema";
 import type { Dataset, FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
-import * as z from "zod";
+import * as z3 from "zod";
 
 const toNumberArray = (dataset: Dataset, feature: string) =>
 	z.array(z.number()).parse(dataset?.map((record) => record[feature]));
@@ -25,14 +26,14 @@ export const create = (dataset: Dataset) => {
 
 	if (!first) return agent;
 
-	const AnyFeatureSchema = z.enum([first, ...rest]);
+	const AnyFeatureSchema = z3.enum([first, ...rest]);
 
 	agent.tools.push(
 		tool({
 			name: "linear_regression",
 			description: "Run a linear regression on data with relevant features.",
-			parameters: z.object({
-				features: z.object({
+			parameters: z3.object({
+				features: z3.object({
 					dependent: AnyFeatureSchema,
 					independent: AnyFeatureSchema, // could be multiple if multiple regression in the future
 				}),
@@ -81,7 +82,7 @@ export const create = (dataset: Dataset) => {
 			name: "describe",
 			description:
 				"Calculate descriptive statistics (mean, median, mode, min, max, quartiles, standard deviation, total) for a given feature.",
-			parameters: z.object({ feature: AnyFeatureSchema }),
+			parameters: z3.object({ feature: AnyFeatureSchema }),
 			execute: ({ feature }): FunctionOutput => {
 				const values = toNumberArray(dataset, feature);
 
@@ -166,9 +167,9 @@ export const create = (dataset: Dataset) => {
 		tool({
 			name: "percentile",
 			description: "Find a percentile for a given feature.",
-			parameters: z.object({
+			parameters: z3.object({
 				feature: AnyFeatureSchema,
-				percentile: z.number(),
+				percentile: z3.number(),
 			}),
 			execute: ({ feature, percentile }): FunctionOutput => {
 				const values = toNumberArray(dataset, feature);
@@ -228,8 +229,8 @@ export const create = (dataset: Dataset) => {
 		tool({
 			name: "correlation",
 			description: "Calculate sample correlation between two features.",
-			parameters: z.object({
-				features: z.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
+			parameters: z3.object({
+				features: z3.object({ x: AnyFeatureSchema, y: AnyFeatureSchema }),
 			}),
 			execute: ({ features }): FunctionOutput => {
 				const x = toNumberArray(dataset, features.x);
@@ -243,7 +244,9 @@ export const create = (dataset: Dataset) => {
 			description:
 				"Remove duplicate records based on specified features. If no features are given, all fields will be used as the key.",
 			needsApproval: true,
-			parameters: z.object({ features: z.array(AnyFeatureSchema).nullable() }),
+			parameters: z3.object({
+				features: z3.array(AnyFeatureSchema).nullable(),
+			}),
 			execute: ({ features }): FunctionOutput => {
 				const fields = features ?? keys;
 				const seen = new Set<string>();
@@ -269,7 +272,9 @@ export const create = (dataset: Dataset) => {
 			description:
 				"Remove any rows where one or more specified features are null, undefined or NaN. If no features are given, any record with missing data will be removed.",
 			needsApproval: true,
-			parameters: z.object({ features: z.array(AnyFeatureSchema).nullable() }),
+			parameters: z3.object({
+				features: z3.array(AnyFeatureSchema).nullable(),
+			}),
 			execute: ({ features }) => {
 				const fields = features ?? keys;
 				let write = 0;
@@ -294,12 +299,12 @@ export const create = (dataset: Dataset) => {
 			name: "impute_missing",
 			description:
 				"Impute missing values for specified features using a given strategy. Strategies: mean, median, mode, constant. If no features are given, all features will be imputed.",
-			parameters: z.object({
-				features: z.array(AnyFeatureSchema).nullable(),
-				strategy: z
+			parameters: z3.object({
+				features: z3.array(AnyFeatureSchema).nullable(),
+				strategy: z3
 					.enum(["mean", "median", "mode", "constant"])
 					.default("mean"),
-				constant: z.number().nullable().optional(),
+				constant: z3.number().nullable().optional(),
 			}),
 			needsApproval: true,
 			execute: ({ features, strategy, constant }) => {

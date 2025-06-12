@@ -1,5 +1,5 @@
 import * as ai from "@/lib/ai";
-import { toMdCodeBlock } from "@/lib/format";
+import * as format from "@/lib/format";
 import * as mime from "@/lib/mime";
 import type { AgentInputItem } from "@openai/agents-core";
 import * as ovr from "ovr";
@@ -42,7 +42,7 @@ export const fileInput = async (files: File[]) => {
 			input.push({
 				role: "system",
 				content: ovr.escape(
-					`**${file.name}**\n\n${toMdCodeBlock(file.name.split(".").at(-1), await file.text())}`,
+					`**${file.name}**\n\n${format.toMdCodeBlock(file.name.split(".").at(-1), await file.text())}`,
 				),
 			});
 		}

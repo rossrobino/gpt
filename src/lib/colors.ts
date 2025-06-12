@@ -1,5 +1,3 @@
-import tw from "tailwindcss/colors";
-
 export const base = {
 	50: "oklch(0.995 0.005 256.429)",
 	100: "oklch(0.972625 0.00943333 256.429)",
@@ -13,5 +11,3 @@ export const base = {
 	900: "oklch(0.176075 0.0352333 256.429)",
 	950: "oklch(0.1 0.035 256.429)",
 } as const;
-
-export { tw };

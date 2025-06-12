@@ -5,7 +5,7 @@ import * as math from "@/lib/math";
 import type { FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
-import * as z from "zod";
+import * as z3 from "zod";
 
 export const create = () =>
 	new Agent({
@@ -17,7 +17,7 @@ export const create = () =>
 			tool({
 				name: "sum",
 				description: "Add numbers with precision.",
-				parameters: z.object({ numbers: z.array(z.number()) }),
+				parameters: z3.object({ numbers: z3.array(z3.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
 					const result = stats.sum(numbers);
 					return {
@@ -29,7 +29,7 @@ export const create = () =>
 			tool({
 				name: "difference",
 				description: "Subtract numbers with precision.",
-				parameters: z.object({ numbers: z.array(z.number()) }),
+				parameters: z3.object({ numbers: z3.array(z3.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
 					const result = math.difference(numbers);
 					return {
@@ -41,7 +41,7 @@ export const create = () =>
 			tool({
 				name: "product",
 				description: "Multiply numbers with precision.",
-				parameters: z.object({ numbers: z.array(z.number()) }),
+				parameters: z3.object({ numbers: z3.array(z3.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
 					const result = stats.product(numbers);
 					return {
@@ -53,7 +53,7 @@ export const create = () =>
 			tool({
 				name: "quotient",
 				description: "Divide numbers with precision.",
-				parameters: z.object({ numbers: z.array(z.number()) }),
+				parameters: z3.object({ numbers: z3.array(z3.number()) }),
 				execute: ({ numbers }): FunctionOutput => {
 					const result = math.quotient(numbers);
 					return {
@@ -65,7 +65,7 @@ export const create = () =>
 			tool({
 				name: "square_root",
 				description: "Find the square root of a number.",
-				parameters: z.object({ number: z.number() }),
+				parameters: z3.object({ number: z3.number() }),
 				execute: ({ number }): FunctionOutput => {
 					const result = Math.sqrt(number);
 					return {
@@ -77,7 +77,7 @@ export const create = () =>
 			tool({
 				name: "cube_root",
 				description: "Find the cube root of a number.",
-				parameters: z.object({ number: z.number() }),
+				parameters: z3.object({ number: z3.number() }),
 				execute: ({ number }): FunctionOutput => {
 					const result = Math.cbrt(number);
 					return {
@@ -90,7 +90,7 @@ export const create = () =>
 				name: "power",
 				description:
 					"Returns the number taken to a specified power. For example, to square a number, pass in a `power` of 2.",
-				parameters: z.object({ number: z.number(), power: z.number() }),
+				parameters: z3.object({ number: z3.number(), power: z3.number() }),
 				execute: ({ number, power }): FunctionOutput => {
 					const result = Math.pow(number, power);
 					return {
@@ -102,7 +102,7 @@ export const create = () =>
 			tool({
 				name: "sine",
 				description: "Find the sine of a number.",
-				parameters: z.object({ number: z.number() }),
+				parameters: z3.object({ number: z3.number() }),
 				execute: ({ number }): FunctionOutput => {
 					const result = Math.sin(number);
 					return {
@@ -114,7 +114,7 @@ export const create = () =>
 			tool({
 				name: "cosine",
 				description: "Find the cosine of a number.",
-				parameters: z.object({ number: z.number() }),
+				parameters: z3.object({ number: z3.number() }),
 				execute: ({ number }): FunctionOutput => {
 					const result = Math.cos(number);
 					return {
@@ -126,7 +126,7 @@ export const create = () =>
 			tool({
 				name: "tangent",
 				description: "Find the tangent of a number.",
-				parameters: z.object({ number: z.number() }),
+				parameters: z3.object({ number: z3.number() }),
 				execute: ({ number }): FunctionOutput => {
 					const result = Math.tan(number);
 					return {

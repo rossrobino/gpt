@@ -1,7 +1,7 @@
 import { Approvals } from "@/ui/approval";
-import { Page } from "ovr";
+import * as ovr from "ovr";
 
-export const page = new Page("/test", () => {
+export const page = new ovr.Page("/test", () => {
 	return (
 		<div>
 			<h1>Test</h1>

@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { clsx } from "clsx";
 import * as ovr from "ovr";
 
 export const Arrow = () =>

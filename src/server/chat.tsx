@@ -18,12 +18,12 @@ import { PastMessages } from "@/ui/past-messages";
 import { WebSearchCall } from "@/ui/web-search-call";
 import {
 	type Agent,
+	type AgentInputItem,
 	Runner,
 	RunState,
 	RunToolApprovalItem,
-	type AgentInputItem,
 } from "@openai/agents";
-import type OpenAI from "openai";
+import type { OpenAI } from "openai";
 import * as ovr from "ovr";
 
 export const action = new ovr.Action("/chat", async (c) => {
@@ -187,7 +187,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 											const args = JSON.parse(event.item.rawItem.arguments);
 
 											yield toMdCodeBlock(
-												"fn-input",
+												"fn",
 												`${event.item.rawItem.name}(${format.jsFormat(args)})`,
 											);
 										} catch (error) {
@@ -231,6 +231,7 @@ export const action = new ovr.Action("/chat", async (c) => {
 							yield* ovr.toGenerator(
 								<NewLines>
 									<Approvals interruptions={interruptions} />
+									{/* don't do this if you want to hide system prompt and other info, it'd be nice to use the previous response id to obtain again. */}
 									<input
 										type="hidden"
 										name="state"

@@ -1,21 +1,21 @@
 import instructions from "@/lib/ai/agents/code/instructions.md?raw";
-import * as z4 from "@/lib/schema";
+import * as z from "@/lib/schema";
 import type { FunctionOutput } from "@/lib/types";
 import { GrepResults } from "@/ui/grep-result";
 import { Agent, tool } from "@openai/agents-core";
 import * as ovr from "ovr";
-import { z } from "zod";
+import * as z3 from "zod";
 
-const GrepSchema = z4
+const GrepSchema = z
 	.object({
-		facets: z4.object({
-			repo: z4.object({ buckets: z4.array(z4.object({ val: z4.string() })) }),
+		facets: z.object({
+			repo: z.object({ buckets: z.array(z.object({ val: z.string() })) }),
 		}),
-		hits: z4.object({
-			hits: z4.array(
-				z4.object({
-					id: z4.object({ raw: z4.string() }),
-					content: z4.object({ snippet: z4.string() }),
+		hits: z.object({
+			hits: z.array(
+				z.object({
+					id: z.object({ raw: z.string() }),
+					content: z.object({ snippet: z.string() }),
 				}),
 			),
 		}),
@@ -34,7 +34,7 @@ export const create = () =>
 				name: "grep",
 				description:
 					"Quickly search public GitHub repositories with a regular expression.",
-				parameters: z.object({ regexPattern: z.string() }),
+				parameters: z3.object({ regexPattern: z3.string() }),
 				execute: async ({ regexPattern }): Promise<FunctionOutput> => {
 					const grepUrl = new URL("https://grep.app/api/search");
 					grepUrl.searchParams.set("regexp", "true");
