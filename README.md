@@ -4,6 +4,10 @@ AI6 uses the [OpenAI Agents SDK](https://github.com/openai/openai-agents-js) to 
 
 Agents and tools help AI become more precise and useful. Agents can be specialists that are particularly competent in a specific area.
 
+## Contributing
+
+Open to contributions, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 ## Accessibility
 
 AI6 strives to be accessible to any user. In contrast to most AI chat applications, this project does not require any client-side JavaScript to run and stream chat messages.
