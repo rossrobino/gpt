@@ -7,7 +7,7 @@ export const Agents = (props: { agent?: AgentClass }) => {
 	if (!props.agent) props.agent = triage.create([{ home: 0 }]); // to populate agent info
 
 	return (
-		<Popover title="Agents" trigger={{ children: svg.BookUser }}>
+		<Popover title="Agents" id="agents" trigger={{ children: svg.BookUser }}>
 			<div class="grid gap-4">
 				{props.agent.handoffs.map((agent, i) => {
 					if (agent instanceof AgentClass) {

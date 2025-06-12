@@ -11,14 +11,14 @@
 	},
 	"devDependencies": {
 		"@domcojs/vercel": "^2.0.1",
-		"@iconify-json/lucide": "^1.2.47",
+		"@iconify-json/lucide": "^1.2.48",
 		"@iconify/tailwind4": "^1.0.6",
-		"@tailwindcss/vite": "^4.1.9",
+		"@tailwindcss/vite": "^4.1.10",
 		"@types/papaparse": "^5.3.16",
 		"domco": "^4.1.3",
 		"prettier": "^3.5.3",
 		"prettier-plugin-tailwindcss": "^0.6.12",
-		"tailwindcss": "^4.1.9",
+		"tailwindcss": "^4.1.10",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5"
 	},
@@ -43,6 +43,6 @@
 		"papaparse": "^5.5.3",
 		"simple-statistics": "^7.8.8",
 		"uico": "^0.10.2",
-		"zod": "^3.25.62"
+		"zod": "^3.25.63"
 	}
 }

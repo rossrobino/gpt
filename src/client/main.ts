@@ -12,3 +12,31 @@ form.addEventListener("keydown", (e) => {
 		form.submit();
 	}
 });
+
+customElements.define(
+	"open-agents",
+	class extends HTMLElement {
+		connectedCallback() {
+			this.style.display = "contents";
+
+			const button = document.createElement("button");
+			button.type = "button";
+			button.textContent = "View Agents";
+
+			const openAgents = () => {
+				const agentsPopover = document.querySelector("#agents");
+				if (agentsPopover instanceof HTMLElement) {
+					agentsPopover.showPopover();
+				}
+			};
+
+			const params = new URLSearchParams(window.location.search);
+
+			if (params.has("agents")) openAgents();
+
+			button.addEventListener("click", openAgents);
+
+			this.append(button);
+		}
+	},
+);
