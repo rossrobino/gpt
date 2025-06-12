@@ -36,3 +36,5 @@ export const toMdTable = (records: Record<string, unknown>[]) => {
 
 	return [header, separator, ...rows].join("\n") + "\n\n";
 };
+
+export const toKatexBlock = (str: string) => `\n\n$$${str}$$\n\n`;

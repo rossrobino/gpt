@@ -1,12 +1,11 @@
 import instructions from "@/lib/ai/agents/math/instructions.md?raw";
 import katex from "@/lib/ai/agents/math/katex.md?raw";
+import * as format from "@/lib/format";
 import * as math from "@/lib/math";
 import type { FunctionOutput } from "@/lib/types";
 import { tool, Agent } from "@openai/agents";
 import * as stats from "simple-statistics";
 import * as z from "zod";
-
-const toKatexBlock = (str: string) => `\n\n$$${str}$$\n\n`;
 
 export const create = () =>
 	new Agent({
@@ -19,12 +18,11 @@ export const create = () =>
 				name: "sum",
 				description: "Add numbers with precision.",
 				parameters: z.object({ numbers: z.array(z.number()) }),
-				needsApproval: true,
 				execute: ({ numbers }): FunctionOutput => {
 					const result = stats.sum(numbers);
 					return {
 						result,
-						summary: toKatexBlock(`${numbers.join(" + ")} = ${result}`),
+						summary: format.toKatexBlock(`${numbers.join(" + ")} = ${result}`),
 					};
 				},
 			}),
@@ -36,7 +34,7 @@ export const create = () =>
 					const result = math.difference(numbers);
 					return {
 						result,
-						summary: toKatexBlock(`${numbers.join(" - ")} = ${result}`),
+						summary: format.toKatexBlock(`${numbers.join(" - ")} = ${result}`),
 					};
 				},
 			}),
@@ -48,7 +46,7 @@ export const create = () =>
 					const result = stats.product(numbers);
 					return {
 						result,
-						summary: toKatexBlock(`${numbers.join(" x ")} = ${result}`),
+						summary: format.toKatexBlock(`${numbers.join(" x ")} = ${result}`),
 					};
 				},
 			}),
@@ -60,7 +58,7 @@ export const create = () =>
 					const result = math.quotient(numbers);
 					return {
 						result,
-						summary: toKatexBlock(`${numbers.join(" / ")} = ${result}`),
+						summary: format.toKatexBlock(`${numbers.join(" / ")} = ${result}`),
 					};
 				},
 			}),
@@ -72,7 +70,7 @@ export const create = () =>
 					const result = Math.sqrt(number);
 					return {
 						result,
-						summary: toKatexBlock(`\\sqrt{${number}} = ${result}`),
+						summary: format.toKatexBlock(`\\sqrt{${number}} = ${result}`),
 					};
 				},
 			}),
@@ -84,7 +82,7 @@ export const create = () =>
 					const result = Math.cbrt(number);
 					return {
 						result,
-						summary: toKatexBlock(`\\sqrt[3]{${number}} = ${result}`),
+						summary: format.toKatexBlock(`\\sqrt[3]{${number}} = ${result}`),
 					};
 				},
 			}),
@@ -97,7 +95,7 @@ export const create = () =>
 					const result = Math.pow(number, power);
 					return {
 						result,
-						summary: toKatexBlock(`${number}^${power} = ${result}`),
+						summary: format.toKatexBlock(`${number}^${power} = ${result}`),
 					};
 				},
 			}),
@@ -109,7 +107,7 @@ export const create = () =>
 					const result = Math.sin(number);
 					return {
 						result,
-						summary: toKatexBlock(`\\sin(${number}) = ${result}`),
+						summary: format.toKatexBlock(`\\sin(${number}) = ${result}`),
 					};
 				},
 			}),
@@ -121,7 +119,7 @@ export const create = () =>
 					const result = Math.cos(number);
 					return {
 						result,
-						summary: toKatexBlock(`\\cos(${number}) = ${result}`),
+						summary: format.toKatexBlock(`\\cos(${number}) = ${result}`),
 					};
 				},
 			}),
@@ -133,7 +131,7 @@ export const create = () =>
 					const result = Math.tan(number);
 					return {
 						result,
-						summary: toKatexBlock(`\\tan(${number}) = ${result}`),
+						summary: format.toKatexBlock(`\\tan(${number}) = ${result}`),
 					};
 				},
 			}),

@@ -242,6 +242,7 @@ export const create = (dataset: Dataset) => {
 			name: "remove_duplicates",
 			description:
 				"Remove duplicate records based on specified features. If no features are given, all fields will be used as the key.",
+			needsApproval: true,
 			parameters: z.object({ features: z.array(AnyFeatureSchema).nullable() }),
 			execute: ({ features }): FunctionOutput => {
 				const fields = features ?? keys;
@@ -267,6 +268,7 @@ export const create = (dataset: Dataset) => {
 			name: "drop_missing",
 			description:
 				"Remove any rows where one or more specified features are null, undefined or NaN. If no features are given, any record with missing data will be removed.",
+			needsApproval: true,
 			parameters: z.object({ features: z.array(AnyFeatureSchema).nullable() }),
 			execute: ({ features }) => {
 				const fields = features ?? keys;
@@ -299,6 +301,7 @@ export const create = (dataset: Dataset) => {
 					.default("mean"),
 				constant: z.number().nullable().optional(),
 			}),
+			needsApproval: true,
 			execute: ({ features, strategy, constant }) => {
 				const fields = features ?? keys;
 

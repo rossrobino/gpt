@@ -1,4 +1,5 @@
 import * as echarts from "echarts";
+import * as ovr from "ovr";
 import * as z from "zod/v4";
 
 export * from "zod/v4";
@@ -72,3 +73,28 @@ export const functionOutput = () =>
 					chartOptions?: echarts.EChartsOption;
 				},
 		);
+
+export const interruption = () => {
+	return z.object({ rawItem: z.any(), agent: z.any() }).loose();
+};
+
+const removeDoubleEscaped = (s: string) => s.replaceAll("\\\\", "\\");
+
+export const interruptions = () =>
+	z.array(
+		z.string().transform((str) => {
+			const json = JSON.parse(removeDoubleEscaped(str));
+			return interruption().parse(json);
+		}),
+	);
+
+export const state = () =>
+	z
+		.string()
+		.nullable()
+		.transform((str) => {
+			if (!str) return null;
+			return removeDoubleEscaped(str);
+		});
+
+export const escape = () => z.string().transform((text) => ovr.escape(text));

@@ -44,6 +44,11 @@ app.error = (c, error) => {
 
 app.add(home, chat);
 
+if (import.meta.env.DEV) {
+	const test = await import("@/server/test");
+	app.add(test);
+}
+
 app.use((c, next) => {
 	c.layout(Layout);
 	return next();

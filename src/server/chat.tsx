@@ -8,6 +8,7 @@ import { processor } from "@/lib/md";
 import { render } from "@/lib/render";
 import * as z from "@/lib/schema";
 import { AgentNumberAndName } from "@/ui/agents";
+import { Approvals } from "@/ui/approval";
 import { Chart } from "@/ui/chart";
 import { ExistingData } from "@/ui/existing-data";
 import { Input } from "@/ui/input";
@@ -28,36 +29,37 @@ import * as ovr from "ovr";
 export const action = new ovr.Action("/chat", async (c) => {
 	const form = z
 		.formData({
+			/** Previous response ID */
 			id: z
 				.string()
 				.nullable()
 				.transform((id) => (!id ? undefined : id)),
+			/** Previously generated title */
 			title: z.string().nullable(),
-			text: z.string().transform((text) => ovr.escape(text)),
+			/** The user's current text message */
+			text: z.escape(),
+			/** Image URL */
 			image: z.httpUrl(),
+			/** Website URL to render */
 			website: z.httpUrl(),
+			/** File inputs */
 			files: z.files(),
+			/** Directory inputs */
 			directory: z.files(),
+			/** Current message index */
 			index: z.coerce.number(),
+			/** New dataset submitted from file input */
 			dataset: z.fileOrNull(),
+			/** Existing dataset sent back from hidden input */
 			existing: z.string().nullable(),
+			/** Do not store message for future use */
 			temporary: z.checkbox(),
-			state: z
-				.string()
-				.nullable()
-				.transform((str) => {
-					if (!str) return null;
-					return str.replaceAll("\\\\", "\\");
-				}),
-			approval: z.array(
-				z.string().transform((str) => {
-					const json = JSON.parse(str.replaceAll("\\\\", "\\"));
-					return z
-						.object({ rawItem: z.any(), agent: z.any() })
-						.loose()
-						.parse(json);
-				}),
-			),
+			/** State sent back from hidden input to use for approvals */
+			state: z.state(),
+			/** Any interruptions that were approved */
+			approval: z.interruptions(),
+			/** All interruptions - difference of this and approved are the rejected */
+			interruption: z.interruptions(),
 		})
 		.parse(await c.req.formData());
 
@@ -68,61 +70,71 @@ export const action = new ovr.Action("/chat", async (c) => {
 			<PastMessages id={form.id} />
 
 			{async function* () {
-				let stateOrInput: RunState<{}, Agent<any, any>> | AgentInputItem[] = [];
+				let stateOrInput: RunState<{}, Agent> | AgentInputItem[] = [];
 
-				const [input, { dataset, dataInput }, renderResult] = await Promise.all(
-					[
+				const [fileInputItems, { dataset, dataInput }, renderResult] =
+					await Promise.all([
 						fileInput(form.files),
 						parseDataset(form.dataset, form.existing),
 						render(form.website),
-					],
-				);
+					]);
 
 				const triageAgent = triage.create(dataset);
 
 				if (form.state) {
-					form.id = undefined;
+					// process approvals
+					form.id = undefined; // use the run state instead
 					stateOrInput = await RunState.fromString(triageAgent, form.state);
 
-					for (const interruption of form.approval) {
-						const item = new RunToolApprovalItem(
-							interruption.rawItem,
-							interruption.agent,
+					for (const approval of form.approval) {
+						stateOrInput.approve(
+							new RunToolApprovalItem(approval.rawItem, approval.agent),
+						);
+					}
+
+					if (form.approval.length < form.interruption.length) {
+						const approvedIds = form.approval.map((int) => int.rawItem.id);
+						const rejections = form.interruption.filter(
+							(int) => !approvedIds.includes(int.rawItem.id),
 						);
 
-						stateOrInput.approve(item);
+						for (const rejection of rejections) {
+							stateOrInput.reject(
+								new RunToolApprovalItem(rejection.rawItem, rejection.agent),
+							);
+						}
 					}
 				} else {
+					// normal message (no approvals)
+					// add all the various inputs
+					stateOrInput.push(...fileInputItems);
+
 					if (renderResult.success) {
-						input.push({ role: "user", content: renderResult.md });
+						stateOrInput.push({ role: "system", content: renderResult.md });
 					}
 
 					if (form.image) {
-						input.push({
+						stateOrInput.push({
 							role: "user",
 							content: [{ type: "input_image", image: form.image }],
 						});
 					}
 
-					input.push(
+					stateOrInput.push(
 						// current message input
 						{ role: "user", content: form.text },
 						...dataInput,
 					);
 
-					yield input.map((inp, i) => (
+					yield stateOrInput.map((inp, i) => (
 						<Message input={inp} index={form.index + i} />
 					));
-
-					stateOrInput = input;
 				}
 
 				const runner = new Runner({
 					model: "gpt-4.1-nano",
 					modelSettings: { truncation: "auto", store: !form.temporary },
 				});
-
-				console.log(stateOrInput);
 
 				const result = await runner.run(triageAgent, stateOrInput, {
 					stream: true,
@@ -131,6 +143,8 @@ export const action = new ovr.Action("/chat", async (c) => {
 
 				yield* processor.generate(
 					(async function* () {
+						const interruptions: RunToolApprovalItem[] = [];
+
 						for await (const event of result) {
 							if (event.type === "raw_model_stream_event") {
 								// raw events from the model
@@ -187,6 +201,8 @@ export const action = new ovr.Action("/chat", async (c) => {
 											.safeParse(event.item.output);
 
 										if (data) {
+											// additional items to render for the user
+											// from the function result
 											if (data.chartOptions) {
 												yield* ovr.toGenerator(
 													<NewLines>
@@ -204,33 +220,24 @@ export const action = new ovr.Action("/chat", async (c) => {
 									}
 								} else if (event.type === "run_item_stream_event") {
 									if (event.item.type === "tool_approval_item") {
-										yield* ovr.toGenerator(
-											<NewLines>
-												<div>
-													{result.interruptions.map((int) => {
-														return (
-															<div>
-																<p>{int.rawItem.name} requires approval.</p>
-																<input
-																	type="checkbox"
-																	name="approval"
-																	value={ovr.escape(JSON.stringify(int), true)}
-																/>
-															</div>
-														);
-													})}
-													<button>Send</button>
-												</div>
-												<input
-													type="hidden"
-													name="state"
-													value={ovr.escape(JSON.stringify(result.state), true)}
-												/>
-											</NewLines>,
-										);
+										interruptions.push(event.item);
 									}
 								}
 							}
+						}
+
+						if (interruptions.length) {
+							// ask for approvals and send serialized state
+							yield* ovr.toGenerator(
+								<NewLines>
+									<Approvals interruptions={interruptions} />
+									<input
+										type="hidden"
+										name="state"
+										value={ovr.escape(JSON.stringify(result.state), true)}
+									/>
+								</NewLines>,
+							);
 						}
 
 						await result.completed;
@@ -242,12 +249,14 @@ export const action = new ovr.Action("/chat", async (c) => {
 						{!form.temporary && (
 							<input type="hidden" name="id" value={result.lastResponseId} />
 						)}
+
 						<Input
 							index={form.index + 1}
 							store={!form.temporary}
 							undo={true}
 							clear={true}
 						/>
+
 						<ExistingData dataset={dataset} />
 					</>
 				);
