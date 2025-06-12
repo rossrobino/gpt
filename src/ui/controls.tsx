@@ -115,7 +115,7 @@ const Submit = () => (
 
 const Clear = () => {
 	return (
-		<drab-prefetch prerender>
+		<drab-prefetch>
 			<a
 				data-trigger
 				href="/"
