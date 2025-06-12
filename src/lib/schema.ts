@@ -78,6 +78,8 @@ export const interruption = () => {
 	return z.object({ rawItem: z.any(), agent: z.any() }).loose();
 };
 
+// this is required due to interruptions and state already having
+// escaped strings within their properties
 const removeDoubleEscaped = (s: string) => s.replaceAll("\\\\", "\\");
 
 export const interruptions = () =>

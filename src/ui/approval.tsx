@@ -25,7 +25,7 @@ const Approval = ({ interruption }: { interruption: RunToolApprovalItem }) => {
 	const value = ovr.escape(JSON.stringify(interruption), true);
 
 	return (
-		<div class="flex items-center gap-3">
+		<div class="flex items-center gap-3" aria-label="approval">
 			<label class="flex items-center gap-2">
 				<input type="checkbox" name="approval" value={value} />
 				<div class="badge secondary font-mono font-light">
