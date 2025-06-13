@@ -11,8 +11,6 @@ const app = new App();
 app.base = html;
 
 app.error = (c, error) => {
-	console.error(error);
-
 	if (error instanceof z.ZodError) {
 		const validationError = "Validation Error";
 

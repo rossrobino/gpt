@@ -10,6 +10,7 @@ export const files = () =>
 export const fileOrNull = () =>
 	z
 		.file()
+		.max(5_000_000) // 5MB
 		.nullable()
 		.transform((file) => {
 			if (!file?.size) return null;
