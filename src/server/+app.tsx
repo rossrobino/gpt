@@ -1,3 +1,4 @@
+import { csrf } from "@/lib/csrf";
 import * as z from "@/lib/schema";
 import * as chat from "@/server/chat";
 import * as home from "@/server/home";
@@ -9,6 +10,17 @@ import { App } from "ovr";
 const app = new App();
 
 app.base = html;
+
+app.notFound = (c) => {
+	c.layout(Layout);
+	return c.page(
+		<div>
+			<h1>Not Found</h1>
+			<home.page.Anchor>Return Home</home.page.Anchor>
+		</div>,
+		404,
+	);
+};
 
 app.error = (c, error) => {
 	if (error instanceof z.ZodError) {
@@ -47,7 +59,7 @@ if (import.meta.env.DEV) {
 	app.add(test);
 }
 
-app.use((c, next) => {
+app.use(csrf, (c, next) => {
 	c.layout(Layout);
 	return next();
 });
