@@ -10,6 +10,10 @@ export const jsFormat = (obj: unknown): string => {
 	return String(obj);
 };
 
+/**
+ * @param lang default "txt"
+ * @param code strings are passed directly, otherwise JSON.stringify
+ */
 export const toMdCodeBlock = (lang: string | undefined, code: unknown) =>
 	`\n\n\`\`\`${lang ?? "txt"}\n${typeof code === "string" ? code : JSON.stringify(code)}\n\`\`\`\n\n`;
 
