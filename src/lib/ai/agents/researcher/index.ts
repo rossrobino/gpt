@@ -13,7 +13,9 @@ export const create = () => {
 		model: "gpt-4.1-mini",
 		handoffDescription:
 			"The Researcher has access to the internet and the user's approximate geolocation.",
-		instructions: `User geo information:${toMdCodeBlock("json", geo)}`,
+		instructions: geo
+			? `User geo information:${toMdCodeBlock("json", geo)}`
+			: undefined,
 		tools: [
 			webSearchTool({
 				searchContextSize: "low",
