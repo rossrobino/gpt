@@ -46,7 +46,9 @@ export const create = () =>
 					const result = stats.product(numbers);
 					return {
 						result,
-						summary: format.toKatexBlock(`${numbers.join(" x ")} = ${result}`),
+						summary: format.toKatexBlock(
+							`${numbers.join(" \\cdot ")} = ${result}`,
+						),
 					};
 				},
 			}),

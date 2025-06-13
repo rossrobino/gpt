@@ -16,7 +16,7 @@ Energy is calculated by $E=mc^2$
 
 #### Example 2
 
-Circumference: $( A = \pi r^2 )$
+Circumference: $( A = \\\pi r^2 )$
 
 ### Block
 
