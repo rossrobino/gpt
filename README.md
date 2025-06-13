@@ -14,6 +14,6 @@ AI6 strives to be accessible to any user. In contrast to most AI chat applicatio
 
 Open to contributions.
 
-Easy developer setup - since AI6 uses HTML forms and the OpenAI's Responses API to save conversation state, no other database is used. You simply need an OpenAI API key to run locally.
+Easy development setup - since AI6 uses HTML forms and the OpenAI's Responses API to save conversation state, no other database is used. You just need an OpenAI API key to run locally.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more information.
