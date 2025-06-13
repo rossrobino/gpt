@@ -1,9 +1,11 @@
 import { BackButton } from "./back-button";
+import { generateId } from "@/lib/generate-id";
 import { Agents } from "@/ui/agents";
 import { Overview } from "@/ui/overview";
 import { Popover } from "@/ui/popover";
 import * as svg from "@/ui/svg";
 import type { Agent } from "@openai/agents";
+import type { JSX } from "ovr";
 
 export const Controls = (props: {
 	store: boolean;
@@ -41,7 +43,7 @@ const Attachments = () => {
 			title="Attachments"
 			trigger={{ children: svg.Paperclip, class: "icon secondary" }}
 		>
-			<div className="flex flex-col gap-3">
+			<div className="flex flex-col gap-6">
 				<Dataset />
 				<Files />
 				<Directory />
@@ -52,58 +54,92 @@ const Attachments = () => {
 	);
 };
 
+const Input = (props: {
+	label: JSX.IntrinsicElements["label"];
+	input: JSX.IntrinsicElements["input"];
+	description?: JSX.IntrinsicElements["div"];
+}) => {
+	if (props.description) {
+		props.description.id = `desc-${generateId()}`;
+		props.input["aria-describedby"] = props.description.id;
+	}
+
+	return (
+		<div>
+			<label {...props.label} />
+			<input {...props.input} />
+			{props.description && (
+				<div class="text-base-500 mt-2 text-sm" {...props.description} />
+			)}
+		</div>
+	);
+};
+
 const Dataset = () => (
-	<div>
-		<label for="dataset">Dataset</label>
-		<input type="file" id="dataset" name="dataset" accept=".csv,.json" />
-	</div>
+	<Input
+		label={{ for: "dataset", children: "Dataset" }}
+		input={{
+			type: "file",
+			id: "dataset",
+			name: "dataset",
+			accept: ".csv,.json",
+		}}
+		description={{ children: "Upload a dataset to run analyses on." }}
+	/>
 );
 
 const Files = () => (
-	<div>
-		<label for="files">Files</label>
-		<input type="file" id="files" name="files" multiple />
-	</div>
+	<Input
+		label={{ for: "files", children: "Files" }}
+		input={{ type: "file", id: "files", name: "files", multiple: true }}
+		description={{
+			children:
+				"PDFs and images are read with vision. Word documents are read as text.",
+		}}
+	/>
 );
 
 const Directory = () => (
-	<div>
-		<label for="directory">Directory</label>
-		<input
-			type="file"
-			id="directory"
-			name="directory"
-			multiple
-			webkitdirectory
-		/>
-	</div>
+	<Input
+		label={{ for: "directory", children: "Directory" }}
+		input={{
+			type: "file",
+			id: "directory",
+			name: "directory",
+			multiple: true,
+			webkitdirectory: true,
+		}}
+		description={{ children: "Select an entire directory to attach." }}
+	/>
 );
 
 const Image = () => {
 	return (
-		<div>
-			<label for="image">Image</label>
-			<input
-				type="url"
-				name="image"
-				id="image"
-				placeholder="https://link-to-image"
-			/>
-		</div>
+		<Input
+			label={{ for: "image", children: "Image" }}
+			input={{
+				type: "url",
+				name: "image",
+				id: "image",
+				placeholder: "https://link-to-image",
+			}}
+			description={{ children: "Link to an image to be read with vision." }}
+		/>
 	);
 };
 
 const Website = () => {
 	return (
-		<div>
-			<label for="website">Website</label>
-			<input
-				type="url"
-				name="website"
-				id="website"
-				placeholder="https://website-to-include"
-			/>
-		</div>
+		<Input
+			label={{ for: "website", children: "Website" }}
+			input={{
+				type: "url",
+				name: "website",
+				id: "website",
+				placeholder: "https://website-to-include",
+			}}
+			description={{ children: "Include the text of a webpage." }}
+		/>
 	);
 };
 
