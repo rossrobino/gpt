@@ -141,6 +141,11 @@
 		word-break: break-word;
 	}
 
+	input,
+	input::placeholder {
+		@apply font-light;
+	}
+
 	tr:nth-child(n + 100) td {
 		content-visibility: auto;
 	}
