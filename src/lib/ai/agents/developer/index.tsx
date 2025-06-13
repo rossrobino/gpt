@@ -1,4 +1,4 @@
-import instructions from "@/lib/ai/agents/code/instructions.md?raw";
+import instructions from "@/lib/ai/agents/developer/instructions.md?raw";
 import * as z from "@/lib/schema";
 import type { FunctionOutput } from "@/lib/types";
 import { GrepResults } from "@/ui/grep-result";

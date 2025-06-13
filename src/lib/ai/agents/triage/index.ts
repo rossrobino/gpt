@@ -1,6 +1,6 @@
 import * as assistant from "@/lib/ai/agents/assistant";
-import * as code from "@/lib/ai/agents/code";
 import * as data from "@/lib/ai/agents/data";
+import * as developer from "@/lib/ai/agents/developer";
 import * as math from "@/lib/ai/agents/math";
 import * as researcher from "@/lib/ai/agents/researcher";
 import instructions from "@/lib/ai/agents/triage/instructions.md?raw";
@@ -16,7 +16,7 @@ export const create = (dataset: Dataset) =>
 		handoffs: [
 			assistant.create(),
 			data.create(dataset),
-			code.create(),
+			developer.create(),
 			math.create(),
 			researcher.create(),
 		],
